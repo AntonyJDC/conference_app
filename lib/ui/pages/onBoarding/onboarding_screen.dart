@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:conference_app/ui/pages/home/home_screen.dart';
 
 class OnboardingContents {
   final String title;
@@ -24,21 +26,19 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   final List<OnboardingContents> contents = [
     OnboardingContents(
-      title: "Track Your work and get the result",
+      title: "Busca un evento",
       image: "assets/images/image1.png",
-      desc: "Remember to keep track of your professional accomplishments.",
+      desc: "Explora conferencias y eventos que se ajusten a tus intereses.",
     ),
     OnboardingContents(
-      title: "Stay organized with team",
+      title: "Suscríbete fácil",
       image: "assets/images/image2.png",
-      desc:
-          "But understanding the contributions our colleagues make to our teams and companies.",
+      desc: "Regístrate y recibe notificaciones de tus eventos favoritos.",
     ),
     OnboardingContents(
-      title: "Get notified when work happens",
+      title: "Califica tus eventos",
       image: "assets/images/image3.png",
-      desc:
-          "Take control of notifications, collaborate live or on your own time.",
+      desc: "Califica de manera anonima y segura tus eventos.",
     ),
   ];
 
@@ -53,24 +53,36 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   AnimatedContainer _buildDots({int? index}) {
     return AnimatedContainer(
       duration: const Duration(milliseconds: 200),
-      decoration: const BoxDecoration(
-        borderRadius: BorderRadius.all(Radius.circular(50)),
-        color: Colors.black,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(50),
+        color: _currentPage == index
+            ? Theme.of(context).colorScheme.primary
+            : Colors.grey,
       ),
       margin: const EdgeInsets.only(right: 5),
       height: 10,
-      curve: Curves.easeIn,
       width: _currentPage == index ? 20 : 10,
     );
   }
 
+  Future<void> _finishOnboarding() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('onboarding_seen', true);
+    if (mounted) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const HomeScreen()),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    double width = MediaQuery.of(context).size.width;
-    double height = MediaQuery.of(context).size.height;
+    final width = MediaQuery.of(context).size.width;
+    final height = MediaQuery.of(context).size.height;
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).colorScheme.background,
       body: SafeArea(
         child: Column(
           children: [
@@ -83,29 +95,39 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 itemCount: contents.length,
                 itemBuilder: (context, i) {
                   return Padding(
-                    padding: const EdgeInsets.all(40.0),
+                    padding: const EdgeInsets.all(30.0),
                     child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Expanded(
-                          child: Image.asset(contents[i].image),
+                        SizedBox(
+                          height: height * 0.35,
+                          child: Image.asset(
+                            contents[i].image,
+                            fit: BoxFit.contain,
+                          ),
                         ),
-                        SizedBox(height: (height >= 840) ? 60 : 30),
+                        const SizedBox(height: 40),
                         Text(
                           contents[i].title,
                           textAlign: TextAlign.center,
                           style: TextStyle(
-                            fontWeight: FontWeight.w600,
-                            fontSize: (width <= 550) ? 30 : 35,
+                            fontWeight: FontWeight.w700,
+                            fontSize: (width <= 550) ? 22 : 26,
+                            color: Theme.of(context).colorScheme.primary,
                           ),
                         ),
-                        const SizedBox(height: 15),
-                        Text(
-                          contents[i].desc,
-                          style: TextStyle(
-                            fontWeight: FontWeight.w300,
-                            fontSize: (width <= 550) ? 17 : 25,
+                        const SizedBox(height: 20),
+                        SizedBox(
+                          width: width * 0.9,
+                          child: Text(
+                            contents[i].desc,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontWeight: FontWeight.w400,
+                              fontSize: (width <= 550) ? 14 : 18,
+                              color: Theme.of(context).colorScheme.onBackground,
+                            ),
                           ),
-                          textAlign: TextAlign.center,
                         ),
                       ],
                     ),
@@ -118,6 +140,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
+                  // Dots
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: List.generate(
@@ -125,13 +148,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       (int index) => _buildDots(index: index),
                     ),
                   ),
+
+                  // Botones
                   _currentPage + 1 == contents.length
                       ? Padding(
                           padding: const EdgeInsets.all(30),
                           child: ElevatedButton(
-                            onPressed: () {
-                              // Aquí iría la navegación al HomeScreen
-                            },
+                            onPressed: _finishOnboarding,
                             style: ElevatedButton.styleFrom(
                               backgroundColor:
                                   Theme.of(context).colorScheme.primary,
@@ -142,13 +165,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                               ),
                               padding: (width <= 550)
                                   ? const EdgeInsets.symmetric(
-                                      horizontal: 100, vertical: 20)
+                                      horizontal: 60, vertical: 16)
                                   : EdgeInsets.symmetric(
                                       horizontal: width * 0.2, vertical: 25),
                               textStyle:
-                                  TextStyle(fontSize: (width <= 550) ? 13 : 17),
+                                  TextStyle(fontSize: (width <= 550) ? 14 : 18),
                             ),
-                            child: const Text("START"),
+                            child: const Text("EMPEZAR"),
                           ),
                         )
                       : Padding(
@@ -163,12 +186,15 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                 style: TextButton.styleFrom(
                                   textStyle: TextStyle(
                                     fontWeight: FontWeight.w600,
-                                    fontSize: (width <= 550) ? 13 : 17,
+                                    fontSize: (width <= 550) ? 12 : 15,
                                   ),
                                 ),
-                                child: const Text(
-                                  "SKIP",
-                                  style: TextStyle(color: Colors.black),
+                                child: Text(
+                                  "SALTAR",
+                                  style: TextStyle(
+                                    color:
+                                        Theme.of(context).colorScheme.primary,
+                                  ),
                                 ),
                               ),
                               ElevatedButton(
@@ -179,20 +205,23 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                   );
                                 },
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.black,
+                                  backgroundColor:
+                                      Theme.of(context).colorScheme.primary,
+                                  foregroundColor:
+                                      Theme.of(context).colorScheme.onPrimary,
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(50),
                                   ),
                                   padding: (width <= 550)
                                       ? const EdgeInsets.symmetric(
-                                          horizontal: 30, vertical: 20)
+                                          horizontal: 30, vertical: 16)
                                       : const EdgeInsets.symmetric(
                                           horizontal: 30, vertical: 25),
                                   textStyle: TextStyle(
-                                    fontSize: (width <= 550) ? 13 : 17,
+                                    fontSize: (width <= 550) ? 12 : 15,
                                   ),
                                 ),
-                                child: const Text("NEXT"),
+                                child: const Text("SIGUIENTE"),
                               ),
                             ],
                           ),
