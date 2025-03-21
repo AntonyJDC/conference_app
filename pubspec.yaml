@@ -36,6 +36,9 @@ dependencies:
   path: ^1.8.3            # Manejo de rutas
   json_annotation: ^4.8.1 # Modelos (futuro)
   google_fonts: ^6.1.0    # Mejoras visuales
+  shared_preferences: ^2.2.2
+  smooth_page_indicator: ^1.1.0
+  lottie: ^2.7.0
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -59,6 +62,15 @@ dev_dependencies:
 
 # The following section is specific to Flutter packages.
 flutter:
+  assets:
+    - assets/images/
+
+  fonts:
+    - family: Mulish
+      fonts:
+        - asset: assets/fonts/Mulish-Light.ttf
+        - asset: assets/fonts/Mulish-SemiBold.ttf
+
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in

@@ -1,70 +1,63 @@
-import 'package:conference_app/ui/theme/app_colors.dart';
 import 'package:flutter/material.dart';
+import 'package:conference_app/ui/pages/onBoarding/onboarding_screen.dart';
 import 'package:conference_app/ui/pages/home/home_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-void main() {
-  runApp(const MyApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  final prefs = await SharedPreferences.getInstance();
+  final onboardingSeen = prefs.getBool('onboarding_seen') ?? false;
+
+  runApp(MyApp(onboardingSeen: onboardingSeen));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final bool onboardingSeen;
+  const MyApp({super.key, required this.onboardingSeen});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Conference App',
-
-      // 🌓 Detecta el modo del sistema (light/dark)
       themeMode: ThemeMode.system,
+      theme: _lightTheme(),
+      darkTheme: _darkTheme(),
+      home: onboardingSeen ? const HomeScreen() : const OnboardingScreen(),
+    );
+  }
 
-      // 🌞 Tema claro
-      theme: ThemeData(
-        brightness: Brightness.light,
-        primaryColor: AppColors.lightPrimary,
-        scaffoldBackgroundColor: AppColors.lightBackground,
-        appBarTheme: AppBarTheme(
-          backgroundColor: AppColors.lightPrimary,
+  ThemeData _lightTheme() {
+    return ThemeData(
+      useMaterial3: true,
+      fontFamily: 'Mulish',
+      colorSchemeSeed: const Color.fromARGB(
+          255, 3, 31, 196), // 🎨 Seed para generar la paleta
+      brightness: Brightness.light,
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
           foregroundColor: Colors.white,
-        ),
-        colorScheme: ColorScheme.light(
-          primary: AppColors.lightPrimary,
-          secondary: AppColors.lightSecondary,
-          background: AppColors.lightBackground,
-          surface: AppColors.lightSurface,
-          error: AppColors.lightError,
-          onPrimary: Colors.white,
-          onSecondary: Colors.white,
-          onSurface: AppColors.lightText,
-          onBackground: AppColors.lightText,
-          onError: Colors.white,
+          backgroundColor: const Color(0xFF3F51B5),
+          textStyle: const TextStyle(fontWeight: FontWeight.w600),
         ),
       ),
+    );
+  }
 
-      // 🌙 Tema oscuro
-      darkTheme: ThemeData(
-        brightness: Brightness.dark,
-        primaryColor: AppColors.darkPrimary,
-        scaffoldBackgroundColor: AppColors.darkBackground,
-        appBarTheme: AppBarTheme(
-          backgroundColor: AppColors.darkPrimary,
+  ThemeData _darkTheme() {
+    return ThemeData(
+      useMaterial3: true,
+      fontFamily: 'Mulish',
+      colorSchemeSeed: const Color.fromARGB(
+          255, 196, 250, 0), // 🎨 Seed diferente para dark mode
+      brightness: Brightness.dark,
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
           foregroundColor: Colors.white,
-        ),
-        colorScheme: ColorScheme.dark(
-          primary: AppColors.darkPrimary,
-          secondary: AppColors.darkSecondary,
-          background: AppColors.darkBackground,
-          surface: AppColors.darkSurface,
-          error: AppColors.darkError,
-          onPrimary: Colors.white,
-          onSecondary: Colors.white,
-          onSurface: AppColors.darkText,
-          onBackground: AppColors.darkText,
-          onError: Colors.white,
+          backgroundColor: const Color(0xFF5C6BC0),
+          textStyle: const TextStyle(fontWeight: FontWeight.w600),
         ),
       ),
-
-      home: const HomeScreen(),
     );
   }
 }
