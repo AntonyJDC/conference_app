@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:conference_app/ui/pages/onBoarding/onboarding_screen.dart';
-import 'package:conference_app/ui/pages/home/home_screen.dart';
+import 'package:get/get.dart';
+import 'package:conference_app/routes/routes.dart';
+import 'package:conference_app/ui/theme/app_colors.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
@@ -17,47 +18,37 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    final materialTheme = MaterialTheme(ThemeData().textTheme);
+
+    return GetMaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Conference App',
+      initialRoute: onboardingSeen ? AppRoutes.main : AppRoutes.onboarding,
+      getPages: AppRoutes.routes,
       themeMode: ThemeMode.system,
-      theme: _lightTheme(),
-      darkTheme: _darkTheme(),
-      home: onboardingSeen ? const HomeScreen() : const OnboardingScreen(),
-    );
-  }
 
-  ThemeData _lightTheme() {
-    return ThemeData(
-      useMaterial3: true,
-      fontFamily: 'Mulish',
-      colorSchemeSeed: const Color.fromARGB(
-          255, 3, 31, 196), // 🎨 Seed para generar la paleta
-      brightness: Brightness.light,
-      elevatedButtonTheme: ElevatedButtonThemeData(
-        style: ElevatedButton.styleFrom(
-          foregroundColor: Colors.white,
-          backgroundColor: const Color(0xFF3F51B5),
-          textStyle: const TextStyle(fontWeight: FontWeight.w600),
-        ),
-      ),
-    );
-  }
+      // 🌞 Tema Claro
+      theme: materialTheme.light().copyWith(
+            textTheme: ThemeData.light().textTheme.apply(
+                  fontFamily: 'Mulish',
+                ),
+            appBarTheme: const AppBarTheme(
+              elevation: 0,
+              backgroundColor: Colors.transparent,
+              foregroundColor: Colors.white,
+            ),
+          ),
 
-  ThemeData _darkTheme() {
-    return ThemeData(
-      useMaterial3: true,
-      fontFamily: 'Mulish',
-      colorSchemeSeed: const Color.fromARGB(
-          255, 196, 250, 0), // 🎨 Seed diferente para dark mode
-      brightness: Brightness.dark,
-      elevatedButtonTheme: ElevatedButtonThemeData(
-        style: ElevatedButton.styleFrom(
-          foregroundColor: Colors.white,
-          backgroundColor: const Color(0xFF5C6BC0),
-          textStyle: const TextStyle(fontWeight: FontWeight.w600),
-        ),
-      ),
+      // 🌙 Tema Oscuro
+      darkTheme: materialTheme.dark().copyWith(
+            textTheme: ThemeData.dark().textTheme.apply(
+                  fontFamily: 'Mulish',
+                ),
+            appBarTheme: const AppBarTheme(
+              elevation: 0,
+              backgroundColor: Colors.transparent,
+              foregroundColor: Colors.white,
+            ),
+          ),
     );
   }
 }
