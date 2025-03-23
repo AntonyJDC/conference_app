@@ -1,15 +1,15 @@
 class EventModel {
   final String id;
-  final String title; // Nombre del evento
-  final String? description; // Descripción (opcional)
-  final String imageUrl; // Imagen
-  final String date; // Fecha del evento "YYYY-MM-DD"
-  final String? startTime; // Hora de inicio "HH:MM" (opcional)
-  final String? endTime; // Hora de fin "HH:MM" (opcional)
-  final String location; // Ubicación (dirección)
-  final int? capacity; // Capacidad máxima de asistentes (opcional)
-  int? spotsLeft; // Cupos disponibles (opcional)
-  final List<String> categories; // Categorías (Ej: Música, Tecnología)
+  final String title;
+  final String description;
+  final String imageUrl;
+  final String date; // "YYYY-MM-DD"
+  final String startTime; // "HH:MM"
+  final String endTime; // "HH:MM"
+  final String location;
+  final int capacity;
+  int spotsLeft;
+  final List<String> categories; // Ej: ["Música", "Tecnología"]
 
   EventModel({
     required this.id,
@@ -24,6 +24,34 @@ class EventModel {
     this.spotsLeft, // Opcional
     required this.categories,
   });
+
+  Map<String, dynamic> toMap() => {
+        'id': id,
+        'title': title,
+        'description': description,
+        'imageUrl': imageUrl,
+        'date': date,
+        'startTime': startTime,
+        'endTime': endTime,
+        'location': location,
+        'capacity': capacity,
+        'spotsLeft': spotsLeft,
+        'categories': categories.join(','),
+      };
+
+  factory EventModel.fromMap(Map<String, dynamic> map) => EventModel(
+        id: map['id'],
+        title: map['title'],
+        description: map['description'],
+        imageUrl: map['imageUrl'],
+        date: map['date'],
+        startTime: map['startTime'],
+        endTime: map['endTime'],
+        location: map['location'],
+        capacity: map['capacity'],
+        spotsLeft: map['spotsLeft'],
+        categories: map['categories'].toString().split(','),
+      );
 
   factory EventModel.fromJson(Map<String, dynamic> json) => EventModel(
         id: json['id'],
