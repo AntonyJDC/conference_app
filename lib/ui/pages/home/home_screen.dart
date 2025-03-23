@@ -149,24 +149,33 @@ class HomeScreen extends StatelessWidget {
                                   padding: const EdgeInsets.symmetric(
                                       horizontal: 8, vertical: 4),
                                   decoration: BoxDecoration(
-                                      color: Colors.white.withOpacity(0.8),
-                                      borderRadius: BorderRadius.circular(12)),
+                                    color: Colors.white.withOpacity(0.8),
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
                                   child: Row(
-                                    mainAxisSize: MainAxisSize.min,
                                     children: [
-                                      Icon(Icons.calendar_today,
-                                          size: 14,
-                                          color: daysLeft <= 30
-                                              ? Colors.red
-                                              : Colors.black87),
+                                      Icon(
+                                        Icons.calendar_today,
+                                        size: 14,
+                                        color: daysLeft <= 30
+                                            ? Colors.red
+                                            : Colors.black87,
+                                      ),
                                       const SizedBox(width: 4),
-                                      Text('$daysLeft días restantes',
+                                      // ✅ Hacemos que el texto se adapte con Flexible
+                                      Flexible(
+                                        child: Text(
+                                          '$daysLeft días restantes',
                                           style: TextStyle(
-                                              color: daysLeft <= 30
-                                                  ? Colors.red
-                                                  : Colors.black87,
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.w600)),
+                                            color: daysLeft <= 30
+                                                ? Colors.red
+                                                : Colors.black87,
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
                                     ],
                                   ),
                                 ),
