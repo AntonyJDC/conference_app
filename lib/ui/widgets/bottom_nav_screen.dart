@@ -12,18 +12,10 @@ class BottomNavScreen extends StatelessWidget {
 
   final NavbarController navcontroller = Get.put(NavbarController());
 
-  final List pages = [
-  HomeScreen(),
-  SearchPage(),
-  CalendarScreen(),
-  Center(child: Text('Favoritos')),
-  Center(child: Text('Perfil')),
-];
-
   final List<Widget> pages = [
     HomeScreen(),
     SearchPage(),
-    Center(child: Text('Calendario')),
+    CalendarScreen(),
     FavoritesPage(),
     Center(child: Text('Perfil')),
   ];
