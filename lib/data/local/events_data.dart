@@ -5,8 +5,8 @@ List<EventModel> dummyEvents = [
     id: 'evt001',
     title: 'Meta Expo Singapore',
     description: 'Tech and meta world event',
-    imageUrl: 'assets/images/evt001.jpeg', // Imagen actualizada
-    date: '2025-09-13', // Formato correcto
+    imageUrl: 'assets/images/evt006.jpeg',
+    date: '2025-09-13',
     startTime: '09:00',
     endTime: '18:00',
     location: 'Marina Bay Sands, Singapore',
@@ -18,7 +18,7 @@ List<EventModel> dummyEvents = [
     id: 'evt006',
     title: 'ACM CHI Conference For Students',
     description: 'Human-Computer Interaction event',
-    imageUrl: 'assets/images/evt006.jpeg', // Imagen actualizada
+    imageUrl: 'assets/images/evt006.jpeg',
     date: '2025-09-13',
     startTime: '08:00',
     endTime: '16:00',
@@ -31,7 +31,7 @@ List<EventModel> dummyEvents = [
     id: 'evt002',
     title: 'Singapore FinTech Festival',
     description: 'FinTech revolution event',
-    imageUrl: 'assets/images/evt002.jpeg', // Imagen actualizada
+    imageUrl: 'assets/images/evt002.jpeg',
     date: '2025-12-11',
     startTime: '10:00',
     endTime: '17:00',
@@ -44,7 +44,7 @@ List<EventModel> dummyEvents = [
     id: 'evt003',
     title: 'Miami Carnival 2025',
     description: 'Yearly Carnival celebration',
-    imageUrl: 'assets/images/evt003.jpeg', // Imagen actualizada
+    imageUrl: 'assets/images/evt003.jpeg',
     date: '2025-04-21',
     startTime: '12:00',
     endTime: '20:00',
@@ -57,8 +57,8 @@ List<EventModel> dummyEvents = [
     id: 'evt004',
     title: 'Virtual Coffee Chat',
     description: 'Meet people online over coffee',
-    imageUrl: 'assets/images/evt004.jpeg', // Imagen actualizada
-    date: '2025-05-10',
+    imageUrl: 'assets/images/evt004.jpeg',
+    date: '2025-01-10',
     startTime: '15:00',
     endTime: '16:00',
     location: 'IDP Online',
@@ -70,7 +70,7 @@ List<EventModel> dummyEvents = [
     id: 'evt005',
     title: 'Suhani Shah India Tour',
     description: 'Magic and story show',
-    imageUrl: 'assets/images/evt005.jpeg', // Imagen actualizada
+    imageUrl: 'assets/images/evt004.jpeg',
     date: '2025-10-01',
     startTime: '18:00',
     endTime: '21:00',
@@ -83,26 +83,26 @@ List<EventModel> dummyEvents = [
     id: 'evt007',
     title: 'Feria de Tecnología',
     description: 'Explora las últimas innovaciones tecnológicas',
-    date: '2025-11-15', // Verifica que esté en formato YYYY-MM-DD
+    date: '2025-11-15',
     startTime: '10:00',
     endTime: '18:00',
     location: 'Centro de Convenciones',
-    imageUrl: 'assets/images/evt007.jpg', // Imagen para evt007
+    imageUrl: 'assets/images/evt007.jpg',
     capacity: 300,
     spotsLeft: 150,
-    categories: ['Tecnología'], // Categoría del evento
+    categories: ['Tecnología'],
   ),
   EventModel(
     id: 'evt008',
     title: 'Concierto de Rock',
     description: 'Un concierto de rock inolvidable',
-    date: '2025-12-01', // Verifica que esté en formato YYYY-MM-DD
+    date: '2025-12-01',
     startTime: '20:00',
     endTime: '23:00',
     location: 'Auditorio Nacional',
-    imageUrl: 'assets/images/evt008.jpg', // Imagen para evt008
+    imageUrl: 'assets/images/evt008.jpg',
     capacity: 500,
     spotsLeft: 100,
-    categories: ['Música'], // Categoría del evento
+    categories: ['Música'],
   ),
 ];

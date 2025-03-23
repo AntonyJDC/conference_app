@@ -117,57 +117,60 @@ class HomeScreen extends StatelessWidget {
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(20),
                           image: DecorationImage(
-                            image: AssetImage(event.imageUrl.isNotEmpty
-                                ? event.imageUrl
-                                : 'assets/images/placeholder.jpg'),
-                            fit: BoxFit.cover,
-                          ),
+                              image: AssetImage(event.imageUrl),
+                              fit: BoxFit.cover),
                         ),
-                        child: Align(
-                          alignment: Alignment.bottomLeft,
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(event.title,
-                                  style: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold)),
-                              const SizedBox(height: 8),
-                              if (daysLeft >= 0)
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 8, vertical: 4),
-                                  decoration: BoxDecoration(
-                                    color: Colors.white.withOpacity(0.8),
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  child: Row(
-                                    children: [
-                                      Icon(
-                                        Icons.calendar_today,
-                                        size: 14,
-                                        color: daysLeft <= 30
-                                            ? Colors.red
-                                            : Colors.black87,
-                                      ),
-                                      const SizedBox(width: 4),
-                                      // ✅ Hacemos que el texto se adapte con Flexible
-                                      Flexible(
-                                        child: Text(
-                                          '$daysLeft días restantes',
-                                          style: TextStyle(
+                        child: Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(20),
+                            gradient: LinearGradient(
+                              colors: [
+                                Colors.black.withOpacity(0.6),
+                                Colors.transparent
+                              ],
+                              begin: Alignment.bottomCenter,
+                              end: Alignment.topCenter,
+                            ),
+                          ),
+                          child: Align(
+                            alignment: Alignment.bottomLeft,
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(event.title,
+                                    style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold)),
+                                const SizedBox(height: 8),
+                                if (daysLeft >= 0)
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 8, vertical: 4),
+                                    decoration: BoxDecoration(
+                                        color: Colors.white.withOpacity(0.8),
+                                        borderRadius:
+                                            BorderRadius.circular(12)),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Icon(Icons.calendar_today,
+                                            size: 14,
                                             color: daysLeft <= 30
                                                 ? Colors.red
-                                                : Colors.black87,
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.w600,
-                                          ),
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      ),
-                                    ],
+                                                : Colors.black87),
+                                        const SizedBox(width: 4),
+                                        Text('$daysLeft días restantes',
+                                            style: TextStyle(
+                                                color: daysLeft <= 30
+                                                    ? Colors.red
+                                                    : Colors.black87,
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.w600)),
+                                      ],
+                                    ),
                                   ),
                               ],
                             ),
@@ -258,17 +261,6 @@ class HomeScreen extends StatelessWidget {
                                             fontWeight: FontWeight.w500),
                                         maxLines: 1,
                                         overflow: TextOverflow.ellipsis),
-                                  ),
-                                  Text(
-                                    event.description ?? "Sin descripción",
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .labelMedium
-                                        ?.copyWith(
-                                          fontWeight: FontWeight.normal,
-                                          fontSize: 13,
-                                          color: Colors.grey,
-                                        ),
                                   ),
                                 ],
                               ),

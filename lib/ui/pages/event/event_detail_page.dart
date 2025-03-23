@@ -29,8 +29,7 @@ class EventDetailPage extends StatelessWidget {
     final double overlap = imageHeight * 0.15;
 
     // Calcula el porcentaje disponible
-    double percentage =
-        (event.spotsLeft ?? 0) / (event.capacity ?? 1); // Evita división por 0
+    double percentage = (event.spotsLeft) / (event.capacity);
     // Define el color dinámico según el porcentaje
     Color spotColor;
     if (percentage < 0.25) {
@@ -82,8 +81,7 @@ class EventDetailPage extends StatelessWidget {
                       ),
                       // Descripción
                       Text(
-                        event.description ??
-                            "Sin descripción", // Manejo de valores nulos
+                        event.description,
                         style: theme.textTheme.labelMedium?.copyWith(
                           fontWeight: FontWeight.normal,
                           fontSize: 13,
@@ -108,7 +106,7 @@ class EventDetailPage extends StatelessWidget {
                                 ),
                               ),
                               Text(
-                                '${DateFormat('EEEE', 'en_US').format(DateTime.parse(event.date))}, de ${event.startTime ?? 'N/A'} a ${event.endTime ?? 'N/A'}',
+                                '${DateFormat('EEEE', 'en_US').format(DateTime.parse(event.date))}, de ${event.startTime} a ${event.endTime}',
                                 style: const TextStyle(
                                   color: Colors.grey,
                                   fontSize: 10,
@@ -164,7 +162,7 @@ class EventDetailPage extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                '${event.capacity ?? 'N/A'} personas',
+                                '${event.capacity} personas',
                                 style: const TextStyle(
                                     fontSize: 13, fontWeight: FontWeight.bold),
                               ),
@@ -220,7 +218,7 @@ class EventDetailPage extends StatelessWidget {
 
                             // Spots restantes a la derecha con color dinámico
                             Text(
-                              '${event.spotsLeft ?? 0}',
+                              '${event.spotsLeft}',
                               style: TextStyle(
                                 color: spotColor,
                                 fontSize: 12,
@@ -261,20 +259,20 @@ class EventDetailPage extends StatelessWidget {
                 height: 50,
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: (event.spotsLeft ?? 0) > 0
+                    backgroundColor: (event.spotsLeft) > 0
                         ? Theme.of(context).colorScheme.primary
                         : Colors.transparent,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30),
                     ),
                   ),
-                  onPressed: (event.spotsLeft ?? 0) > 0
+                  onPressed: (event.spotsLeft) > 0
                       ? () {
                           // Acción de reserva
                         }
                       : null,
                   child: Text(
-                    (event.spotsLeft ?? 0) > 0 ? "Suscribirme" : "Agotado",
+                    (event.spotsLeft) > 0 ? "Suscribirme" : "Agotado",
                     style: const TextStyle(color: Colors.white, fontSize: 16),
                   ),
                 ),
