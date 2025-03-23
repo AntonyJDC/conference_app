@@ -48,44 +48,53 @@ class BookedEventsController extends GetxController {
   }
 
   List<TimePlannerTask> convertEventsToTasks(List<EventModel> events) {
-    return events.map((event) {
-      final startParts = event.startTime.split(':');
-      final endParts = event.endTime.split(':');
+    return events
+        .map((event) {
+          if (event.startTime == null || event.endTime == null) {
+            // Si faltan tiempos, omitir el evento
+            return null;
+          }
 
-      final startHour = int.parse(startParts[0]);
-      final startMinutes = int.parse(startParts[1]);
-      final endHour = int.parse(endParts[0]);
-      final endMinutes = int.parse(endParts[1]);
+          final startParts = event.startTime!.split(':');
+          final endParts = event.endTime!.split(':');
 
-      final durationMinutes =
-          ((endHour * 60 + endMinutes) - (startHour * 60 + startMinutes)).abs();
+          final startHour = int.parse(startParts[0]);
+          final startMinutes = int.parse(startParts[1]);
+          final endHour = int.parse(endParts[0]);
+          final endMinutes = int.parse(endParts[1]);
 
-      return TimePlannerTask(
-        color: Colors.purple,
-        dateTime:
-            TimePlannerDateTime(day: 0, hour: startHour, minutes: startMinutes),
-        minutesDuration: durationMinutes,
-        daysDuration: 1,
-        onTap: () {
-          // Puedes manejar la interacción con el evento aquí
-        },
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              event.title,
-              style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold),
+          final durationMinutes =
+              ((endHour * 60 + endMinutes) - (startHour * 60 + startMinutes))
+                  .abs();
+
+          return TimePlannerTask(
+            color: Colors.purple,
+            dateTime: TimePlannerDateTime(
+                day: 0, hour: startHour, minutes: startMinutes),
+            minutesDuration: durationMinutes,
+            daysDuration: 1,
+            onTap: () {
+              // Puedes manejar la interacción con el evento aquí
+            },
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  event.title,
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold),
+                ),
+                Text(
+                  event.location,
+                  style: TextStyle(color: Colors.white70, fontSize: 12),
+                ),
+              ],
             ),
-            Text(
-              event.location,
-              style: TextStyle(color: Colors.white70, fontSize: 12),
-            ),
-          ],
-        ),
-      );
-    }).toList();
+          );
+        })
+        .whereType<TimePlannerTask>()
+        .toList(); // Filtra los valores nulos
   }
 }

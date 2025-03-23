@@ -1,27 +1,27 @@
 class EventModel {
   final String id;
   final String title; // Nombre del evento
-  final String description; // Descripción
+  final String? description; // Descripción (opcional)
   final String imageUrl; // Imagen
   final String date; // Fecha del evento "YYYY-MM-DD"
-  final String startTime; // Hora de inicio "HH:MM"
-  final String endTime; // Hora de fin "HH:MM"
+  final String? startTime; // Hora de inicio "HH:MM" (opcional)
+  final String? endTime; // Hora de fin "HH:MM" (opcional)
   final String location; // Ubicación (dirección)
-  final int capacity; // Capacidad máxima de asistentes
-  int spotsLeft; // Cupos disponibles
+  final int? capacity; // Capacidad máxima de asistentes (opcional)
+  int? spotsLeft; // Cupos disponibles (opcional)
   final List<String> categories; // Categorías (Ej: Música, Tecnología)
 
   EventModel({
     required this.id,
     required this.title,
-    required this.description,
+    this.description, // Opcional
     required this.imageUrl,
     required this.date,
-    required this.startTime,
-    required this.endTime,
+    this.startTime, // Opcional
+    this.endTime, // Opcional
     required this.location,
-    required this.capacity,
-    required this.spotsLeft,
+    this.capacity, // Opcional
+    this.spotsLeft, // Opcional
     required this.categories,
   });
 
