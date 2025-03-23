@@ -1,3 +1,4 @@
+import 'package:conference_app/ui/pages/favorites/favorites_screen.dart';
 import 'package:conference_app/ui/pages/search/search_page.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -13,7 +14,7 @@ class BottomNavScreen extends StatelessWidget {
     HomeScreen(),
     SearchPage(),
     Center(child: Text('Calendario')),
-    Center(child: Text('Favoritos')),
+    FavoritesPage(),
     Center(child: Text('Perfil')),
   ];
 
