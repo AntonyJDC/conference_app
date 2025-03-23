@@ -21,7 +21,7 @@ class HomeScreen extends StatelessWidget {
       'Deportes': Icons.sports_soccer,
       'Arte': Icons.color_lens,
       'Moda': Icons.checkroom,
-      'Fiesta': Icons.celebration,
+      'Fiesta': Icons.wine_bar,
     };
 
     final size = MediaQuery.of(context).size;
@@ -36,7 +36,7 @@ class HomeScreen extends StatelessWidget {
         title: Row(
           children: [
             Container(
-              width: 36,
+              width: 36,  
               height: 36,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(8),
