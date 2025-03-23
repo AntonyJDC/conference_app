@@ -1,7 +1,8 @@
-import 'package:flutter/material.dart';
 import 'package:conference_app/data/local/events_data.dart';
-import 'package:collection/collection.dart';
+import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:get/get.dart';
+import 'package:collection/collection.dart';
 
 class SearchPage extends StatefulWidget {
   const SearchPage({super.key});
@@ -12,11 +13,11 @@ class SearchPage extends StatefulWidget {
 
 class _SearchPageState extends State<SearchPage> {
   final TextEditingController searchController = TextEditingController();
-  List dummyFiltered = dummyEvents;
+  List filteredEvents = dummyEvents;
 
   void filterEvents(String query) {
     setState(() {
-      dummyFiltered = dummyEvents.where((event) {
+      filteredEvents = dummyEvents.where((event) {
         final titleMatch =
             event.title.toLowerCase().contains(query.toLowerCase());
         final locationMatch =
@@ -28,17 +29,21 @@ class _SearchPageState extends State<SearchPage> {
 
   @override
   Widget build(BuildContext context) {
-    final groupedEvents = groupBy(dummyFiltered, (e) => e.date);
+    final theme = Theme.of(context);
+    final screenWidth = MediaQuery.of(context).size.width;
+
+    // Agrupar eventos por fecha
+    final groupedEvents = groupBy(filteredEvents, (e) => e.date);
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.primary,
+        backgroundColor: theme.colorScheme.primary,
         centerTitle: true,
         elevation: 0,
+        scrolledUnderElevation: 0,
         title: Text(
           'Buscar Eventos',
           style: TextStyle(
-            color: Theme.of(context).colorScheme.onPrimary,
             fontSize: 16,
             fontWeight: FontWeight.w600,
           ),
@@ -46,13 +51,14 @@ class _SearchPageState extends State<SearchPage> {
       ),
       body: Column(
         children: [
+          // 🔎 Barra de búsqueda
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.primary,
+              color: theme.colorScheme.primary,
               borderRadius: const BorderRadius.only(
-                bottomLeft: Radius.circular(30),
-                bottomRight: Radius.circular(30),
+                bottomLeft: Radius.circular(28),
+                bottomRight: Radius.circular(28),
               ),
             ),
             child: SizedBox(
@@ -60,24 +66,21 @@ class _SearchPageState extends State<SearchPage> {
               child: TextField(
                 controller: searchController,
                 onChanged: filterEvents,
-                cursorColor: Theme.of(context).colorScheme.onPrimary,
+                cursorColor: theme.colorScheme.onPrimary,
                 style: TextStyle(
-                  color: Theme.of(context).colorScheme.onPrimary,
+                  color: theme.colorScheme.onPrimary,
                   fontSize: 14,
                 ),
                 decoration: InputDecoration(
-                  hintText: 'Buscar por nombre o ubicación',
+                  hintText: 'Buscar eventos',
                   hintStyle: TextStyle(
-                    color: Theme.of(context)
-                        .colorScheme
-                        .onPrimary
-                        .withOpacity(0.5),
+                    color: theme.colorScheme.onPrimary.withOpacity(0.5),
                     fontSize: 14,
                   ),
                   prefixIcon: Icon(Icons.search,
-                      color: Theme.of(context).colorScheme.onPrimary, size: 20),
+                      color: theme.colorScheme.onPrimary, size: 20),
                   filled: true,
-                  fillColor: Theme.of(context).colorScheme.primary,
+                  fillColor: theme.colorScheme.primary,
                   contentPadding:
                       const EdgeInsets.symmetric(vertical: 0, horizontal: 16),
                   border: OutlineInputBorder(
@@ -88,6 +91,8 @@ class _SearchPageState extends State<SearchPage> {
               ),
             ),
           ),
+
+          // 🔥 Lista de eventos
           Expanded(
             child: ListView.builder(
               padding: const EdgeInsets.all(14),
@@ -99,85 +104,149 @@ class _SearchPageState extends State<SearchPage> {
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Fecha como separador
+                    // 📅 Fecha como separador
                     Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 8.0),
+                      padding: const EdgeInsets.only(bottom: 12, top: 20),
                       child: Text(
                         DateFormat('dd MMMM yyyy')
                             .format(DateTime.parse(dateKey)),
                         style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          color: Theme.of(context).colorScheme.primary,
+                          fontSize: 15,
+                          fontWeight: FontWeight.w700,
+                          color: theme.colorScheme.primary,
                         ),
                       ),
                     ),
 
-                    // Lista de eventos de esa fecha
-                    ...eventsForDate.map((event) => Card(
-                          elevation: 2,
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12)),
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                ClipRRect(
-                                  borderRadius: BorderRadius.circular(8),
-                                  child: Image.asset(
-                                    event.imageUrl,
-                                    width: 80,
-                                    height: 100,
-                                    fit: BoxFit.cover,
-                                  ),
+                    // 🔥 Tarjetas de eventos
+                    ...eventsForDate.map((event) => Padding(
+                          padding: const EdgeInsets.only(
+                              bottom: 50), // Espacio real entre eventos
+                          child: Stack(
+                            clipBehavior: Clip.none,
+                            children: [
+                              // Imagen del evento
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(16),
+                                child: Image.asset(
+                                  event.imageUrl,
+                                  width: double.infinity,
+                                  height: screenWidth * 0.5,
+                                  fit: BoxFit.cover,
                                 ),
-                                const SizedBox(width: 12),
-                                Expanded(
-                                  child: Padding(
-                                    padding: const EdgeInsets.only(right: 8.0),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          event.title,
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
-                                          style: const TextStyle(
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.w600),
-                                        ),
-                                        const SizedBox(height: 8),
-                                        Row(
+                              ),
+
+                              // Contenido que se sobrepone a la imagen (-30 lo saca)
+                              Positioned(
+                                bottom:
+                                    -30, // Mitad dentro de la imagen y mitad fuera
+                                left: 10,
+                                right: 10,
+                                child: Container(
+                                  padding: const EdgeInsets.all(16),
+                                  decoration: BoxDecoration(
+                                    color:
+                                        Theme.of(context).colorScheme.surface,
+                                    borderRadius: BorderRadius.circular(16),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .outline
+                                            .withOpacity(0.3),
+                                        blurRadius: 6,
+                                        offset: const Offset(0, 3),
+                                      ),
+                                    ],
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
                                           children: [
-                                            Icon(Icons.location_on,
-                                                size: 16, color: Colors.grey),
-                                            const SizedBox(width: 5),
-                                            Expanded(
-                                              child: Text(
-                                                event.location,
-                                                maxLines: 1,
-                                                overflow: TextOverflow.ellipsis,
-                                                style: const TextStyle(
-                                                    fontSize: 13,
+                                            Text(
+                                              event.title,
+                                              maxLines: 1,
+                                              style: const TextStyle(
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.w600),
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                            const SizedBox(height: 2),
+                                            Row(
+                                              children: [
+                                                const Icon(Icons.location_on,
+                                                    size: 12,
                                                     color: Colors.grey),
-                                              ),
+                                                const SizedBox(width: 4),
+                                                Expanded(
+                                                  child: Text(
+                                                    event.location,
+                                                    style: const TextStyle(
+                                                        fontSize: 10,
+                                                        color: Colors.grey),
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                            Row(
+                                              children: [
+                                                const Icon(
+                                                  Icons.calendar_month_rounded,
+                                                  size: 12,
+                                                  color: Colors.grey,
+                                                ),
+                                                const SizedBox(width: 4),
+                                                Expanded(
+                                                  child: Text(
+                                                    '${event.date} - ${event.startTime} - ${event.endTime}',
+                                                    style: const TextStyle(
+                                                      fontSize: 10,
+                                                      color: Colors.grey,
+                                                    ),
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                  ),
+                                                ),
+                                              ],
                                             ),
                                           ],
                                         ),
-                                      ],
-                                    ),
+                                      ),
+                                      Container(
+                                        margin: const EdgeInsets.only(left: 12),
+                                        child: ElevatedButton(
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor: Theme.of(context)
+                                                .colorScheme
+                                                .primary,
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(12),
+                                            ),
+                                          ),
+                                          onPressed: () => Get.toNamed(
+                                              '/detail',
+                                              arguments: event),
+                                          child: const Icon(
+                                            Icons.arrow_forward_rounded,
+                                            size: 18,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
-                                Icon(Icons.arrow_forward_ios,
-                                    size: 16,
-                                    color:
-                                        Theme.of(context).colorScheme.primary),
-                              ],
-                            ),
+                              ),
+                            ],
                           ),
-                        ))
+                        )),
+                    const SizedBox(height: 8),
                   ],
                 );
               },
