@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:time_planner/time_planner.dart';
 
 class BookedEventsController extends GetxController {
-  final _tasks = <TimePlannerTask>[
+  final _tasks = <TimePlannerTask>[ 
+    //Reemplazar con la lista de eventos a los que se suscriba el usuario (deben venir de EventDetailPage)
     TimePlannerTask(
       color: Colors.purple,
       dateTime: TimePlannerDateTime(day: 0, hour: 14, minutes: 30),

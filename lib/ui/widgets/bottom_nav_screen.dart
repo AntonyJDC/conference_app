@@ -58,9 +58,9 @@ class BottomNavScreen extends StatelessWidget {
                         activeIcon: Icon(Icons.favorite),
                         label: 'Favorite'),
                     BottomNavigationBarItem(
-                        icon: Icon(Icons.person_outline),
-                        activeIcon: Icon(Icons.person),
-                        label: 'Profile'),
+                        icon: Icon(Icons.history_edu_outlined),
+                        activeIcon: Icon(Icons.history),
+                        label: 'History'),
                   ],
                 ),
               ),
