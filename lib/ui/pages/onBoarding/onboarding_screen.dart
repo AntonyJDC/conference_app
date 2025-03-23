@@ -124,7 +124,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                             style: TextStyle(
                               fontWeight: FontWeight.w400,
                               fontSize: (width <= 550) ? 14 : 18,
-                              color: Theme.of(context).colorScheme.onBackground,
+                              color: Theme.of(context).colorScheme.onSurface,
                             ),
                           ),
                         ),
