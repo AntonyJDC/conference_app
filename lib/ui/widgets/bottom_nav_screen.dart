@@ -1,38 +1,39 @@
 import 'package:conference_app/ui/pages/search/search_page.dart';
-import 'package:conference_app/ui/pages/booking//calendar_screen';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:conference_app/controllers/navbar_controller.dart';
 import 'package:conference_app/ui/pages/home/home_screen.dart';
 import 'package:time_planner/time_planner.dart';
+import 'package:conference_app/ui/pages/booking/calendar_screen.dart';
 
 class BottomNavScreen extends StatelessWidget {
   BottomNavScreen({super.key});
 
-  final NavbarController controller = Get.put(NavbarController());
+  final NavbarController navcontroller = Get.put(NavbarController());
 
-  final List<Widget> pages = [
-    HomeScreen(),
-    SearchPage(),
-    CalendarScreen(tasks: tasks),
-    Center(child: Text('Favoritos')),
-    Center(child: Text('Perfil')),
-  ];
+  final List pages = [
+  HomeScreen(),
+  SearchPage(),
+  CalendarScreen(),
+  Center(child: Text('Favoritos')),
+  Center(child: Text('Perfil')),
+];
+
 
   @override
   Widget build(BuildContext context) {
     final navBarItemWidth = MediaQuery.of(context).size.width / 5;
 
     return Scaffold(
-      body: Obx(() => pages[controller.currentIndex.value]),
+      body: Obx(() => pages[navcontroller.currentIndex.value]),
       bottomNavigationBar: Obx(() => Stack(
             children: [
               SizedBox(
                 height: 65,
                 child: BottomNavigationBar(
                   type: BottomNavigationBarType.fixed,
-                  currentIndex: controller.currentIndex.value,
-                  onTap: controller.changeTab,
+                  currentIndex: navcontroller.currentIndex.value,
+                  onTap: navcontroller.changeTab,
                   selectedItemColor: Theme.of(context).colorScheme.primary,
                   unselectedItemColor: Colors.grey,
                   backgroundColor: Theme.of(context)
@@ -65,7 +66,7 @@ class BottomNavScreen extends StatelessWidget {
               AnimatedPositioned(
                 duration: const Duration(milliseconds: 300),
                 curve: Curves.easeInOut,
-                left: (navBarItemWidth * controller.currentIndex.value) +
+                left: (navBarItemWidth * navcontroller.currentIndex.value) +
                     (navBarItemWidth - navBarItemWidth * 0.8) / 2,
                 bottom: 65 - 3,
                 child: Container(
