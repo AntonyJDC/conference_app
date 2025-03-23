@@ -32,7 +32,7 @@ class MaterialTheme {
       surface: Color(0xFFFDFDFD),
       onSurface: Color(0xFF212121),
       onSurfaceVariant: Color(0xFF4E4E4E),
-      outline: Color(0xFFBDBDBD),
+      outline: Color.fromARGB(55, 189, 189, 189),
       outlineVariant: Color(0xFFE0E0E0),
 
       shadow: Colors.black,
@@ -121,7 +121,7 @@ class MaterialTheme {
       onError: Color(0xffffffff),
       errorContainer: Color(0xff98000a),
       onErrorContainer: Color(0xffffffff),
-      surface: Color(0xfff5fafd),
+      surface: Color(0xFFFBFBFE),
       onSurface: Color(0xff000000),
       onSurfaceVariant: Color(0xff000000),
       outline: Color(0xff252d31),
@@ -159,9 +159,9 @@ class MaterialTheme {
   static ColorScheme darkScheme() {
     return const ColorScheme(
       brightness: Brightness.dark,
-      primary: Color(0xFF004AAD),
+      primary: Color(0xFF6366F1),
       surfaceTint: Color(0xFFD7BDE2),
-      onPrimary: Color(0xFF2C0E38),
+      onPrimary: Colors.white,
 
       primaryContainer: Color(0xFF5B2C6F),
       onPrimaryContainer: Colors.white,
@@ -181,10 +181,10 @@ class MaterialTheme {
       errorContainer: Color(0xFFB71C1C),
       onErrorContainer: Colors.white,
 
-      surface: Color(0xFF121212),
+      surface: Color(0xFF212E36),
       onSurface: Color(0xFFE0E0E0),
       onSurfaceVariant: Color(0xFFBDBDBD),
-      outline: Color(0xFF757575),
+      outline: Color.fromARGB(52, 117, 117, 117),
       outlineVariant: Color(0xFF9E9E9E),
 
       shadow: Colors.black,
@@ -221,7 +221,7 @@ class MaterialTheme {
       surface: Color(0xff0f1416),
       onSurface: Color(0xffffffff),
       onSurfaceVariant: Color(0xffd5dee2),
-      outline: Color(0xffabb3b7),
+      outline: Color.fromARGB(80, 171, 179, 183),
       outlineVariant: Color(0xff899296),
       shadow: Color(0xff000000),
       scrim: Color(0xff000000),
