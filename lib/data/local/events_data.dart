@@ -1,11 +1,11 @@
 import 'package:conference_app/data/models/event_model.dart';
 
-List<EventModel> dummyEvents = [
+ List<EventModel> dummyEvents = [
   EventModel(
     id: 'evt001',
     title: 'Meta Expo Singapore',
     description: 'Tech and meta world event',
-    imageUrl: 'assets/images/img.jpeg',
+    imageUrl: 'assets/images/evt001.jpeg',
     date: '2025-09-13',
     startTime: '09:00',
     endTime: '18:00',
@@ -18,7 +18,7 @@ List<EventModel> dummyEvents = [
     id: 'evt006',
     title: 'ACM CHI Conference For Students',
     description: 'Human-Computer Interaction event',
-    imageUrl: 'assets/images/img.jpeg',
+    imageUrl: 'assets/images/evt006.jpeg', 
     date: '2025-09-13',
     startTime: '08:00',
     endTime: '16:00',
@@ -31,7 +31,7 @@ List<EventModel> dummyEvents = [
     id: 'evt002',
     title: 'Singapore FinTech Festival',
     description: 'FinTech revolution event',
-    imageUrl: 'assets/images/img.jpeg',
+    imageUrl: 'assets/images/evt002.jpeg', 
     date: '2025-12-11',
     startTime: '10:00',
     endTime: '17:00',
@@ -44,7 +44,7 @@ List<EventModel> dummyEvents = [
     id: 'evt003',
     title: 'Miami Carnival 2025',
     description: 'Yearly Carnival celebration',
-    imageUrl: 'assets/images/img.jpeg',
+    imageUrl: 'assets/images/evt003.jpeg', 
     date: '2025-04-21',
     startTime: '12:00',
     endTime: '20:00',
@@ -57,7 +57,7 @@ List<EventModel> dummyEvents = [
     id: 'evt004',
     title: 'Virtual Coffee Chat',
     description: 'Meet people online over coffee',
-    imageUrl: 'assets/images/img.jpeg',
+    imageUrl: 'assets/images/evt004.jpeg', 
     date: '2025-05-10',
     startTime: '15:00',
     endTime: '16:00',
@@ -70,7 +70,7 @@ List<EventModel> dummyEvents = [
     id: 'evt005',
     title: 'Suhani Shah India Tour',
     description: 'Magic and story show',
-    imageUrl: 'assets/images/img.jpeg',
+    imageUrl: 'assets/images/evt005.jpeg', 
     date: '2025-10-01',
     startTime: '18:00',
     endTime: '21:00',
