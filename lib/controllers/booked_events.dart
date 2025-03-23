@@ -1,9 +1,11 @@
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:time_planner/time_planner.dart';
+import 'package:conference_app/data/models/event_model.dart';
 
 class BookedEventsController extends GetxController {
   final _tasks = <TimePlannerTask>[
+    //Reemplazar con la lista de eventos a los que se suscriba el usuario (deben venir de EventDetailPage)
     TimePlannerTask(
       color: Colors.purple,
       dateTime: TimePlannerDateTime(day: 0, hour: 14, minutes: 30),
@@ -40,8 +42,59 @@ class BookedEventsController extends GetxController {
   ].obs;
 
   List<TimePlannerTask> get getTask => _tasks;
-  
+
   void addTasks(List<TimePlannerTask> newTasks) {
     _tasks.addAll(newTasks);
+  }
+
+  List<TimePlannerTask> convertEventsToTasks(List<EventModel> events) {
+    return events
+        .map((event) {
+          if (event.startTime == null || event.endTime == null) {
+            // Si faltan tiempos, omitir el evento
+            return null;
+          }
+
+          final startParts = event.startTime!.split(':');
+          final endParts = event.endTime!.split(':');
+
+          final startHour = int.parse(startParts[0]);
+          final startMinutes = int.parse(startParts[1]);
+          final endHour = int.parse(endParts[0]);
+          final endMinutes = int.parse(endParts[1]);
+
+          final durationMinutes =
+              ((endHour * 60 + endMinutes) - (startHour * 60 + startMinutes))
+                  .abs();
+
+          return TimePlannerTask(
+            color: Colors.purple,
+            dateTime: TimePlannerDateTime(
+                day: 0, hour: startHour, minutes: startMinutes),
+            minutesDuration: durationMinutes,
+            daysDuration: 1,
+            onTap: () {
+              // Puedes manejar la interacción con el evento aquí
+            },
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  event.title,
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold),
+                ),
+                Text(
+                  event.location,
+                  style: TextStyle(color: Colors.white70, fontSize: 12),
+                ),
+              ],
+            ),
+          );
+        })
+        .whereType<TimePlannerTask>()
+        .toList(); // Filtra los valores nulos
   }
 }

@@ -37,7 +37,7 @@ class HomeScreen extends StatelessWidget {
         title: Row(
           children: [
             Container(
-              width: 36,  
+              width: 36,
               height: 36,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(8),
@@ -103,33 +103,24 @@ class HomeScreen extends StatelessWidget {
               itemCount: sortedEvents.length,
               itemBuilder: (context, index) {
                 final event = sortedEvents[index];
-                final eventDate = DateTime.parse(event.date);
-                final daysLeft = eventDate.difference(DateTime.now()).inDays;
+                final eventDate = DateTime.tryParse(event.date);
+                if (eventDate != null) {
+                  final daysLeft = eventDate.difference(DateTime.now()).inDays;
 
-                return GestureDetector(
-                  onTap: () => Get.toNamed('/detail', arguments: event),
-                  child: Padding(
-                    padding:
-                        EdgeInsets.only(left: index == 0 ? 14 : 0, right: 14),
-                    child: Container(
-                      width: size.width * 0.6,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(20),
-                        image: DecorationImage(
-                            image: AssetImage(event.imageUrl),
-                            fit: BoxFit.cover),
-                      ),
+                  return GestureDetector(
+                    onTap: () => Get.toNamed('/detail', arguments: event),
+                    child: Padding(
+                      padding:
+                          EdgeInsets.only(left: index == 0 ? 14 : 0, right: 14),
                       child: Container(
-                        padding: const EdgeInsets.all(16),
+                        width: size.width * 0.6,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(20),
-                          gradient: LinearGradient(
-                            colors: [
-                              Colors.black.withOpacity(0.6),
-                              Colors.transparent
-                            ],
-                            begin: Alignment.bottomCenter,
-                            end: Alignment.topCenter,
+                          image: DecorationImage(
+                            image: AssetImage(event.imageUrl.isNotEmpty
+                                ? event.imageUrl
+                                : 'assets/images/placeholder.jpg'),
+                            fit: BoxFit.cover,
                           ),
                         ),
                         child: Align(
@@ -178,14 +169,16 @@ class HomeScreen extends StatelessWidget {
                                       ),
                                     ],
                                   ),
-                                ),
-                            ],
+                              ],
+                            ),
                           ),
                         ),
                       ),
                     ),
-                  ),
-                );
+                  );
+                }
+                return const SizedBox
+                    .shrink(); // Retorno en caso de fecha inválida
               },
             ),
           ),
@@ -266,6 +259,17 @@ class HomeScreen extends StatelessWidget {
                                         maxLines: 1,
                                         overflow: TextOverflow.ellipsis),
                                   ),
+                                  Text(
+                                    event.description ?? "Sin descripción",
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .labelMedium
+                                        ?.copyWith(
+                                          fontWeight: FontWeight.normal,
+                                          fontSize: 13,
+                                          color: Colors.grey,
+                                        ),
+                                  ),
                                 ],
                               ),
                             ),
@@ -314,24 +318,30 @@ class HomeScreen extends StatelessWidget {
         separatorBuilder: (context, index) => const SizedBox(width: 14),
         itemBuilder: (context, index) {
           final category = categories[index];
-          return Column(
-            children: [
-              Container(
-                width: 60,
-                height: 60,
-                decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.primary,
-                    borderRadius: BorderRadius.circular(12)),
-                child: Center(
-                    child: Icon(icons[category] ?? Icons.category,
-                        color: Colors.white, size: 30)),
-              ),
-              const SizedBox(height: 6),
-              Text(category,
-                  style: TextStyle(
-                    fontSize: 9,
-                  )),
-            ],
+          return GestureDetector(
+            onTap: () {
+              print('Navegando a la categoría: $category'); // Depuración
+              Get.toNamed('/category', arguments: category);
+            },
+            child: Column(
+              children: [
+                Container(
+                  width: 60,
+                  height: 60,
+                  decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.primary,
+                      borderRadius: BorderRadius.circular(12)),
+                  child: Center(
+                      child: Icon(icons[category] ?? Icons.category,
+                          color: Colors.white, size: 30)),
+                ),
+                const SizedBox(height: 6),
+                Text(category,
+                    style: const TextStyle(
+                      fontSize: 9,
+                    )),
+              ],
+            ),
           );
         },
       ),
