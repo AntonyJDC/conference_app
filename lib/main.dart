@@ -1,3 +1,4 @@
+import 'package:conference_app/controllers/favorite_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:conference_app/routes/routes.dart';
@@ -8,6 +9,8 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final prefs = await SharedPreferences.getInstance();
   final onboardingSeen = prefs.getBool('onboarding_seen') ?? false;
+
+  Get.put(FavoriteController());
 
   runApp(MyApp(onboardingSeen: onboardingSeen));
 }
