@@ -1,6 +1,6 @@
 import 'package:conference_app/data/models/event_model.dart';
 
- List<EventModel> dummyEvents = [
+  List<EventModel> dummyEvents = [
   EventModel(
     id: 'evt001',
     title: 'Meta Expo Singapore',

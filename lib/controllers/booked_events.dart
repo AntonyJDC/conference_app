@@ -2,44 +2,11 @@ import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:time_planner/time_planner.dart';
 import 'package:conference_app/data/models/event_model.dart';
+import 'package:conference_app/data/local/events_data.dart';
+import 'package:conference_app/ui/theme/rand_color.dart';
 
 class BookedEventsController extends GetxController {
-  final _tasks = <TimePlannerTask>[
-    //Reemplazar con la lista de eventos a los que se suscriba el usuario (deben venir de EventDetailPage)
-    TimePlannerTask(
-      color: Colors.purple,
-      dateTime: TimePlannerDateTime(day: 0, hour: 14, minutes: 30),
-      minutesDuration: 90,
-      daysDuration: 1,
-      onTap: () {},
-      child: Text(
-        'Meeting with team',
-        style: TextStyle(color: Colors.grey[350], fontSize: 12),
-      ),
-    ),
-    TimePlannerTask(
-      color: Colors.blue,
-      dateTime: TimePlannerDateTime(day: 1, hour: 10, minutes: 0),
-      minutesDuration: 60,
-      daysDuration: 1,
-      onTap: () {},
-      child: Text(
-        'Client presentation',
-        style: TextStyle(color: Colors.white, fontSize: 12),
-      ),
-    ),
-    TimePlannerTask(
-      color: Colors.green,
-      dateTime: TimePlannerDateTime(day: 2, hour: 16, minutes: 15),
-      minutesDuration: 45,
-      daysDuration: 1,
-      onTap: () {},
-      child: Text(
-        'Cooking class',
-        style: TextStyle(color: Colors.black, fontSize: 12),
-      ),
-    ),
-  ].obs;
+  final _tasks = convertEventsToTasks(dummyEvents).obs;
 
   List<TimePlannerTask> get getTask => _tasks;
 
@@ -47,7 +14,7 @@ class BookedEventsController extends GetxController {
     _tasks.addAll(newTasks);
   }
 
-  List<TimePlannerTask> convertEventsToTasks(List<EventModel> events) {
+  static List<TimePlannerTask> convertEventsToTasks(List<EventModel> events) {
     return events.map((event) {
       final startParts = event.startTime.split(':');
       final endParts = event.endTime.split(':');
@@ -61,7 +28,7 @@ class BookedEventsController extends GetxController {
           ((endHour * 60 + endMinutes) - (startHour * 60 + startMinutes)).abs();
 
       return TimePlannerTask(
-        color: Colors.purple,
+        color: ColorR.getBrightRandomColor(),
         dateTime:
             TimePlannerDateTime(day: 0, hour: startHour, minutes: startMinutes),
         minutesDuration: durationMinutes,
@@ -87,5 +54,24 @@ class BookedEventsController extends GetxController {
         ),
       );
     }).toList();
+  }
+
+  static TimePlannerTask? findNearestEvent(List<TimePlannerTask> tasks) {
+    if (tasks.isEmpty) return null;
+
+    DateTime now = DateTime.now();
+    return tasks.reduce((nearest, current) {
+      DateTime nearestDate = now.add(Duration(days: nearest.dateTime.day));
+      DateTime currentDate = now.add(Duration(days: current.dateTime.day));
+
+      return currentDate.isBefore(nearestDate) ? current : nearest;
+    });
+  }
+
+  static DateTime? findNearestEventDate(List<TimePlannerTask> tasks) {
+    TimePlannerTask? nearestTask = findNearestEvent(tasks);
+    return nearestTask != null
+        ? DateTime.now().add(Duration(days: nearestTask.dateTime.day))
+        : null;
   }
 }
