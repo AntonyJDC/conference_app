@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:conference_app/routes/routes.dart';
 import 'package:conference_app/ui/theme/app_colors.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -11,6 +12,7 @@ void main() async {
   final onboardingSeen = prefs.getBool('onboarding_seen') ?? false;
 
   Get.put(FavoriteController());
+  await initializeDateFormatting('es_ES', null);
 
   runApp(MyApp(onboardingSeen: onboardingSeen));
 }
