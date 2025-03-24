@@ -1,3 +1,4 @@
+import 'package:conference_app/controllers/booked_events.dart';
 import 'package:conference_app/controllers/favorite_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -11,6 +12,7 @@ void main() async {
   final prefs = await SharedPreferences.getInstance();
   final onboardingSeen = prefs.getBool('onboarding_seen') ?? false;
 
+  Get.put(BookedEventsController());
   Get.put(FavoriteController());
   await initializeDateFormatting('es_ES', null);
 

@@ -12,24 +12,7 @@ class CalendarScreen extends StatefulWidget {
 }
 
 class _CalendarScreenState extends State<CalendarScreen> {
-  final BookedEventsController controller = Get.put(BookedEventsController());
-
-  // Método para obtener los títulos dinámicos con la fecha actual
-  List<TimePlannerTitle> getHeaders() {
-  // Obtener el evento más cercano
-  TimePlannerTask? nearestTask = BookedEventsController.findNearestEvent(controller.getTask);
-  DateTime baseDate = nearestTask != null
-      ? DateTime.now().add(Duration(days: nearestTask.dateTime.day)) // Fecha del evento más cercano
-      : DateTime.now(); // Fallback a la fecha actual si no hay eventos
-
-  return List.generate(7, (index) {
-    DateTime date = baseDate.add(Duration(days: index)); // Suma días desde la fecha base
-    String formattedDate = DateFormat('MM/dd/yyyy').format(date);
-    String dayName = DateFormat('EEEE').format(date);
-    return TimePlannerTitle(date: formattedDate, title: dayName);
-  });
-}
-
+  final bookedEvtController = Get.find<BookedEventsController>();
 
   @override
   Widget build(BuildContext context) {
@@ -44,9 +27,28 @@ class _CalendarScreenState extends State<CalendarScreen> {
           startHour: 6,
           endHour: 23,
           headers: getHeaders(), // Usa los encabezados dinámicos
-          tasks: controller.getTask,
+          tasks: bookedEvtController.tasks,
         ),
       ),
     );
+  }
+
+  // Método para obtener los títulos dinámicos con la fecha actual
+  List<TimePlannerTitle> getHeaders() {
+    // Obtener el evento más cercano
+    TimePlannerTask? nearestTask =
+        BookedEventsController.findNearestEvent(bookedEvtController.tasks);
+    DateTime baseDate = nearestTask != null
+        ? DateTime.now().add(Duration(
+            days: nearestTask.dateTime.day)) // Fecha del evento más cercano
+        : DateTime.now(); // Fallback a la fecha actual si no hay eventos
+
+    return List.generate(7, (index) {
+      DateTime date =
+          baseDate.add(Duration(days: index)); // Suma días desde la fecha base
+      String formattedDate = DateFormat('MM/dd/yyyy').format(date);
+      String dayName = DateFormat('EEEE').format(date);
+      return TimePlannerTitle(date: formattedDate, title: dayName);
+    });
   }
 }

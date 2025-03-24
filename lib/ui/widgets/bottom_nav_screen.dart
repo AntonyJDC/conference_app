@@ -29,7 +29,7 @@ class BottomNavScreen extends StatelessWidget {
       bottomNavigationBar: Obx(() => Stack(
             children: [
               SizedBox(
-                height: 65,
+                height: 60,
                 child: BottomNavigationBar(
                   type: BottomNavigationBarType.fixed,
                   currentIndex: navcontroller.currentIndex.value,

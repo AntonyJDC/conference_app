@@ -2,23 +2,20 @@ import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:time_planner/time_planner.dart';
 import 'package:conference_app/data/models/event_model.dart';
-import 'package:conference_app/data/local/events_data.dart';
 import 'package:conference_app/ui/theme/rand_color.dart';
 
 class BookedEventsController extends GetxController {
-  final _tasks = convertEventsToTasks(dummyEvents).obs;
+  final tasks = convertEventsToTasks([]).obs;
 
-  List<TimePlannerTask> get getTask => _tasks;
-
-  void addTasks(List<TimePlannerTask> newTasks) {
-    _tasks.addAll(newTasks);
+  void addTask(TimePlannerTask newTask) {
+    tasks.add(newTask);
   }
 
   static List<TimePlannerTask> convertEventsToTasks(List<EventModel> events) {
     return events.map((event) {
       final startParts = event.startTime.split(':');
       final endParts = event.endTime.split(':');
-
+      final id = event.id;
       final startHour = int.parse(startParts[0]);
       final startMinutes = int.parse(startParts[1]);
       final endHour = int.parse(endParts[0]);
@@ -28,6 +25,7 @@ class BookedEventsController extends GetxController {
           ((endHour * 60 + endMinutes) - (startHour * 60 + startMinutes)).abs();
 
       return TimePlannerTask(
+        key: Key(id),
         color: ColorR.getBrightRandomColor(),
         dateTime:
             TimePlannerDateTime(day: 0, hour: startHour, minutes: startMinutes),
@@ -54,6 +52,10 @@ class BookedEventsController extends GetxController {
         ),
       );
     }).toList();
+  }
+
+  bool isEventInTasks(String eventId, RxList<TimePlannerTask> tasks) {
+    return tasks.any((task) => task.key == Key(eventId));
   }
 
   static TimePlannerTask? findNearestEvent(List<TimePlannerTask> tasks) {
