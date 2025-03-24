@@ -70,10 +70,11 @@ class HomeScreen extends StatelessWidget {
           // 🔹 Eventos cercanos con navegación
           const SizedBox(height: 16),
           SectionTitle(
-              title: "Eventos cercanos",
-              onTap: () {
-                Get.toNamed('/nearby');
-              }),
+            title: "Eventos cercanos",
+            onTap: () {
+              Get.toNamed('/nearby', arguments: limitedNearbyEvents);
+            },
+          ),
           const SizedBox(height: 16),
           SizedBox(
             height: size.height * 0.35,
@@ -171,7 +172,7 @@ class HomeScreen extends StatelessWidget {
           SectionTitle(
               title: "Eventos proximos",
               onTap: () {
-                Get.toNamed('/nearby');
+                Get.toNamed('/nearby', arguments: sortedEvents);
               }),
 
           const SizedBox(height: 16),
