@@ -11,7 +11,7 @@ class HomeHeader extends StatelessWidget {
         gradient: LinearGradient(
           colors: [
             Theme.of(context).colorScheme.primary,
-            Theme.of(context).colorScheme.primary.withOpacity(0.5),
+            Theme.of(context).colorScheme.primary.withValues(alpha: 0.5),
           ],
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
