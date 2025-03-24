@@ -28,9 +28,6 @@ class HomeScreen extends StatelessWidget {
     // Limita a 10 eventos
     final limitedNearbyEvents = nearbyEvents.take(10).toList();
 
-    print(
-        'Eventos cercanos filtrados: ${limitedNearbyEvents.length}'); // Depuración
-
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
@@ -75,8 +72,6 @@ class HomeScreen extends StatelessWidget {
           SectionTitle(
             title: "Eventos cercanos",
             onTap: () {
-              print('Navegando a /nearby desde Eventos cercanos...');
-              print('Eventos a enviar: ${limitedNearbyEvents.length}');
               Get.toNamed('/nearby', arguments: limitedNearbyEvents);
             },
           ),
