@@ -14,14 +14,14 @@ class EventModel {
   EventModel({
     required this.id,
     required this.title,
-    this.description, // Opcional
+    required this.description, // Opcional
     required this.imageUrl,
     required this.date,
-    this.startTime, // Opcional
-    this.endTime, // Opcional
+    required this.startTime, // Opcional
+    required this.endTime, // Opcional
     required this.location,
-    this.capacity, // Opcional
-    this.spotsLeft, // Opcional
+    required this.capacity, // Opcional
+    required this.spotsLeft, // Opcional
     required this.categories,
   });
 

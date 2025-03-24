@@ -1,5 +1,8 @@
 import 'package:conference_app/data/local/events_data.dart';
 import 'package:conference_app/data/models/event_model.dart';
+import 'package:conference_app/ui/pages/home/widgets/category_list.dart';
+import 'package:conference_app/ui/pages/home/widgets/home_header.dart.dart';
+import 'package:conference_app/ui/pages/home/widgets/section_title.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -8,27 +11,22 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final categories = [
-      'Música',
-      'Tecnología',
-      'Deportes',
-      'Arte',
-      'Moda',
-      'Fiesta'
-    ];
-    final Map<String, IconData> categoryIcons = {
-      'Música': Icons.music_note,
-      'Tecnología': Icons.computer,
-      'Deportes': Icons.sports_soccer,
-      'Arte': Icons.color_lens,
-      'Moda': Icons.checkroom,
-      'Fiesta': Icons.wine_bar,
-    };
-
     final size = MediaQuery.of(context).size;
     List<EventModel> sortedEvents = List.from(dummyEvents)
       ..sort(
           (a, b) => DateTime.parse(a.date).compareTo(DateTime.parse(b.date)));
+
+    final now = DateTime.now();
+
+    // Filtra los eventos cercanos que no hayan superado la fecha actual
+    List<EventModel> nearbyEvents = sortedEvents.where((event) {
+      final eventDate = DateTime.tryParse(event.date);
+      if (eventDate == null) return false;
+      return eventDate.isAfter(now.subtract(const Duration(days: 1)));
+    }).toList();
+
+    // Limita a 10 eventos
+    final limitedNearbyEvents = nearbyEvents.take(10).toList();
 
     return Scaffold(
       appBar: AppBar(
@@ -67,60 +65,51 @@ class HomeScreen extends StatelessWidget {
       body: ListView(
         padding: EdgeInsets.zero,
         children: [
-          // 🔹 Header
-          Container(
-            padding: const EdgeInsets.all(18),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  Theme.of(context).colorScheme.primary,
-                  Theme.of(context).colorScheme.primary.withOpacity(0.5),
-                ],
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-              ),
-              borderRadius:
-                  const BorderRadius.vertical(bottom: Radius.circular(28)),
-            ),
-            child: const Text(
-              "Descubre eventos cerca de ti",
-              style: TextStyle(
-                  fontSize: 17,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white),
-            ),
-          ),
+          const HomeHeader(),
 
           // 🔹 Eventos cercanos con navegación
           const SizedBox(height: 16),
-          _buildSectionTitle(context, "Eventos cercanos"),
+          SectionTitle(
+              title: "Eventos cercanos",
+              onTap: () {
+                Get.toNamed('/nearby');
+              }),
           const SizedBox(height: 16),
           SizedBox(
             height: size.height * 0.35,
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
               physics: const BouncingScrollPhysics(),
-              itemCount: sortedEvents.length,
+              itemCount: limitedNearbyEvents.length,
               itemBuilder: (context, index) {
-                final event = sortedEvents[index];
-                final eventDate = DateTime.tryParse(event.date);
-                if (eventDate != null) {
-                  final daysLeft = eventDate.difference(DateTime.now()).inDays;
+                final event = limitedNearbyEvents[index];
+                final eventDate = DateTime.tryParse(event.date)!;
+                final daysLeft = eventDate.difference(DateTime.now()).inDays;
 
-                  return GestureDetector(
-                    onTap: () => Get.toNamed('/detail', arguments: event),
-                    child: Padding(
-                      padding:
-                          EdgeInsets.only(left: index == 0 ? 14 : 0, right: 14),
+                return GestureDetector(
+                  onTap: () => Get.toNamed('/detail', arguments: event),
+                  child: Padding(
+                    padding:
+                        EdgeInsets.only(left: index == 0 ? 14 : 0, right: 14),
+                    child: Container(
+                      width: size.width * 0.6,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(20),
+                        image: DecorationImage(
+                            image: AssetImage(event.imageUrl),
+                            fit: BoxFit.cover),
+                      ),
                       child: Container(
-                        width: size.width * 0.6,
+                        padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(20),
-                          image: DecorationImage(
-                            image: AssetImage(event.imageUrl.isNotEmpty
-                                ? event.imageUrl
-                                : 'assets/images/placeholder.jpg'),
-                            fit: BoxFit.cover,
+                          gradient: LinearGradient(
+                            colors: [
+                              Colors.black.withOpacity(0.6),
+                              Colors.transparent
+                            ],
+                            begin: Alignment.bottomCenter,
+                            end: Alignment.topCenter,
                           ),
                         ),
                         child: Align(
@@ -144,52 +133,47 @@ class HomeScreen extends StatelessWidget {
                                     borderRadius: BorderRadius.circular(12),
                                   ),
                                   child: Row(
+                                    mainAxisSize: MainAxisSize.min,
                                     children: [
-                                      Icon(
-                                        Icons.calendar_today,
-                                        size: 14,
-                                        color: daysLeft <= 30
-                                            ? Colors.red
-                                            : Colors.black87,
-                                      ),
+                                      Icon(Icons.calendar_today,
+                                          size: 14,
+                                          color: daysLeft <= 30
+                                              ? Colors.red
+                                              : Colors.black87),
                                       const SizedBox(width: 4),
-                                      // ✅ Hacemos que el texto se adapte con Flexible
-                                      Flexible(
-                                        child: Text(
-                                          '$daysLeft días restantes',
+                                      Text('$daysLeft días restantes',
                                           style: TextStyle(
-                                            color: daysLeft <= 30
-                                                ? Colors.red
-                                                : Colors.black87,
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.w600,
-                                          ),
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      ),
+                                              color: daysLeft <= 30
+                                                  ? Colors.red
+                                                  : Colors.black87,
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.w600)),
                                     ],
                                   ),
-                              ],
-                            ),
+                                ),
+                            ],
                           ),
                         ),
                       ),
                     ),
-                  );
-                }
-                return const SizedBox
-                    .shrink(); // Retorno en caso de fecha inválida
+                  ),
+                );
               },
             ),
           ),
 
           // 🔹 Categorías
           const SizedBox(height: 22),
-          _buildCategoryList(context, categories, categoryIcons),
+          const CategoryList(),
 
           // 🔹 Eventos próximos con navegación
           const SizedBox(height: 16),
-          _buildSectionTitle(context, "Eventos próximos"),
+          SectionTitle(
+              title: "Eventos proximos",
+              onTap: () {
+                Get.toNamed('/nearby');
+              }),
+
           const SizedBox(height: 16),
           SizedBox(
             height: 270,
@@ -259,17 +243,6 @@ class HomeScreen extends StatelessWidget {
                                         maxLines: 1,
                                         overflow: TextOverflow.ellipsis),
                                   ),
-                                  Text(
-                                    event.description ?? "Sin descripción",
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .labelMedium
-                                        ?.copyWith(
-                                          fontWeight: FontWeight.normal,
-                                          fontSize: 13,
-                                          color: Colors.grey,
-                                        ),
-                                  ),
                                 ],
                               ),
                             ),
@@ -284,66 +257,6 @@ class HomeScreen extends StatelessWidget {
           ),
           const SizedBox(height: 16),
         ],
-      ),
-    );
-  }
-
-  Widget _buildSectionTitle(BuildContext context, String title) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 14),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(title,
-              style:
-                  const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-          Text("Ver todos",
-              style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  color: Theme.of(context).colorScheme.primary)),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildCategoryList(BuildContext context, List<String> categories,
-      Map<String, IconData> icons) {
-    return SizedBox(
-      height: 90,
-      child: ListView.separated(
-        scrollDirection: Axis.horizontal,
-        itemCount: categories.length,
-        padding: const EdgeInsets.symmetric(horizontal: 14),
-        separatorBuilder: (context, index) => const SizedBox(width: 14),
-        itemBuilder: (context, index) {
-          final category = categories[index];
-          return GestureDetector(
-            onTap: () {
-              print('Navegando a la categoría: $category'); // Depuración
-              Get.toNamed('/category', arguments: category);
-            },
-            child: Column(
-              children: [
-                Container(
-                  width: 60,
-                  height: 60,
-                  decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.primary,
-                      borderRadius: BorderRadius.circular(12)),
-                  child: Center(
-                      child: Icon(icons[category] ?? Icons.category,
-                          color: Colors.white, size: 30)),
-                ),
-                const SizedBox(height: 6),
-                Text(category,
-                    style: const TextStyle(
-                      fontSize: 9,
-                    )),
-              ],
-            ),
-          );
-        },
       ),
     );
   }
