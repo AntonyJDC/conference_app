@@ -76,7 +76,7 @@ class _SearchPageState extends State<SearchPage> {
                 decoration: InputDecoration(
                   hintText: 'Buscar eventos',
                   hintStyle: TextStyle(
-                    color: theme.colorScheme.onPrimary.withOpacity(0.5),
+                    color: theme.colorScheme.onPrimary.withValues(alpha: 0.5),
                     fontSize: 14,
                   ),
                   prefixIcon: Icon(Icons.search,
