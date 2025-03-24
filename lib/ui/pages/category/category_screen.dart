@@ -2,7 +2,7 @@ import 'package:conference_app/data/local/events_data.dart';
 import 'package:conference_app/data/models/event_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:conference_app/ui/widgets/event_card.dart'; // Asegúrate de que esta importación sea válida
+import 'package:conference_app/ui/widgets/event_card.dart';
 
 class CategoryScreen extends StatelessWidget {
   const CategoryScreen({super.key});
@@ -29,9 +29,15 @@ class CategoryScreen extends StatelessWidget {
       ),
       body: filteredEvents.isEmpty
           ? Center(
-              child: Text(
-                "No hay eventos disponibles para esta categoría.",
-                style: const TextStyle(fontSize: 16),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.event_busy, size: 80, color: Colors.grey.shade400),
+                  const SizedBox(height: 16),
+                  Padding(
+                      padding: const EdgeInsets.all(32),
+                      child: Text('No hay eventos en esta categoría')),
+                ],
               ),
             )
           : Padding(
@@ -40,14 +46,8 @@ class CategoryScreen extends StatelessWidget {
                 itemCount: filteredEvents.length,
                 itemBuilder: (context, index) {
                   final event = filteredEvents[index];
-                  // Reutilizamos el diseño de las tarjetas desde SearchPage
                   return EventCard(
                     event: event,
-                    onTap: () {
-                      debugPrint(
-                          'Navegando a la categoría: $category'); // Depuración
-                      Get.toNamed('/category', arguments: category);
-                    },
                   );
                 },
               ),
