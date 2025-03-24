@@ -70,9 +70,12 @@ class EventInfo extends StatelessWidget {
               subtitle: "Capacidad",
               subtitleStyle: null,
             ),
+
             const SizedBox(height: 24),
 
-            _spotsAvailable(context, event.spotsLeft, spotColor),
+            // ✅ Mostrar Cupos disponibles solo si el evento no ha pasado
+            if (!isPastEvent)
+              _spotsAvailable(context, event.spotsLeft, spotColor),
 
             const SizedBox(height: 24),
             const Text("About Event",
