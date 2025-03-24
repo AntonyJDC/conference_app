@@ -30,6 +30,18 @@ class HomeScreen extends StatelessWidget {
       ..sort(
           (a, b) => DateTime.parse(a.date).compareTo(DateTime.parse(b.date)));
 
+    final now = DateTime.now();
+
+    // Filtra los eventos cercanos que no hayan superado la fecha actual
+    List<EventModel> nearbyEvents = sortedEvents.where((event) {
+      final eventDate = DateTime.tryParse(event.date);
+      if (eventDate == null) return false;
+      return eventDate.isAfter(now.subtract(const Duration(days: 1)));
+    }).toList();
+
+    // Limita a 10 eventos
+    final limitedNearbyEvents = nearbyEvents.take(10).toList();
+
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
@@ -93,95 +105,93 @@ class HomeScreen extends StatelessWidget {
 
           // 🔹 Eventos cercanos con navegación
           const SizedBox(height: 16),
-          _buildSectionTitle(context, "Eventos cercanos"),
+          _buildSectionTitle(context, "Eventos cercanos", onTap: () {
+            Get.toNamed('/nearby'); // 👉 Navega a una nueva pantalla con todos
+          }),
           const SizedBox(height: 16),
           SizedBox(
             height: size.height * 0.35,
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
               physics: const BouncingScrollPhysics(),
-              itemCount: sortedEvents.length,
+              itemCount: limitedNearbyEvents.length,
               itemBuilder: (context, index) {
-                final event = sortedEvents[index];
-                final eventDate = DateTime.tryParse(event.date);
-                if (eventDate != null) {
-                  final daysLeft = eventDate.difference(DateTime.now()).inDays;
+                final event = limitedNearbyEvents[index];
+                final eventDate = DateTime.tryParse(event.date)!;
+                final daysLeft = eventDate.difference(DateTime.now()).inDays;
 
-                  return GestureDetector(
-                    onTap: () => Get.toNamed('/detail', arguments: event),
-                    child: Padding(
-                      padding:
-                          EdgeInsets.only(left: index == 0 ? 14 : 0, right: 14),
+                return GestureDetector(
+                  onTap: () => Get.toNamed('/detail', arguments: event),
+                  child: Padding(
+                    padding:
+                        EdgeInsets.only(left: index == 0 ? 14 : 0, right: 14),
+                    child: Container(
+                      width: size.width * 0.6,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(20),
+                        image: DecorationImage(
+                            image: AssetImage(event.imageUrl),
+                            fit: BoxFit.cover),
+                      ),
                       child: Container(
-                        width: size.width * 0.6,
+                        padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(20),
-                          image: DecorationImage(
-                              image: AssetImage(event.imageUrl),
-                              fit: BoxFit.cover),
-                        ),
-                        child: Container(
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(20),
-                            gradient: LinearGradient(
-                              colors: [
-                                Colors.black.withOpacity(0.6),
-                                Colors.transparent
-                              ],
-                              begin: Alignment.bottomCenter,
-                              end: Alignment.topCenter,
-                            ),
+                          gradient: LinearGradient(
+                            colors: [
+                              Colors.black.withOpacity(0.6),
+                              Colors.transparent
+                            ],
+                            begin: Alignment.bottomCenter,
+                            end: Alignment.topCenter,
                           ),
-                          child: Align(
-                            alignment: Alignment.bottomLeft,
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(event.title,
-                                    style: const TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold)),
-                                const SizedBox(height: 8),
-                                if (daysLeft >= 0)
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 8, vertical: 4),
-                                    decoration: BoxDecoration(
-                                        color: Colors.white.withOpacity(0.8),
-                                        borderRadius:
-                                            BorderRadius.circular(12)),
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Icon(Icons.calendar_today,
-                                            size: 14,
-                                            color: daysLeft <= 30
-                                                ? Colors.red
-                                                : Colors.black87),
-                                        const SizedBox(width: 4),
-                                        Text('$daysLeft días restantes',
-                                            style: TextStyle(
-                                                color: daysLeft <= 30
-                                                    ? Colors.red
-                                                    : Colors.black87,
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.w600)),
-                                      ],
-                                    ),
+                        ),
+                        child: Align(
+                          alignment: Alignment.bottomLeft,
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(event.title,
+                                  style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold)),
+                              const SizedBox(height: 8),
+                              if (daysLeft >= 0)
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 8, vertical: 4),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white.withOpacity(0.8),
+                                    borderRadius: BorderRadius.circular(12),
                                   ),
-                              ],
-                            ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(Icons.calendar_today,
+                                          size: 14,
+                                          color: daysLeft <= 30
+                                              ? Colors.red
+                                              : Colors.black87),
+                                      const SizedBox(width: 4),
+                                      Text('$daysLeft días restantes',
+                                          style: TextStyle(
+                                              color: daysLeft <= 30
+                                                  ? Colors.red
+                                                  : Colors.black87,
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.w600)),
+                                    ],
+                                  ),
+                                ),
+                            ],
                           ),
                         ),
                       ),
                     ),
-                  );
-                }
-                return const SizedBox
-                    .shrink(); // Retorno en caso de fecha inválida
+                  ),
+                );
               },
             ),
           ),
@@ -280,7 +290,8 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSectionTitle(BuildContext context, String title) {
+  Widget _buildSectionTitle(BuildContext context, String title,
+      {VoidCallback? onTap}) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 14),
       child: Row(
@@ -289,11 +300,14 @@ class HomeScreen extends StatelessWidget {
           Text(title,
               style:
                   const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-          Text("Ver todos",
-              style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  color: Theme.of(context).colorScheme.primary)),
+          GestureDetector(
+            onTap: onTap,
+            child: Text("Ver todos",
+                style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: Theme.of(context).colorScheme.primary)),
+          ),
         ],
       ),
     );
