@@ -12,12 +12,17 @@ class EventInfo extends StatelessWidget {
     final theme = Theme.of(context);
     final size = MediaQuery.of(context).size;
     final overlap = size.height * 0.35 * 0.15;
+
     final double percentage = event.spotsLeft / event.capacity;
     Color spotColor = percentage < 0.25
         ? Colors.red
         : percentage < 0.5
             ? Colors.amber
             : Colors.green;
+
+    // ✅ Validar si el evento ya finalizó
+    final eventDate = DateTime.tryParse(event.date);
+    final isPastEvent = eventDate != null && eventDate.isBefore(DateTime.now());
 
     return Transform.translate(
       offset: Offset(0, -overlap),
@@ -37,23 +42,38 @@ class EventInfo extends StatelessWidget {
             Text(event.description,
                 style: TextStyle(color: Colors.grey.shade600, fontSize: 13)),
             const SizedBox(height: 25),
+
+            // 📅 FECHA Y HORA o MENSAJE si finalizó
             DetailIcon(
-                icon: Icons.calendar_today,
-                title: event.date,
-                subtitle:
-                    '${DateFormat('EEEE', 'en_US').format(DateTime.parse(event.date))}, de ${event.startTime} a ${event.endTime}'),
+              icon: Icons.calendar_today,
+              title: event.date,
+              subtitle: isPastEvent
+                  ? 'Este evento ya finalizó'
+                  : '${DateFormat('EEEE', 'es_ES').format(eventDate!)}, de ${event.startTime} a ${event.endTime}',
+              subtitleStyle: TextStyle(
+                color: isPastEvent ? Colors.red : Colors.grey,
+                fontSize: 10,
+              ),
+            ),
+
             const SizedBox(height: 16),
             DetailIcon(
-                icon: Icons.location_on,
-                title: event.location,
-                subtitle: "Ubicación"),
+              icon: Icons.location_on,
+              title: event.location,
+              subtitle: "Ubicación",
+              subtitleStyle: null,
+            ),
             const SizedBox(height: 16),
             DetailIcon(
-                icon: Icons.people,
-                title: "${event.capacity} personas",
-                subtitle: "Capacidad"),
+              icon: Icons.people,
+              title: "${event.capacity} personas",
+              subtitle: "Capacidad",
+              subtitleStyle: null,
+            ),
             const SizedBox(height: 24),
+
             _spotsAvailable(context, event.spotsLeft, spotColor),
+
             const SizedBox(height: 24),
             const Text("About Event",
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
