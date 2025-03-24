@@ -22,7 +22,12 @@ class _SearchPageState extends State<SearchPage> {
             event.title.toLowerCase().contains(query.toLowerCase());
         final locationMatch =
             event.location.toLowerCase().contains(query.toLowerCase());
-        return titleMatch || locationMatch;
+        final dateMatch =
+            event.date.toLowerCase().contains(query.toLowerCase());
+        final tagsMatch = event.categories
+            .map((tag) => tag.toLowerCase().contains(query.toLowerCase()))
+            .contains(true);
+        return titleMatch || locationMatch || dateMatch || tagsMatch;
       }).toList();
     });
   }
@@ -39,13 +44,13 @@ class _SearchPageState extends State<SearchPage> {
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: theme.colorScheme.primary,
+        backgroundColor: Theme.of(context).colorScheme.primary,
         centerTitle: true,
         elevation: 0,
-        scrolledUnderElevation: 0,
         title: Text(
           'Buscar Eventos',
           style: TextStyle(
+            color: Theme.of(context).colorScheme.onPrimary,
             fontSize: 16,
             fontWeight: FontWeight.w600,
           ),
@@ -54,50 +59,38 @@ class _SearchPageState extends State<SearchPage> {
       body: Column(
         children: [
           // 🔎 Barra de búsqueda
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-            decoration: BoxDecoration(
-              color: theme.colorScheme.primary,
-              borderRadius: const BorderRadius.only(
-                bottomLeft: Radius.circular(28),
-                bottomRight: Radius.circular(28),
-              ),
-            ),
-            child: SizedBox(
-              height: 55,
+          SizedBox(
+            height: 60,
+            child: Padding(
+              padding: const EdgeInsets.all(10),
               child: TextField(
                 controller: searchController,
                 onChanged: filterEvents,
-                cursorColor: theme.colorScheme.onPrimary,
                 style: TextStyle(
-                  color: theme.colorScheme.onPrimary,
                   fontSize: 14,
                 ),
                 decoration: InputDecoration(
                   hintText: 'Buscar eventos',
                   hintStyle: TextStyle(
-                    color: theme.colorScheme.onPrimary.withValues(alpha: 0.5),
                     fontSize: 14,
                   ),
-                  prefixIcon: Icon(Icons.search,
-                      color: theme.colorScheme.onPrimary, size: 20),
+                  prefixIcon: Icon(Icons.search),
                   filled: true,
-                  fillColor: theme.colorScheme.primary,
+                  fillColor: theme.colorScheme.outline,
                   contentPadding:
                       const EdgeInsets.symmetric(vertical: 0, horizontal: 16),
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(20),
+                    borderRadius: BorderRadius.circular(10),
                     borderSide: BorderSide.none,
                   ),
                 ),
               ),
             ),
           ),
-
           // 🔥 Lista de eventos
           Expanded(
             child: ListView.builder(
-              padding: const EdgeInsets.all(14),
+              padding: const EdgeInsets.symmetric(horizontal: 14),
               itemCount: groupedEvents.keys.length,
               itemBuilder: (context, index) {
                 final dateKey = groupedEvents.keys.elementAt(index);
