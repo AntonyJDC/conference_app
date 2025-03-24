@@ -1,5 +1,6 @@
 import 'package:conference_app/data/local/events_data.dart';
 import 'package:conference_app/data/models/event_model.dart';
+import 'package:conference_app/ui/pages/event/event_list_page.dart';
 import 'package:conference_app/ui/pages/home/widgets/category_list.dart';
 import 'package:conference_app/ui/pages/home/widgets/home_header.dart.dart';
 import 'package:conference_app/ui/pages/home/widgets/section_title.dart';
@@ -72,7 +73,11 @@ class HomeScreen extends StatelessWidget {
           SectionTitle(
             title: "Eventos cercanos",
             onTap: () {
-              Get.toNamed('/nearby', arguments: limitedNearbyEvents);
+              Get.to(() => EventListPage(
+                    title: 'Eventos Cercanos',
+                    emptyMessage: 'No hay eventos cercanos disponibles.',
+                    events: limitedNearbyEvents,
+                  ));
             },
           ),
           const SizedBox(height: 16),
@@ -172,7 +177,11 @@ class HomeScreen extends StatelessWidget {
           SectionTitle(
               title: "Eventos proximos",
               onTap: () {
-                Get.toNamed('/nearby', arguments: sortedEvents);
+                Get.to(() => EventListPage(
+                      title: 'Eventos Próximos',
+                      emptyMessage: 'No hay eventos próximos disponibles.',
+                      events: sortedEvents,
+                    ));
               }),
 
           const SizedBox(height: 16),
