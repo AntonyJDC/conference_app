@@ -35,8 +35,8 @@ class _CalendarScreenState extends State<CalendarScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Incoming Events'),
-        backgroundColor: Colors.blue,
+        title: Text('Incoming Events'),
+        backgroundColor: Color(0xFF004AAD),
       ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
