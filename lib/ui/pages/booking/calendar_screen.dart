@@ -83,8 +83,11 @@ class _CalendarScreenState extends State<CalendarScreen> {
       ..sort((a, b) {
         DateTime dateA = DateTime.parse(a.date);
         DateTime dateB = DateTime.parse(b.date);
-        return dateA.difference(now).inSeconds.abs().compareTo(
-            dateB.difference(now).inSeconds.abs());
+        return dateA
+            .difference(now)
+            .inSeconds
+            .abs()
+            .compareTo(dateB.difference(now).inSeconds.abs());
       });
 
     return DateTime.parse(sortedEvents.first.date);
@@ -107,8 +110,16 @@ class _CalendarScreenState extends State<CalendarScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Incoming Events'),
-        backgroundColor: const Color(0xFF004AAD),
+        title: Text(
+          'Booked Events',
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.onPrimary,
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        backgroundColor:
+            Theme.of(context).colorScheme.primary.withValues(alpha: 0.99),
       ),
       body: Column(
         children: [
@@ -156,7 +167,8 @@ class _CalendarScreenState extends State<CalendarScreen> {
       ),
       floatingActionButton: hasEvents
           ? FloatingActionButton(
-              backgroundColor: const Color.fromARGB(255, 4, 50, 87),
+              backgroundColor:
+                  Theme.of(context).colorScheme.primary.withValues(alpha: 0.99),
               onPressed: _goToNearestEvent,
               child: const Icon(Icons.forward),
             )
