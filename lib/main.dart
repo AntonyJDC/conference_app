@@ -34,7 +34,7 @@ class MyApp extends StatelessWidget {
       // 🌞 Tema Claro
       theme: materialTheme.light().copyWith(
             textTheme: ThemeData.light().textTheme.apply(
-                  fontFamily: 'Mulish',
+                  fontFamily: 'SFProDisplay',
                 ),
             appBarTheme: const AppBarTheme(
               elevation: 0,
@@ -46,7 +46,7 @@ class MyApp extends StatelessWidget {
       // 🌙 Tema Oscuro
       darkTheme: materialTheme.dark().copyWith(
             textTheme: ThemeData.dark().textTheme.apply(
-                  fontFamily: 'Mulish',
+                  fontFamily: 'SFProDisplay',
                 ),
             appBarTheme: const AppBarTheme(
               elevation: 0,
