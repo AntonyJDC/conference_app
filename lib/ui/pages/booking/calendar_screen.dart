@@ -107,9 +107,6 @@ class _CalendarScreenState extends State<CalendarScreen> {
   @override
   Widget build(BuildContext context) {
     bool hasEvents = bookedEventsController.tasks.isNotEmpty;
-    Brightness brightness = Theme.of(context).brightness;
-    Color eventColor =
-        brightness == Brightness.dark ? Colors.white : Colors.black;
 
     return Scaffold(
       appBar: AppBar(
@@ -145,42 +142,33 @@ class _CalendarScreenState extends State<CalendarScreen> {
                 _focusedDay = focusedDay;
               },
               calendarBuilders: CalendarBuilders(
-                defaultBuilder: (context, day, focusedDay) {
-                  final events = _getEventsForDay(day);
-                  bool hasEvents = events.isNotEmpty;
-                  return Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        '${day.day}',
-                        style: TextStyle(fontSize: 16),
-                      ),
-                      if (hasEvents)
-                        Padding(
-                          padding: const EdgeInsets.only(
-                              top: 1), // Baja los puntos un poco
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: List.generate(
-                              events.length.clamp(1, 3), // Máximo 3 puntos
-                              (index) => Container(
-                                margin:
-                                    const EdgeInsets.symmetric(horizontal: 2),
-                                width: 6,
-                                height: 6,
-                                decoration: BoxDecoration(
-                                  color:
-                                      eventColor,
-                                  shape: BoxShape.circle,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                    ],
-                  );
-                },
-              ),
+  markerBuilder: (context, day, events) {
+    if (events.isEmpty) return SizedBox(); // No mostrar nada si no hay eventos
+
+    Brightness brightness = Theme.of(context).brightness;
+    Color eventColor = brightness == Brightness.dark ? Colors.white : Colors.black;
+
+    return Padding(
+      padding: const EdgeInsets.only(top: 20), // Ajusta la posición de los puntos
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: List.generate(
+          events.length.clamp(1, 3),
+          (index) => Container(
+            margin: const EdgeInsets.symmetric(horizontal: 2),
+            width: 6,
+            height: 6,
+            decoration: BoxDecoration(
+              color: eventColor,
+              shape: BoxShape.circle,
+            ),
+          ),
+        ),
+      ),
+    );
+  },
+),
+
             ),
           ),
           const SizedBox(height: 10),
@@ -210,7 +198,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
               backgroundColor:
                   Theme.of(context).colorScheme.primary.withOpacity(0.99),
               onPressed: _goToNearestEvent,
-              child: const Icon(Icons.forward_rounded),
+              child: const Icon(Icons.arrow_upward_rounded),
             )
           : null,
     );
