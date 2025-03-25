@@ -142,7 +142,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                       final event = _selectedEvents[index];
                       return Card(
                         child: ListTile(
-                          leading: Image.asset('assets/images/evt001.webp'),
+                          leading: Image.asset(event.imageUrl),
                           title: Text(event.title),
                           subtitle: Text(
                               "${event.startTime} - ${event.endTime} at ${event.location}"),
