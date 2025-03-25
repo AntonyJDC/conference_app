@@ -1,11 +1,15 @@
 import 'package:conference_app/data/models/event_model.dart';
 import 'package:conference_app/ui/pages/event/widgets/detail_icon.dart';
+import 'package:conference_app/ui/pages/event/widgets/event_category_tags.dart';
+import 'package:conference_app/ui/pages/reviews/widgets/reviews_carousel.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class EventInfo extends StatelessWidget {
   final EventModel event;
-  const EventInfo({super.key, required this.event});
+  final VoidCallback? onTap;
+
+  const EventInfo({super.key, required this.event, this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +31,7 @@ class EventInfo extends StatelessWidget {
     return Transform.translate(
       offset: Offset(0, -overlap),
       child: Container(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(18),
         decoration: BoxDecoration(
           color: theme.colorScheme.surface,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
@@ -36,11 +40,10 @@ class EventInfo extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(event.title,
-                style: theme.textTheme.titleLarge
+                style: theme.textTheme.titleMedium
                     ?.copyWith(fontWeight: FontWeight.bold)),
-            const SizedBox(height: 8),
             Text(event.description,
-                style: TextStyle(color: Colors.grey.shade600, fontSize: 13)),
+                style: TextStyle(color: Colors.grey.shade600, fontSize: 12)),
             const SizedBox(height: 25),
 
             // 📅 FECHA Y HORA o MENSAJE si finalizó
@@ -78,11 +81,26 @@ class EventInfo extends StatelessWidget {
               _spotsAvailable(context, event.spotsLeft, spotColor),
 
             const SizedBox(height: 24),
-            const Text("About Event",
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 8),
-            const Text("Annex Fridays\n2 DJs\nConfetti Blast\nCash Bar\nHookah",
-                style: TextStyle(height: 1.6)),
+            EventCategoryTags(event: event),
+
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text("Reseñas",
+                    style: const TextStyle(
+                        fontSize: 15, fontWeight: FontWeight.bold)),
+                GestureDetector(
+                  onTap: onTap,
+                  child: Text("Ver todas",
+                      style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                          color: Theme.of(context).colorScheme.primary)),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            const ReviewsCarousel(),
           ],
         ),
       ),
