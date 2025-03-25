@@ -18,6 +18,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
   CalendarFormat _calendarFormat = CalendarFormat.month;
+  late Worker _taskListener;
 
   @override
   void initState() {
@@ -28,12 +29,19 @@ class _CalendarScreenState extends State<CalendarScreen> {
     _selectedEvents = [];
     _selectedDay = _focusedDay;
 
-    // Escucha cambios en tasks y actualiza la UI
-    ever(bookedEventsController.tasks, (_) {
-      _loadEvents();
+    _taskListener = ever(bookedEventsController.tasks, (_) {
+      if (mounted) {
+        _loadEvents();
+      }
     });
 
     _loadEvents();
+  }
+
+  @override
+  void dispose() {
+    _taskListener.dispose(); // Cancela la escucha al destruir el widget
+    super.dispose();
   }
 
   void _loadEvents() {
@@ -44,10 +52,12 @@ class _CalendarScreenState extends State<CalendarScreen> {
       newEvents.putIfAbsent(eventDate, () => []).add(event);
     }
 
-    setState(() {
-      _events = newEvents;
-      _selectedEvents = _events[_selectedDay] ?? [];
-    });
+    if (mounted) {
+      setState(() {
+        _events = newEvents;
+        _selectedEvents = _events[_selectedDay] ?? [];
+      });
+    }
   }
 
   void _onDaySelected(DateTime selectedDay, DateTime focusedDay) {
@@ -65,7 +75,6 @@ class _CalendarScreenState extends State<CalendarScreen> {
     return _events[normalizedDay] ?? [];
   }
 
-  /// Obtiene la fecha del evento más cercano a la fecha actual.
   DateTime? _getNearestEventDate() {
     if (bookedEventsController.tasks.isEmpty) return null;
 
@@ -83,7 +92,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
 
   void _goToNearestEvent() {
     DateTime? nearestDate = _getNearestEventDate();
-    if (nearestDate != null) {
+    if (nearestDate != null && mounted) {
       setState(() {
         _focusedDay = nearestDate;
         _selectedDay = nearestDate;

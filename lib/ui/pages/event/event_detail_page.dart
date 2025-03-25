@@ -6,16 +6,28 @@ import 'widgets/event_info.dart';
 import 'widgets/subscribe_button.dart';
 import 'package:conference_app/controllers/favorite_controller.dart';
 
-class EventDetailPage extends StatelessWidget {
+class EventDetailPage extends StatefulWidget {
   const EventDetailPage({super.key});
 
   @override
+  _EventDetailPageState createState() => _EventDetailPageState();
+}
+
+class _EventDetailPageState extends State<EventDetailPage> {
+  late Rx<EventModel> event;
+  late FavoriteController favoriteController;
+
+  @override
+  void initState() {
+    super.initState();
+    favoriteController = Get.find<FavoriteController>();
+
+    // Convertir el evento en un observable
+    event = (Get.arguments as EventModel).obs;
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final favoriteController = Get.find<FavoriteController>();
-
-    // Convertir event en un observable para actualizar la UI al cambiar spotsLeft
-    final event = (Get.arguments as EventModel).obs;
-
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
       body: Stack(

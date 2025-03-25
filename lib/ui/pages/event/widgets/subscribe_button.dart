@@ -44,21 +44,24 @@ class SubscribeButton extends StatelessWidget {
           // Agregar evento a la lista de suscritos
           bookedEvtController.addTask(eventValue);
 
-          // Restar 1 a los cupos disponibles
-          event.update((e) {
-            if (e != null) e.spotsLeft = (e.spotsLeft - 1).clamp(0, e.capacity);
-          });
+          // Restar 1 a los cupos disponibles y actualizar el estado de GetX
+          event.value = event.value.copyWith(
+            spotsLeft:
+                (event.value.spotsLeft - 1).clamp(0, event.value.capacity),
+          );
 
           // También actualizar la lista dummyEvents
           int index = dummyEvents.indexWhere((e) => e.id == eventValue.id);
           if (index != -1) {
-            dummyEvents[index] = eventValue;
+            dummyEvents[index] = event.value;
           }
-        
-          // Mostrar confirmación
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Te has suscrito al evento')),
-          );
+
+          // Mostrar confirmación después del frame actual
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Te has suscrito al evento')),
+            );
+          });
         };
       } else {
         buttonText = "Agotado";
