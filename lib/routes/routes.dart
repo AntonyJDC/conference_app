@@ -15,6 +15,7 @@ class AppRoutes {
   static const String search = '/search';
   static const String detail = '/detail';
   static const String category = '/category';
+  static const String favorite = '/favorite';
   static const String nearby =
       '/nearby'; // Asegúrate de que esta constante exista
 
@@ -24,7 +25,7 @@ class AppRoutes {
     GetPage(name: main, page: () => BottomNavScreen()),
     GetPage(name: search, page: () => const SearchPage()),
     GetPage(name: detail, page: () => const EventDetailPage()),
-    GetPage(name: '/favorite', page: () => const FavoritesPage()),
+    GetPage(name: favorite, page: () => const FavoritesPage()),
     GetPage(name: category, page: () => const CategoryScreen()),
     GetPage(
       name: nearby,

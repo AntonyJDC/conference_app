@@ -1,68 +1,100 @@
+import 'package:conference_app/controllers/booked_events.dart';
 import 'package:conference_app/data/models/event_model.dart';
+import 'package:conference_app/data/local/events_data.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class SubscribeButton extends StatelessWidget {
-  final EventModel event;
+  final Rx<EventModel> event;
   const SubscribeButton({super.key, required this.event});
 
   @override
   Widget build(BuildContext context) {
+    final bookedEvtController = Get.find<BookedEventsController>();
     final theme = Theme.of(context).colorScheme;
 
-    // Validación: ¿El evento ya pasó?
-    final eventDate = DateTime.tryParse(event.date);
-    final now = DateTime.now();
-    final isPastEvent = eventDate != null && eventDate.isBefore(now);
+    return Obx(() {
+      final eventValue = event.value;
 
-    String buttonText;
-    Color buttonColor;
-    VoidCallback? onPressed;
+      // Validación: ¿El evento ya pasó?
+      final eventDate = DateTime.tryParse(eventValue.date);
+      final now = DateTime.now();
+      final isPastEvent = eventDate != null && eventDate.isBefore(now);
 
-    // Lógica de condiciones
-    if (isPastEvent) {
-      buttonText = "Evento finalizado";
-      buttonColor = Colors.grey;
-      onPressed = null;
-    } else if (event.spotsLeft > 0) {
-      buttonText = "Suscribirme";
-      buttonColor = theme.primary;
-      onPressed = () {
-        // Acción de suscripción
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Te has suscrito al evento')),
-        );
-      };
-    } else {
-      buttonText = "Agotado";
-      buttonColor = Colors.grey;
-      onPressed = null;
-    }
+      // Verificar si ya está suscrito
+      final bool isSubscribed =
+          bookedEvtController.tasks.any((e) => e.id == eventValue.id);
 
-    return Positioned(
-      bottom: 0,
-      left: 0,
-      right: 0,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-        decoration: BoxDecoration(color: theme.surface),
-        child: SizedBox(
-          width: double.infinity,
-          height: 50,
-          child: ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: buttonColor,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(30),
+      String buttonText;
+      Color buttonColor;
+      VoidCallback? onPressed;
+
+      if (isPastEvent) {
+        buttonText = "Evento finalizado";
+        buttonColor = Colors.grey;
+        onPressed = null;
+      } else if (isSubscribed) {
+        buttonText = "Ya estás suscrito";
+        buttonColor = Colors.grey;
+        onPressed = null;
+      } else if (eventValue.spotsLeft > 0) {
+        buttonText = "Suscribirme";
+        buttonColor = theme.primary;
+        onPressed = () {
+          // Agregar evento a la lista de suscritos
+          bookedEvtController.addTask(eventValue);
+
+          // Restar 1 a los cupos disponibles y actualizar el estado de GetX
+          event.value = event.value.copyWith(
+            spotsLeft:
+                (event.value.spotsLeft - 1).clamp(0, event.value.capacity),
+          );
+
+          // También actualizar la lista dummyEvents
+          int index = dummyEvents.indexWhere((e) => e.id == eventValue.id);
+          if (index != -1) {
+            dummyEvents[index] = event.value;
+          }
+
+          // Mostrar confirmación después del frame actual
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Te has suscrito al evento')),
+            );
+          });
+        };
+      } else {
+        buttonText = "Agotado";
+        buttonColor = Colors.grey;
+        onPressed = null;
+      }
+
+      return Positioned(
+        bottom: 0,
+        left: 0,
+        right: 0,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+          decoration: BoxDecoration(color: theme.surface),
+          child: SizedBox(
+            width: double.infinity,
+            height: 50,
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: buttonColor,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(30),
+                ),
               ),
-            ),
-            onPressed: onPressed,
-            child: Text(
-              buttonText,
-              style: const TextStyle(color: Colors.white, fontSize: 16),
+              onPressed: onPressed,
+              child: Text(
+                buttonText,
+                style: const TextStyle(color: Colors.white, fontSize: 16),
+              ),
             ),
           ),
         ),
-      ),
-    );
+      );
+    });
   }
 }

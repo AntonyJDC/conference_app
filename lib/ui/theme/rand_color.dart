@@ -29,5 +29,5 @@ class ColorR extends Color {
   }
 
   /// Constructor adicional para facilitar la creación desde ARGB
-  ColorR.fromARGB(int a, int r, int g, int b) : super.fromARGB(a, r, g, b);
+  ColorR.fromARGB(super.a, super.r, super.g, super.b) : super.fromARGB();
 }
