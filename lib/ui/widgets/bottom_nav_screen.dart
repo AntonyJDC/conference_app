@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:conference_app/controllers/navbar_controller.dart';
 import 'package:conference_app/ui/pages/home/home_screen.dart';
-import 'package:time_planner/time_planner.dart';
 import 'package:conference_app/ui/pages/booking/calendar_screen.dart';
 
 class BottomNavScreen extends StatelessWidget {
@@ -83,39 +82,3 @@ class BottomNavScreen extends StatelessWidget {
     );
   }
 }
-
-List<TimePlannerTask> tasks = [
-  TimePlannerTask(
-    color: Colors.purple,
-    dateTime: TimePlannerDateTime(day: 0, hour: 14, minutes: 30),
-    minutesDuration: 90,
-    daysDuration: 1,
-    onTap: () {},
-    child: Text(
-      'Meeting with team',
-      style: TextStyle(color: Colors.grey[350], fontSize: 12),
-    ),
-  ),
-  TimePlannerTask(
-    color: Colors.blue,
-    dateTime: TimePlannerDateTime(day: 1, hour: 10, minutes: 0),
-    minutesDuration: 60,
-    daysDuration: 1,
-    onTap: () {},
-    child: Text(
-      'Client presentation',
-      style: TextStyle(color: Colors.white, fontSize: 12),
-    ),
-  ),
-  TimePlannerTask(
-    color: Colors.green,
-    dateTime: TimePlannerDateTime(day: 2, hour: 16, minutes: 15),
-    minutesDuration: 45,
-    daysDuration: 1,
-    onTap: () {},
-    child: Text(
-      'Code review',
-      style: TextStyle(color: Colors.black, fontSize: 12),
-    ),
-  ),
-];

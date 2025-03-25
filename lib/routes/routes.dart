@@ -26,9 +26,6 @@ class AppRoutes {
     GetPage(name: detail, page: () => const EventDetailPage()),
     GetPage(name: '/favorite', page: () => const FavoritesPage()),
     GetPage(name: category, page: () => const CategoryScreen()),
-    GetPage(
-      name: nearby,
-      page: () => NearbyEventsPage(),
-    ),
+    GetPage(name: nearby, page: () => NearbyEventsPage()),
   ];
 }

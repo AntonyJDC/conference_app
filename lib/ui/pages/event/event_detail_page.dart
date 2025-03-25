@@ -12,13 +12,9 @@ class EventDetailPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final favoriteController = Get.find<FavoriteController>();
-    late EventModel event;
-    try {
-      event = Get.arguments as EventModel;
-    } catch (e) {
-      return const Scaffold(
-          body: Center(child: Text('Error al cargar el evento.')));
-    }
+
+    // Convertir event en un observable para actualizar la UI al cambiar spotsLeft
+    final event = (Get.arguments as EventModel).obs;
 
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
@@ -27,8 +23,8 @@ class EventDetailPage extends StatelessWidget {
           ListView(
             padding: const EdgeInsets.only(bottom: 20),
             children: [
-              EventImage(event: event),
-              EventInfo(event: event),
+              EventImage(event: event()),
+              EventInfo(event: event()),
               GestureDetector(
                 onTap: () {
                   final nearbyEvents = [
@@ -60,9 +56,7 @@ class EventDetailPage extends StatelessWidget {
                     ),
                   ];
 
-                  Get.toNamed('/nearby',
-                      arguments:
-                          nearbyEvents); // Asegúrate de usar la ruta correcta
+                  Get.toNamed('/nearby', arguments: nearbyEvents);
                 },
                 child: Text(
                   'Ver todos',
@@ -83,9 +77,9 @@ class EventDetailPage extends StatelessWidget {
             top: 40,
             right: 16,
             child: Obx(() {
-              bool isFav = favoriteController.isFavorite(event);
+              bool isFav = favoriteController.isFavorite(event.value);
               return _circleButton(
-                () => favoriteController.toggleFavorite(event),
+                () => favoriteController.toggleFavorite(event.value),
                 isFav ? Icons.favorite : Icons.favorite_border,
                 color: isFav ? Colors.red : Colors.white,
               );
@@ -104,7 +98,7 @@ class EventDetailPage extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
-          color: Colors.black.withValues(alpha: 0.5),
+          color: Colors.black.withOpacity(0.5),
           shape: BoxShape.circle,
         ),
         child: Icon(icon, color: color),
