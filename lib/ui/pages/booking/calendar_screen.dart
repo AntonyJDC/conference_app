@@ -40,7 +40,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
 
   @override
   void dispose() {
-    _taskListener.dispose(); // Cancela la escucha al destruir el widget
+    _taskListener.dispose();
     super.dispose();
   }
 
@@ -107,6 +107,9 @@ class _CalendarScreenState extends State<CalendarScreen> {
   @override
   Widget build(BuildContext context) {
     bool hasEvents = bookedEventsController.tasks.isNotEmpty;
+    Brightness brightness = Theme.of(context).brightness;
+    Color eventColor =
+        brightness == Brightness.dark ? Colors.white : Colors.black;
 
     return Scaffold(
       appBar: AppBar(
@@ -119,7 +122,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
           ),
         ),
         backgroundColor:
-            Theme.of(context).colorScheme.primary.withValues(alpha: 0.99),
+            Theme.of(context).colorScheme.primary.withOpacity(0.99),
       ),
       body: Column(
         children: [
@@ -130,7 +133,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
               lastDay: DateTime.utc(2100, 12, 31),
               focusedDay: _focusedDay,
               selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
-              eventLoader: (day) => _events[day] ?? [],
+              eventLoader: _getEventsForDay,
               onDaySelected: _onDaySelected,
               calendarFormat: _calendarFormat,
               onFormatChanged: (format) {
@@ -141,6 +144,43 @@ class _CalendarScreenState extends State<CalendarScreen> {
               onPageChanged: (focusedDay) {
                 _focusedDay = focusedDay;
               },
+              calendarBuilders: CalendarBuilders(
+                defaultBuilder: (context, day, focusedDay) {
+                  final events = _getEventsForDay(day);
+                  bool hasEvents = events.isNotEmpty;
+                  return Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        '${day.day}',
+                        style: TextStyle(fontSize: 16),
+                      ),
+                      if (hasEvents)
+                        Padding(
+                          padding: const EdgeInsets.only(
+                              top: 1), // Baja los puntos un poco
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: List.generate(
+                              events.length.clamp(1, 3), // Máximo 3 puntos
+                              (index) => Container(
+                                margin:
+                                    const EdgeInsets.symmetric(horizontal: 2),
+                                width: 6,
+                                height: 6,
+                                decoration: BoxDecoration(
+                                  color:
+                                      eventColor,
+                                  shape: BoxShape.circle,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                    ],
+                  );
+                },
+              ),
             ),
           ),
           const SizedBox(height: 10),
@@ -168,9 +208,9 @@ class _CalendarScreenState extends State<CalendarScreen> {
       floatingActionButton: hasEvents
           ? FloatingActionButton(
               backgroundColor:
-                  Theme.of(context).colorScheme.primary.withValues(alpha: 0.99),
+                  Theme.of(context).colorScheme.primary.withOpacity(0.99),
               onPressed: _goToNearestEvent,
-              child: const Icon(Icons.forward),
+              child: const Icon(Icons.forward_rounded),
             )
           : null,
     );
