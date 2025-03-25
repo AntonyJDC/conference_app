@@ -1,3 +1,4 @@
+import 'package:conference_app/controllers/favorite_controller.dart';
 import 'package:conference_app/data/models/event_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -14,8 +15,9 @@ class SecondEventCard extends StatelessWidget {
     final date = DateTime.parse(event.date);
     final now = DateTime.now();
     final isPastEvent = date.isBefore(now);
+    final favoriteController = Get.find<FavoriteController>();
 
-    // Banderín dinámico
+    // Color del banderín
     final banderinColor = isPastEvent
         ? const Color.fromARGB(255, 245, 46, 32)
         : theme.colorScheme.primary;
@@ -72,6 +74,32 @@ class SecondEventCard extends StatelessWidget {
             ),
           ),
 
+          // ❤️ Favorito dinámico
+          Positioned(
+            top: 12,
+            right: 12,
+            child: Obx(() {
+              final isFavorite = favoriteController.isFavorite(event);
+              return GestureDetector(
+                onTap: () => favoriteController.toggleFavorite(event),
+                child: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.black.withOpacity(0.4),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    isFavorite ? Icons.favorite : Icons.favorite_border,
+                    color: isFavorite
+                        ? const Color.fromARGB(255, 255, 17, 0)
+                        : Colors.white,
+                    size: 20,
+                  ),
+                ),
+              );
+            }),
+          ),
+
           // 📄 Contenido sobre la imagen
           Positioned(
             bottom: -30,
@@ -84,7 +112,7 @@ class SecondEventCard extends StatelessWidget {
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
-                    color: theme.colorScheme.outline.withValues(alpha: 0.3),
+                    color: theme.colorScheme.outline.withOpacity(0.3),
                     blurRadius: 6,
                     offset: const Offset(0, 3),
                   ),

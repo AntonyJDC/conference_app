@@ -1,5 +1,6 @@
 import 'package:conference_app/data/local/events_data.dart';
 import 'package:conference_app/data/models/event_model.dart';
+import 'package:conference_app/ui/pages/event/event_list_page.dart';
 import 'package:conference_app/ui/pages/home/widgets/category_list.dart';
 import 'package:conference_app/ui/pages/home/widgets/home_header.dart.dart';
 import 'package:conference_app/ui/pages/home/widgets/section_title.dart';
@@ -72,7 +73,11 @@ class HomeScreen extends StatelessWidget {
           SectionTitle(
             title: "Eventos cercanos",
             onTap: () {
-              Get.toNamed('/nearby', arguments: limitedNearbyEvents);
+              Get.to(() => EventListPage(
+                    title: 'Eventos Cercanos',
+                    emptyMessage: 'No hay eventos cercanos disponibles.',
+                    events: limitedNearbyEvents,
+                  ));
             },
           ),
           const SizedBox(height: 16),
@@ -120,9 +125,10 @@ class HomeScreen extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(event.title,
+                                  maxLines: 2,
                                   style: const TextStyle(
                                       color: Colors.white,
-                                      fontSize: 16,
+                                      fontSize: 14,
                                       fontWeight: FontWeight.bold)),
                               const SizedBox(height: 8),
                               if (daysLeft >= 0)
@@ -147,7 +153,7 @@ class HomeScreen extends StatelessWidget {
                                               color: daysLeft <= 30
                                                   ? Colors.red
                                                   : Colors.black87,
-                                              fontSize: 12,
+                                              fontSize: 11,
                                               fontWeight: FontWeight.w600)),
                                     ],
                                   ),
@@ -165,6 +171,8 @@ class HomeScreen extends StatelessWidget {
 
           // 🔹 Categorías
           const SizedBox(height: 22),
+          SectionTitle(title: "Categorías"),
+          const SizedBox(height: 16),
           const CategoryList(),
 
           // 🔹 Eventos próximos con navegación
@@ -172,7 +180,11 @@ class HomeScreen extends StatelessWidget {
           SectionTitle(
               title: "Eventos proximos",
               onTap: () {
-                Get.toNamed('/nearby', arguments: sortedEvents);
+                Get.to(() => EventListPage(
+                      title: 'Eventos Próximos',
+                      emptyMessage: 'No hay eventos próximos disponibles.',
+                      events: sortedEvents,
+                    ));
               }),
 
           const SizedBox(height: 16),
@@ -214,7 +226,7 @@ class HomeScreen extends StatelessWidget {
                                   Text(event.title,
                                       style: const TextStyle(
                                           fontWeight: FontWeight.w700,
-                                          fontSize: 13),
+                                          fontSize: 12),
                                       maxLines: 2,
                                       overflow: TextOverflow.ellipsis),
                                   const SizedBox(height: 8),
@@ -239,7 +251,7 @@ class HomeScreen extends StatelessWidget {
                                     child: Text(event.date,
                                         style: const TextStyle(
                                             color: Colors.grey,
-                                            fontSize: 12,
+                                            fontSize: 11,
                                             fontWeight: FontWeight.w500),
                                         maxLines: 1,
                                         overflow: TextOverflow.ellipsis),

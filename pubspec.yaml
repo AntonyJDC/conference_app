@@ -70,10 +70,12 @@ flutter:
     - assets/images/
 
   fonts:
-    - family: Mulish
+    - family: SFProDisplay
       fonts:
-        - asset: assets/fonts/Mulish-Light.ttf
-        - asset: assets/fonts/Mulish-SemiBold.ttf
+        - asset: assets/fonts/SFPRODISPLAYREGULAR.OTF
+        - asset: assets/fonts/SFPRODISPLAYBOLD.OTF
+        - asset: assets/fonts/SFPRODISPLAYMEDIUM.OTF
+        - asset: assets/fonts/SFPRODISPLAYLIGHTITALIC.OTF
 
 
   # The following line ensures that the Material Icons font is

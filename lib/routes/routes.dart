@@ -1,4 +1,5 @@
 import 'package:conference_app/ui/pages/event/event_detail_page.dart';
+import 'package:conference_app/ui/pages/event/event_list_page.dart';
 import 'package:conference_app/ui/pages/favorites/favorites_screen.dart';
 import 'package:conference_app/ui/pages/search/search_page.dart';
 import 'package:get/get.dart';
@@ -6,7 +7,6 @@ import 'package:conference_app/ui/pages/home/home_screen.dart';
 import 'package:conference_app/ui/pages/onBoarding/onboarding_screen.dart';
 import 'package:conference_app/ui/widgets/bottom_nav_screen.dart';
 import 'package:conference_app/ui/pages/category/category_screen.dart';
-import 'package:conference_app/ui/pages/event/nearby_events_page.dart';
 
 class AppRoutes {
   static const String onboarding = '/';
@@ -27,6 +27,16 @@ class AppRoutes {
     GetPage(name: detail, page: () => const EventDetailPage()),
     GetPage(name: favorite, page: () => const FavoritesPage()),
     GetPage(name: category, page: () => const CategoryScreen()),
-    GetPage(name: nearby, page: () => NearbyEventsPage()),
+    GetPage(
+      name: nearby,
+      page: () {
+        final args = Get.arguments;
+        return EventListPage(
+          title: args['title'] ?? 'Eventos',
+          emptyMessage: args['emptyMessage'] ?? 'No hay eventos disponibles.',
+          events: args['events'] ?? [],
+        );
+      },
+    ),
   ];
 }

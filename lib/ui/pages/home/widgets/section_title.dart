@@ -15,13 +15,13 @@ class SectionTitle extends StatelessWidget {
         children: [
           Text(title,
               style:
-                  const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                  const TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
           if (onTap != null)
             GestureDetector(
               onTap: onTap,
               child: Text("Ver todos",
                   style: TextStyle(
-                      fontSize: 12,
+                      fontSize: 11,
                       fontWeight: FontWeight.w600,
                       color: Theme.of(context).colorScheme.primary)),
             ),
