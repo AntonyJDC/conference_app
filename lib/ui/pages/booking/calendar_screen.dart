@@ -107,9 +107,6 @@ class _CalendarScreenState extends State<CalendarScreen> {
   @override
   Widget build(BuildContext context) {
     bool hasEvents = bookedEventsController.tasks.isNotEmpty;
-    Brightness brightness = Theme.of(context).brightness;
-    Color eventColor =
-        brightness == Brightness.dark ? Colors.white : Colors.black;
 
     return Scaffold(
       appBar: AppBar(
