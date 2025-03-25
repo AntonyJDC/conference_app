@@ -125,9 +125,10 @@ class HomeScreen extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(event.title,
+                                  maxLines: 2,
                                   style: const TextStyle(
                                       color: Colors.white,
-                                      fontSize: 16,
+                                      fontSize: 14,
                                       fontWeight: FontWeight.bold)),
                               const SizedBox(height: 8),
                               if (daysLeft >= 0)
@@ -152,7 +153,7 @@ class HomeScreen extends StatelessWidget {
                                               color: daysLeft <= 30
                                                   ? Colors.red
                                                   : Colors.black87,
-                                              fontSize: 12,
+                                              fontSize: 11,
                                               fontWeight: FontWeight.w600)),
                                     ],
                                   ),
@@ -170,6 +171,8 @@ class HomeScreen extends StatelessWidget {
 
           // 🔹 Categorías
           const SizedBox(height: 22),
+          SectionTitle(title: "Categorías"),
+          const SizedBox(height: 16),
           const CategoryList(),
 
           // 🔹 Eventos próximos con navegación
@@ -223,7 +226,7 @@ class HomeScreen extends StatelessWidget {
                                   Text(event.title,
                                       style: const TextStyle(
                                           fontWeight: FontWeight.w700,
-                                          fontSize: 13),
+                                          fontSize: 12),
                                       maxLines: 2,
                                       overflow: TextOverflow.ellipsis),
                                   const SizedBox(height: 8),
@@ -248,7 +251,7 @@ class HomeScreen extends StatelessWidget {
                                     child: Text(event.date,
                                         style: const TextStyle(
                                             color: Colors.grey,
-                                            fontSize: 12,
+                                            fontSize: 11,
                                             fontWeight: FontWeight.w500),
                                         maxLines: 1,
                                         overflow: TextOverflow.ellipsis),
