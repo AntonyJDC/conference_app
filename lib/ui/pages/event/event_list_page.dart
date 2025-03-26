@@ -56,7 +56,11 @@ class EventListPage extends StatelessWidget {
                 itemCount: events.length,
                 itemBuilder: (context, index) {
                   final event = events[index];
-                  return EventCard(event: event);
+                  return EventCard(
+                    event: event,
+                    showFavorite: false,
+                    showDate: true,
+                  );
                 },
               ),
             ),

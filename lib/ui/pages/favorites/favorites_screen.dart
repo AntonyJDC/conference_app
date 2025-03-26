@@ -1,5 +1,5 @@
 import 'package:conference_app/controllers/favorite_controller.dart';
-import 'package:conference_app/ui/widgets/second_event_card.dart';
+import 'package:conference_app/ui/widgets/event_card.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -49,7 +49,7 @@ class FavoritesPage extends StatelessWidget {
           itemCount: favorites.length,
           itemBuilder: (context, index) {
             final event = favorites[index];
-            return SecondEventCard(event: event);
+            return EventCard(event: event, showDate: true, showFavorite: true);
           },
         );
       }),

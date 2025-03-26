@@ -1,34 +1,113 @@
+import 'package:conference_app/controllers/favorite_controller.dart';
 import 'package:conference_app/data/models/event_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 
 class EventCard extends StatelessWidget {
   final EventModel event;
+  final bool showFavorite, showDate;
 
-  const EventCard({super.key, required this.event});
+  const EventCard(
+      {super.key,
+      required this.event,
+      this.showFavorite = false,
+      this.showDate = false});
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final screenWidth = MediaQuery.of(context).size.width;
+    final date = DateTime.parse(event.date);
+    final now = DateTime.now();
+    final isPastEvent = date.isBefore(now);
+    final favoriteController = Get.find<FavoriteController>();
+
+    // Color del banderín
+    final banderinColor = isPastEvent
+        ? const Color.fromARGB(255, 245, 46, 32)
+        : theme.colorScheme.primary;
+
+    final day = DateFormat('dd').format(date);
+    final month = DateFormat('MMM', 'es_CO').format(date).toUpperCase();
 
     return Padding(
-      padding: const EdgeInsets.only(bottom: 50), // Espacio entre cards
+      padding: const EdgeInsets.only(bottom: 50),
       child: Stack(
         clipBehavior: Clip.none,
         children: [
-          // Imagen del evento
+          // 📸 Imagen del evento
           ClipRRect(
             borderRadius: BorderRadius.circular(16),
             child: Image.asset(
               event.imageUrl,
               width: double.infinity,
-              height: screenWidth * 0.5,
+              height: MediaQuery.of(context).size.width * 0.5,
               fit: BoxFit.cover,
             ),
           ),
 
-          // Contenido sobre la imagen
+          // 📌 Banderín de la fecha
+          if (showDate)
+            Positioned(
+              top: 12,
+              left: 12,
+              child: Container(
+                width: 44,
+                height: 54,
+                decoration: BoxDecoration(
+                  color: banderinColor,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      day,
+                      style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold),
+                    ),
+                    Text(
+                      month,
+                      style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 10,
+                          fontWeight: FontWeight.w500),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+          // ❤️ Favorito dinámico
+          if (showFavorite)
+            Positioned(
+              top: 12,
+              right: 12,
+              child: Obx(() {
+                final isFavorite = favoriteController.isFavorite(event);
+                return GestureDetector(
+                  onTap: () => favoriteController.toggleFavorite(event),
+                  child: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.black.withValues(alpha: 0.4),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      isFavorite ? Icons.favorite : Icons.favorite_border,
+                      color: isFavorite
+                          ? const Color.fromARGB(255, 255, 17, 0)
+                          : Colors.white,
+                      size: 20,
+                    ),
+                  ),
+                );
+              }),
+            ),
+
+          // 📄 Contenido sobre la imagen
           Positioned(
             bottom: -30,
             left: 10,
@@ -48,7 +127,7 @@ class EventCard extends StatelessWidget {
               ),
               child: Row(
                 children: [
-                  // Info del evento
+                  // 📃 Info del evento
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -76,18 +155,25 @@ class EventCard extends StatelessWidget {
                             ),
                           ],
                         ),
+                        const SizedBox(height: 2),
                         Row(
                           children: [
-                            const Icon(Icons.calendar_month_rounded,
+                            const Icon(Icons.timer,
                                 size: 12, color: Colors.grey),
                             const SizedBox(width: 4),
                             Expanded(
-                              child: Text(
-                                '${event.date} - ${event.startTime} - ${event.endTime}',
-                                style: const TextStyle(
-                                    fontSize: 10, color: Colors.grey),
-                                overflow: TextOverflow.ellipsis,
-                              ),
+                              child: isPastEvent
+                                  ? const Text(
+                                      'Evento finalizado',
+                                      style: TextStyle(
+                                          fontSize: 10, color: Colors.red),
+                                    )
+                                  : Text(
+                                      '${event.startTime} - ${event.endTime}',
+                                      style: const TextStyle(
+                                          fontSize: 10, color: Colors.grey),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
                             ),
                           ],
                         ),
@@ -95,7 +181,7 @@ class EventCard extends StatelessWidget {
                     ),
                   ),
 
-                  // Botón Ver Detalle
+                  // 🔗 Botón Ver Detalle
                   Container(
                     margin: const EdgeInsets.only(left: 12),
                     child: ElevatedButton(
