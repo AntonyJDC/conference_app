@@ -23,7 +23,7 @@ class SecondEventCard extends StatelessWidget {
         : theme.colorScheme.primary;
 
     final day = DateFormat('dd').format(date);
-    final month = DateFormat('MMM', 'es_ES').format(date).toUpperCase();
+    final month = DateFormat('MMM', 'es_CO').format(date).toUpperCase();
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 50),
