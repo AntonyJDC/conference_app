@@ -1,4 +1,5 @@
 import 'package:conference_app/data/models/event_model.dart';
+import 'package:conference_app/ui/pages/booking/widgets/event_card.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:conference_app/controllers/booked_events.dart';
@@ -36,6 +37,8 @@ class _CalendarScreenState extends State<CalendarScreen> {
     });
 
     _loadEvents();
+
+    _selectedEvents = _getEventsForDay(_selectedDay!);
   }
 
   @override
@@ -107,25 +110,64 @@ class _CalendarScreenState extends State<CalendarScreen> {
   @override
   Widget build(BuildContext context) {
     bool hasEvents = bookedEventsController.tasks.isNotEmpty;
+    double screenWidth = MediaQuery.of(context).size.width;
+    double daysOfWeekHeight = screenWidth < 400 ? 50 : 70;
 
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        centerTitle: true,
+        elevation: 0,
         title: Text(
-          'Booked Events',
+          'Calendario de eventos',
           style: TextStyle(
             color: Theme.of(context).colorScheme.onPrimary,
             fontSize: 16,
             fontWeight: FontWeight.w600,
           ),
         ),
-        backgroundColor:
-            Theme.of(context).colorScheme.primary.withOpacity(0.99),
       ),
       body: Column(
         children: [
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: TableCalendar(
+              locale: 'es_CO',
+              calendarStyle: CalendarStyle(
+                todayDecoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.primary,
+                  shape: BoxShape.circle,
+                ),
+                selectedDecoration: BoxDecoration(
+                  color: Theme.of(context)
+                      .colorScheme
+                      .primary
+                      .withValues(alpha: 0.5),
+                  shape: BoxShape.circle,
+                ),
+                markersMaxCount: 3,
+              ),
+              daysOfWeekHeight: daysOfWeekHeight,
+              headerStyle: HeaderStyle(
+                headerPadding: EdgeInsets.only(top: 10),
+                titleCentered: true,
+                titleTextStyle: TextStyle(
+                  color: Theme.of(context).colorScheme.primary,
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
+                ),
+                formatButtonVisible: false,
+              ),
+              daysOfWeekStyle: DaysOfWeekStyle(
+                weekdayStyle: TextStyle(
+                  color: Theme.of(context).colorScheme.primary,
+                  fontWeight: FontWeight.w400,
+                ),
+                weekendStyle: TextStyle(
+                  color: Theme.of(context).colorScheme.primary,
+                  fontWeight: FontWeight.w400,
+                ),
+              ),
               firstDay: DateTime.utc(2000, 1, 1),
               lastDay: DateTime.utc(2100, 12, 31),
               focusedDay: _focusedDay,
@@ -142,51 +184,63 @@ class _CalendarScreenState extends State<CalendarScreen> {
                 _focusedDay = focusedDay;
               },
               calendarBuilders: CalendarBuilders(
-  markerBuilder: (context, day, events) {
-    if (events.isEmpty) return SizedBox(); // No mostrar nada si no hay eventos
+                markerBuilder: (context, day, events) {
+                  if (events.isEmpty) {
+                    return SizedBox(); // No mostrar nada si no hay eventos
+                  }
 
-    Brightness brightness = Theme.of(context).brightness;
-    Color eventColor = brightness == Brightness.dark ? Colors.white : Colors.black;
+                  Brightness brightness = Theme.of(context).brightness;
+                  Color eventColor = brightness == Brightness.dark
+                      ? Colors.white
+                      : Theme.of(context).colorScheme.inversePrimary;
 
-    return Padding(
-      padding: const EdgeInsets.only(top: 20), // Ajusta la posición de los puntos
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: List.generate(
-          events.length.clamp(1, 3),
-          (index) => Container(
-            margin: const EdgeInsets.symmetric(horizontal: 2),
-            width: 6,
-            height: 6,
-            decoration: BoxDecoration(
-              color: eventColor,
-              shape: BoxShape.circle,
-            ),
-          ),
-        ),
-      ),
-    );
-  },
-),
-
+                  return Padding(
+                    padding: const EdgeInsets.only(
+                        top: 30), // Ajusta la posición de los puntos
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: List.generate(
+                        events.length.clamp(1, 3),
+                        (index) => Container(
+                          margin: const EdgeInsets.symmetric(horizontal: 2),
+                          width: 6,
+                          height: 6,
+                          decoration: BoxDecoration(
+                            color: eventColor,
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
             ),
           ),
           const SizedBox(height: 10),
           Expanded(
             child: _selectedEvents.isEmpty
-                ? const Center(child: Text("No events for this day"))
+                ? Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.calendar_today,
+                            size: 80, color: Colors.grey.shade400),
+                        const SizedBox(height: 16),
+                        const Padding(
+                          padding: EdgeInsets.all(32),
+                          child: Text('No tienes eventos para hoy'),
+                        ),
+                      ],
+                    ),
+                  )
                 : ListView.builder(
                     itemCount: _selectedEvents.length,
                     itemBuilder: (context, index) {
                       final event = _selectedEvents[index];
-                      return Card(
-                        child: ListTile(
-                          leading: Image.asset(event.imageUrl),
-                          title: Text(event.title),
-                          subtitle: Text(
-                              "${event.startTime} - ${event.endTime} at ${event.location}"),
-                          onTap: () => Get.toNamed('/detail', arguments: event),
-                        ),
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8),
+                        child: EventCard(event: event),
                       );
                     },
                   ),
@@ -196,9 +250,10 @@ class _CalendarScreenState extends State<CalendarScreen> {
       floatingActionButton: hasEvents
           ? FloatingActionButton(
               backgroundColor:
-                  Theme.of(context).colorScheme.primary.withOpacity(0.99),
+                  Theme.of(context).colorScheme.primary.withValues(alpha: 0.99),
               onPressed: _goToNearestEvent,
-              child: const Icon(Icons.arrow_upward_rounded),
+              child:
+                  const Icon(Icons.arrow_upward_rounded, color: Colors.white),
             )
           : null,
     );
