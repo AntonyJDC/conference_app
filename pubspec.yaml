@@ -47,6 +47,7 @@ dependencies:
   intl: ^0.20.2
   time_planner: ^0.1.2+1
   table_calendar: ^3.2.0
+  timezone: ^0.10.0
 
 dev_dependencies:
   flutter_test:

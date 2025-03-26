@@ -1,27 +1,71 @@
+import 'dart:async';
 import 'package:conference_app/controllers/booked_events.dart';
 import 'package:conference_app/data/models/event_model.dart';
 import 'package:conference_app/data/local/events_data.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:timezone/timezone.dart' as tz;
+import 'package:timezone/data/latest.dart' as tz;
 
-class SubscribeButton extends StatelessWidget {
+class SubscribeButton extends StatefulWidget {
   final Rx<EventModel> event;
   const SubscribeButton({super.key, required this.event});
 
   @override
+  State<SubscribeButton> createState() => _SubscribeButtonState();
+}
+
+class _SubscribeButtonState extends State<SubscribeButton> {
+  late Timer _timer;
+  late BookedEventsController bookedEvtController;
+  late ColorScheme theme;
+  late tz.Location _colombiaTZ;
+
+  @override
+  void initState() {
+    super.initState();
+    bookedEvtController = Get.find<BookedEventsController>();
+    tz.initializeTimeZones();
+    _colombiaTZ = tz.getLocation('America/Bogota');
+
+    // ⏱ Actualiza cada minuto
+    _timer = Timer.periodic(const Duration(seconds: 10), (_) {
+      if (mounted) setState(() {});
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer.cancel();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final bookedEvtController = Get.find<BookedEventsController>();
-    final theme = Theme.of(context).colorScheme;
+    theme = Theme.of(context).colorScheme;
 
     return Obx(() {
-      final eventValue = event.value;
+      final eventValue = widget.event.value;
 
-      // Validación: ¿El evento ya pasó?
+      // ✅ Validación con hora de Colombia
       final eventDate = DateTime.tryParse(eventValue.date);
-      final now = DateTime.now();
-      final isPastEvent = eventDate != null && eventDate.isBefore(now);
+      final now = tz.TZDateTime.now(_colombiaTZ);
+      bool isPastEvent = false;
 
-      // Verificar si ya está suscrito
+      if (eventDate != null) {
+        final endTimeParts = eventValue.endTime.split(':');
+        final eventEnd = tz.TZDateTime(
+          _colombiaTZ,
+          eventDate.year,
+          eventDate.month,
+          eventDate.day,
+          int.parse(endTimeParts[0]),
+          int.parse(endTimeParts[1]),
+        );
+        isPastEvent =
+            now.isAfter(eventEnd.subtract(const Duration(seconds: 2)));
+      }
+
       final bool isSubscribed =
           bookedEvtController.tasks.any((e) => e.id == eventValue.id);
 
@@ -41,22 +85,17 @@ class SubscribeButton extends StatelessWidget {
         buttonText = "Suscribirme";
         buttonColor = theme.primary;
         onPressed = () {
-          // Agregar evento a la lista de suscritos
           bookedEvtController.addTask(eventValue);
-
-          // Restar 1 a los cupos disponibles y actualizar el estado de GetX
-          event.value = event.value.copyWith(
-            spotsLeft:
-                (event.value.spotsLeft - 1).clamp(0, event.value.capacity),
+          widget.event.value = widget.event.value.copyWith(
+            spotsLeft: (widget.event.value.spotsLeft - 1)
+                .clamp(0, widget.event.value.capacity),
           );
 
-          // También actualizar la lista dummyEvents
           int index = dummyEvents.indexWhere((e) => e.id == eventValue.id);
           if (index != -1) {
-            dummyEvents[index] = event.value;
+            dummyEvents[index] = widget.event.value;
           }
 
-          // Mostrar confirmación después del frame actual
           WidgetsBinding.instance.addPostFrameCallback((_) {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(content: Text('Te has suscrito al evento')),
