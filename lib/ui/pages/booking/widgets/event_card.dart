@@ -1,7 +1,6 @@
 import 'package:conference_app/data/models/event_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
 
 class EventCard extends StatelessWidget {
   final EventModel event;
@@ -11,14 +10,12 @@ class EventCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final date = DateTime.parse(event.date);
-    final day = DateFormat('dd').format(date);
-    final month = DateFormat('MMM').format(date).toUpperCase();
 
     return InkWell(
       onTap: () => Get.toNamed('/detail', arguments: event),
       child: Card(
-        elevation: 2,
+        color: theme.colorScheme.surface.withValues(alpha: 0.7),
+        elevation: 1,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         child: Stack(
           children: [
@@ -56,16 +53,14 @@ class EventCard extends StatelessWidget {
                           const SizedBox(height: 8),
                           Row(
                             children: [
-                              const Icon(Icons.location_on,
-                                  size: 16, color: Colors.grey),
+                              const Icon(Icons.location_on, size: 16),
                               const SizedBox(width: 5),
                               Expanded(
                                 child: Text(
                                   event.location,
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(
-                                      fontSize: 13, color: Colors.grey),
+                                  style: const TextStyle(fontSize: 13),
                                 ),
                               ),
                             ],
@@ -79,45 +74,12 @@ class EventCard extends StatelessWidget {
                   Container(
                     margin: const EdgeInsets.only(left: 6),
                     child: Icon(
-                      Icons.arrow_forward_ios,
-                      size: 16,
+                      Icons.arrow_forward_rounded,
+                      size: 20,
                       color: theme.colorScheme.primary,
                     ),
                   ),
                 ],
-              ),
-            ),
-
-            // 📌 Banderín de fecha
-            Positioned(
-              top: 8,
-              left: 8,
-              child: Container(
-                width: 40,
-                height: 50,
-                decoration: BoxDecoration(
-                  color: theme.colorScheme.primary,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      day,
-                      style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold),
-                    ),
-                    Text(
-                      month,
-                      style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 8,
-                          fontWeight: FontWeight.w500),
-                    ),
-                  ],
-                ),
               ),
             ),
           ],
