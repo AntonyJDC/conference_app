@@ -1,10 +1,10 @@
 import 'package:conference_app/data/models/event_model.dart';
-import 'package:conference_app/data/services/database_helper.dart';
+import 'package:conference_app/data/services/favorites_db.dart';
 import 'package:get/get.dart';
 
 class FavoriteController extends GetxController {
   var favorites = <EventModel>[].obs;
-  final dbHelper = DatabaseHelper();
+  final dbHelper = FavoritesDB();
 
   @override
   void onInit() {
