@@ -2,7 +2,7 @@ import 'package:conference_app/data/models/event_model.dart';
 import 'package:conference_app/ui/pages/booking/widgets/event_card.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:conference_app/controllers/booked_events.dart';
+import 'package:conference_app/controllers/booked_events_controller.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 class CalendarScreen extends StatefulWidget {
