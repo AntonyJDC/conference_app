@@ -2,25 +2,25 @@ import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:conference_app/data/models/event_model.dart';
 
-class DatabaseHelper {
-  static final DatabaseHelper _instance = DatabaseHelper._internal();
-  factory DatabaseHelper() => _instance;
-  DatabaseHelper._internal();
+class BookedEventsDB {
+  static final BookedEventsDB _instance = BookedEventsDB._internal();
+  factory BookedEventsDB() => _instance;
+  BookedEventsDB._internal();
 
-  Database? _database;
+  Database? _db;
 
   Future<Database> get database async {
-    _database ??= await _initDB();
-    return _database!;
+    _db ??= await _initDB();
+    return _db!;
   }
 
   Future<Database> _initDB() async {
     final dbPath = await getDatabasesPath();
-    final path = join(dbPath, 'favorites.db');
+    final path = join(dbPath, 'booked_events.db');
 
     return await openDatabase(path, version: 1, onCreate: (db, version) async {
       await db.execute('''
-        CREATE TABLE favorites (
+        CREATE TABLE booked_events (
           id TEXT PRIMARY KEY,
           title TEXT,
           description TEXT,
@@ -36,10 +36,10 @@ class DatabaseHelper {
     });
   }
 
-  Future<void> insertFavorite(EventModel event) async {
+  Future<void> insertEvent(EventModel event) async {
     final db = await database;
     await db.insert(
-      'favorites',
+      'booked_events',
       {
         'id': event.id,
         'title': event.title,
@@ -56,19 +56,19 @@ class DatabaseHelper {
     );
   }
 
-  Future<void> deleteFavorite(String id) async {
+  Future<void> deleteEvent(String id) async {
     final db = await database;
-    await db.delete('favorites', where: 'id = ?', whereArgs: [id]);
+    await db.delete('booked_events', where: 'id = ?', whereArgs: [id]);
   }
 
-  Future<void> clearFavorites() async {
+  Future<void> clearEvents() async {
     final db = await database;
-    await db.delete('favorites');
+    await db.delete('booked_events');
   }
 
-  Future<List<EventModel>> getFavorites() async {
+  Future<List<EventModel>> getAllEvents() async {
     final db = await database;
-    final List<Map<String, dynamic>> maps = await db.query('favorites');
+    final List<Map<String, dynamic>> maps = await db.query('booked_events');
 
     return List.generate(maps.length, (i) {
       return EventModel(
@@ -82,8 +82,15 @@ class DatabaseHelper {
         location: maps[i]['location'],
         capacity: maps[i]['capacity'],
         spotsLeft: maps[i]['spotsLeft'],
-        categories: [], // Si quieres manejar categorías, ajusta aquí
+        categories: [],
       );
     });
+  }
+
+  Future<bool> isBooked(String id) async {
+    final db = await database;
+    final result =
+        await db.query('booked_events', where: 'id = ?', whereArgs: [id]);
+    return result.isNotEmpty;
   }
 }
