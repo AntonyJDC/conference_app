@@ -10,10 +10,10 @@ class EventDetailPage extends StatefulWidget {
   const EventDetailPage({super.key});
 
   @override
-  _EventDetailPageState createState() => _EventDetailPageState();
+  EventDetailPageState createState() => EventDetailPageState();
 }
 
-class _EventDetailPageState extends State<EventDetailPage> {
+class EventDetailPageState extends State<EventDetailPage> {
   late Rx<EventModel> event;
   late FavoriteController favoriteController;
 
