@@ -14,7 +14,7 @@ void main() async {
 
   Get.put(BookedEventsController());
   Get.put(FavoriteController());
-  await initializeDateFormatting('es_ES', null);
+  await initializeDateFormatting('es_CO', null);
 
   runApp(MyApp(onboardingSeen: onboardingSeen));
 }
