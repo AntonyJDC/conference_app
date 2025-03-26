@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'package:conference_app/controllers/booked_events.dart';
+import 'package:conference_app/controllers/booked_events_controller.dart';
 import 'package:conference_app/data/models/event_model.dart';
 import 'package:conference_app/data/local/events_data.dart';
 import 'package:flutter/material.dart';
@@ -86,6 +86,7 @@ class _SubscribeButtonState extends State<SubscribeButton> {
         buttonColor = theme.primary;
         onPressed = () {
           bookedEvtController.addTask(eventValue);
+
           widget.event.value = widget.event.value.copyWith(
             spotsLeft: (widget.event.value.spotsLeft - 1)
                 .clamp(0, widget.event.value.capacity),
@@ -98,7 +99,9 @@ class _SubscribeButtonState extends State<SubscribeButton> {
 
           WidgetsBinding.instance.addPostFrameCallback((_) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Te has suscrito al evento')),
+              const SnackBar(
+                content: Text('Te has suscrito al evento'),
+              ),
             );
           });
         };
