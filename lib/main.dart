@@ -1,4 +1,4 @@
-import 'package:conference_app/controllers/booked_events.dart';
+import 'package:conference_app/controllers/booked_events_controller.dart';
 import 'package:conference_app/controllers/favorite_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
