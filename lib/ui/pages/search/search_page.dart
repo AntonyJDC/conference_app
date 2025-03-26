@@ -103,7 +103,7 @@ class _SearchPageState extends State<SearchPage> {
                     Padding(
                       padding: const EdgeInsets.only(bottom: 12, top: 20),
                       child: Text(
-                        DateFormat('dd MMMM yyyy', 'es_ES')
+                        DateFormat('dd MMMM yyyy', 'es_CO')
                             .format(DateTime.parse(dateKey)),
                         style: TextStyle(
                           fontSize: 15,
