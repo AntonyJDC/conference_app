@@ -11,6 +11,9 @@ class EventModel {
   int spotsLeft;
   final List<String> categories; // Ej: ["Música", "Tecnología"]
 
+  int? rating;
+  String? comment;
+
   EventModel({
     required this.id,
     required this.title,
@@ -23,6 +26,8 @@ class EventModel {
     required this.capacity, // Opcional
     required this.spotsLeft, // Opcional
     required this.categories,
+    this.rating,
+    this.comment,
   });
 
   Map<String, dynamic> toMap() => {
@@ -37,6 +42,8 @@ class EventModel {
         'capacity': capacity,
         'spotsLeft': spotsLeft,
         'categories': categories.join(','),
+        'rating': rating,
+        'comment': comment,
       };
 
   factory EventModel.fromMap(Map<String, dynamic> map) => EventModel(
@@ -51,6 +58,8 @@ class EventModel {
         capacity: map['capacity'],
         spotsLeft: map['spotsLeft'],
         categories: map['categories'].toString().split(','),
+        rating: map['rating'],
+        comment: map['comment'],
       );
 
   factory EventModel.fromJson(Map<String, dynamic> json) => EventModel(
@@ -65,6 +74,8 @@ class EventModel {
         capacity: json['capacity'],
         spotsLeft: json['spots_left'],
         categories: List<String>.from(json['categories']),
+        rating: json['rating'],
+        comment: json['comment'],
       );
 
   // Método copyWith
@@ -80,6 +91,8 @@ class EventModel {
     int? capacity,
     int? spotsLeft,
     List<String>? categories,
+    int? rating,
+    String? comment,
   }) {
     return EventModel(
       id: id ?? this.id,
@@ -93,6 +106,8 @@ class EventModel {
       capacity: capacity ?? this.capacity,
       spotsLeft: spotsLeft ?? this.spotsLeft,
       categories: categories ?? this.categories,
+      rating: rating ?? this.rating,
+      comment: comment ?? this.comment,
     );
   }
 }
