@@ -78,11 +78,27 @@ class _SubscribeButtonState extends State<SubscribeButton> {
         buttonColor = Colors.grey;
         onPressed = null;
       } else if (isSubscribed) {
-        buttonText = "Ya estás suscrito";
-        buttonColor = Colors.grey;
-        onPressed = null;
+        buttonText = "Darse de baja";
+        buttonColor = Colors.red;
+        onPressed = () {
+          bookedEvtController.removeTask(eventValue.id);
+
+          widget.event.value = widget.event.value.copyWith(
+            spotsLeft: (widget.event.value.spotsLeft + 1)
+                .clamp(0, widget.event.value.capacity),
+          );
+
+          int index = dummyEvents.indexWhere((e) => e.id == eventValue.id);
+          if (index != -1) {
+            dummyEvents[index] = widget.event.value;
+          }
+
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            showTopSnackBar(context, 'Cancelaste tu suscripción al evento');
+          });
+        };
       } else if (eventValue.spotsLeft > 0) {
-        buttonText = "Suscribirme";
+        buttonText = "Suscribirse";
         buttonColor = theme.primary;
         onPressed = () {
           bookedEvtController.addTask(eventValue);
@@ -98,11 +114,7 @@ class _SubscribeButtonState extends State<SubscribeButton> {
           }
 
           WidgetsBinding.instance.addPostFrameCallback((_) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Te has suscrito al evento'),
-              ),
-            );
+            showTopSnackBar(context, 'Te has suscrito al evento');
           });
         };
       } else {
@@ -137,6 +149,38 @@ class _SubscribeButtonState extends State<SubscribeButton> {
           ),
         ),
       );
+    });
+  }
+
+  void showTopSnackBar(BuildContext context, String message) {
+    final overlay = Overlay.of(context);
+    final overlayEntry = OverlayEntry(
+      builder: (context) => Positioned(
+        top: MediaQuery.of(context).padding.top + 10, // Ajusta la posición
+        left: 20,
+        right: 20,
+        child: Material(
+          color: Colors.transparent,
+          child: Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.black.withOpacity(0.6),
+              borderRadius: BorderRadius.circular(15),
+            ),
+            child: Text(
+              message,
+              style: const TextStyle(color: Colors.white, fontSize: 15),
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ),
+      ),
+    );
+
+    overlay.insert(overlayEntry);
+
+    Future.delayed(const Duration(seconds: 3), () {
+      overlayEntry.remove();
     });
   }
 }
