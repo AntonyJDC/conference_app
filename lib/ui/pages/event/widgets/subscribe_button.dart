@@ -94,11 +94,7 @@ class _SubscribeButtonState extends State<SubscribeButton> {
           }
 
           WidgetsBinding.instance.addPostFrameCallback((_) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Cancelaste tu suscripción al evento'),
-              ),
-            );
+            showTopSnackBar(context, 'Cancelaste tu suscripción al evento');
           });
         };
       } else if (eventValue.spotsLeft > 0) {
@@ -118,11 +114,7 @@ class _SubscribeButtonState extends State<SubscribeButton> {
           }
 
           WidgetsBinding.instance.addPostFrameCallback((_) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Te has suscrito al evento'),
-              ),
-            );
+            showTopSnackBar(context, 'Te has suscrito al evento');
           });
         };
       } else {
@@ -157,6 +149,38 @@ class _SubscribeButtonState extends State<SubscribeButton> {
           ),
         ),
       );
+    });
+  }
+
+  void showTopSnackBar(BuildContext context, String message) {
+    final overlay = Overlay.of(context);
+    final overlayEntry = OverlayEntry(
+      builder: (context) => Positioned(
+        top: MediaQuery.of(context).padding.top + 10, // Ajusta la posición
+        left: 20,
+        right: 20,
+        child: Material(
+          color: Colors.transparent,
+          child: Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.black.withOpacity(0.6),
+              borderRadius: BorderRadius.circular(15),
+            ),
+            child: Text(
+              message,
+              style: const TextStyle(color: Colors.white, fontSize: 15),
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ),
+      ),
+    );
+
+    overlay.insert(overlayEntry);
+
+    Future.delayed(const Duration(seconds: 3), () {
+      overlayEntry.remove();
     });
   }
 }
