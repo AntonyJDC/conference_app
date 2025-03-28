@@ -1,8 +1,9 @@
-import 'package:conference_app/data/local/events_data.dart';
+import 'package:conference_app/data/models/event_model.dart';
+import 'package:conference_app/domain/use_case/get_all_events_use_case.dart';
+import 'package:conference_app/ui/widgets/event_card.dart';
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:collection/collection.dart';
-import 'package:conference_app/ui/widgets/event_card.dart';
 
 class SearchPage extends StatefulWidget {
   const SearchPage({super.key});
@@ -13,11 +14,26 @@ class SearchPage extends StatefulWidget {
 
 class _SearchPageState extends State<SearchPage> {
   final TextEditingController searchController = TextEditingController();
-  List filteredEvents = dummyEvents;
+  List<EventModel> allEvents = [];
+  List<EventModel> filteredEvents = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadEvents();
+  }
+
+  Future<void> _loadEvents() async {
+    final events = await GetAllEventsUseCase().execute();
+    setState(() {
+      allEvents = events;
+      filteredEvents = events;
+    });
+  }
 
   void filterEvents(String query) {
     setState(() {
-      filteredEvents = dummyEvents.where((event) {
+      filteredEvents = allEvents.where((event) {
         final titleMatch =
             event.title.toLowerCase().contains(query.toLowerCase());
         final locationMatch =
@@ -35,22 +51,21 @@ class _SearchPageState extends State<SearchPage> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    // Ordenar los eventos por fecha antes de agrupar
+
+    // Agrupamos por fecha
     filteredEvents.sort(
         (a, b) => DateTime.parse(a.date).compareTo(DateTime.parse(b.date)));
-
-    // Agrupar eventos por fecha
     final groupedEvents = groupBy(filteredEvents, (e) => e.date);
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.primary,
+        backgroundColor: theme.colorScheme.primary,
         centerTitle: true,
         elevation: 0,
         title: Text(
           'Buscar Eventos',
           style: TextStyle(
-            color: Theme.of(context).colorScheme.onPrimary,
+            color: theme.colorScheme.onPrimary,
             fontSize: 16,
             fontWeight: FontWeight.w600,
           ),
@@ -66,15 +81,11 @@ class _SearchPageState extends State<SearchPage> {
               child: TextField(
                 controller: searchController,
                 onChanged: filterEvents,
-                style: TextStyle(
-                  fontSize: 14,
-                ),
+                style: const TextStyle(fontSize: 14),
                 decoration: InputDecoration(
                   hintText: 'Buscar eventos',
-                  hintStyle: TextStyle(
-                    fontSize: 14,
-                  ),
-                  prefixIcon: Icon(Icons.search),
+                  hintStyle: const TextStyle(fontSize: 14),
+                  prefixIcon: const Icon(Icons.search),
                   filled: true,
                   fillColor: theme.colorScheme.outline,
                   contentPadding:
@@ -87,38 +98,42 @@ class _SearchPageState extends State<SearchPage> {
               ),
             ),
           ),
+
           // 🔥 Lista de eventos
           Expanded(
-            child: ListView.builder(
-              padding: const EdgeInsets.symmetric(horizontal: 14),
-              itemCount: groupedEvents.keys.length,
-              itemBuilder: (context, index) {
-                final dateKey = groupedEvents.keys.elementAt(index);
-                final eventsForDate = groupedEvents[dateKey]!;
+            child: groupedEvents.isEmpty
+                ? const Center(child: Text('No se encontraron eventos.'))
+                : ListView.builder(
+                    padding: const EdgeInsets.symmetric(horizontal: 14),
+                    itemCount: groupedEvents.keys.length,
+                    itemBuilder: (context, index) {
+                      final dateKey = groupedEvents.keys.elementAt(index);
+                      final eventsForDate = groupedEvents[dateKey]!;
 
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // 📅 Fecha como separador
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 12, top: 20),
-                      child: Text(
-                        DateFormat('dd MMMM yyyy', 'es_CO')
-                            .format(DateTime.parse(dateKey)),
-                        style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w700,
-                          color: theme.colorScheme.primary,
-                        ),
-                      ),
-                    ),
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // 📅 Fecha como separador
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 12, top: 20),
+                            child: Text(
+                              DateFormat('dd MMMM yyyy', 'es_CO')
+                                  .format(DateTime.parse(dateKey)),
+                              style: TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w700,
+                                color: theme.colorScheme.primary,
+                              ),
+                            ),
+                          ),
 
-                    // 🔥 Tarjetas de eventos
-                    ...eventsForDate.map((event) => EventCard(event: event))
-                  ],
-                );
-              },
-            ),
+                          // 🔥 Tarjetas de eventos
+                          ...eventsForDate
+                              .map((event) => EventCard(event: event))
+                        ],
+                      );
+                    },
+                  ),
           ),
         ],
       ),
