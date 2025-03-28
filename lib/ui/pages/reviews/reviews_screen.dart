@@ -106,15 +106,18 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
                 ),
               ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 45),
             Expanded(
               child: Obx(() {
                 final now = DateTime.now();
                 final events = controller.tasks;
 
-                final feedbackEvents = events
-                    .where((e) => e.comment != null || e.rating != null)
-                    .toList();
+                final feedbackEvents = events.where((e) {
+                  final hasRating = e.rating != null && e.rating! > 0;
+                  final hasComment =
+                      e.comment != null && e.comment!.trim().isNotEmpty;
+                  return hasRating || hasComment;
+                }).toList();
 
                 final completedEvents = events.where((e) {
                   final eventDate = DateTime.tryParse(e.date);
@@ -125,46 +128,28 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
                     showFeedbacks ? feedbackEvents : completedEvents;
 
                 if (displayed.isEmpty) {
-                  return const Center(
+                  return Center(
                     child: Text(
-                      'No hay eventos aún.',
-                      style: TextStyle(fontSize: 16),
+                      showFeedbacks
+                          ? 'No has dejado ningún feedback aún.'
+                          : 'No has asistido a eventos finalizados aún.',
+                      style: const TextStyle(fontSize: 16),
                     ),
                   );
                 }
 
                 return ListView.builder(
-                  padding: const EdgeInsets.all(12),
+                  padding: const EdgeInsets.fromLTRB(12, 20, 12, 12),
                   itemCount: displayed.length,
                   itemBuilder: (context, index) {
                     final event = displayed[index];
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        EventCard(event: event),
-                        const SizedBox(height: 4),
-                        Padding(
-                          padding: const EdgeInsets.only(left: 12, bottom: 12),
-                          child: showFeedbacks
-                              ? Text(
-                                  '⭐ ${event.rating ?? '-'} — ${event.comment ?? 'Sin comentario'}',
-                                  style: const TextStyle(
-                                      fontStyle: FontStyle.italic),
-                                )
-                              : Text(
-                                  event.comment != null || event.rating != null
-                                      ? '✅ Ya dejaste feedback.'
-                                      : '❗ No dejaste feedback.',
-                                  style: TextStyle(
-                                    fontStyle: FontStyle.italic,
-                                    color: event.comment == null &&
-                                            event.rating == null
-                                        ? Colors.red
-                                        : Colors.green,
-                                  ),
-                                ),
-                        )
-                      ],
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 12),
+                      child: EventCard(
+                        event: event,
+                        rating: event.rating,
+                        comment: event.comment,
+                      ),
                     );
                   },
                 );
