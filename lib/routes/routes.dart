@@ -7,6 +7,7 @@ import 'package:conference_app/ui/pages/home/home_screen.dart';
 import 'package:conference_app/ui/pages/onBoarding/onboarding_screen.dart';
 import 'package:conference_app/ui/widgets/bottom_nav_screen.dart';
 import 'package:conference_app/ui/pages/category/category_screen.dart';
+import 'package:conference_app/ui/pages/reviews/reviews_screen.dart';
 
 class AppRoutes {
   static const String onboarding = '/';
@@ -38,5 +39,6 @@ class AppRoutes {
         );
       },
     ),
+    GetPage(name: '/reviews', page: () => const ReviewsScreen()),
   ];
 }

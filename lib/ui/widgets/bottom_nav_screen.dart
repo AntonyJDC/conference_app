@@ -5,6 +5,7 @@ import 'package:conference_app/ui/pages/search/search_page.dart';
 import 'package:conference_app/ui/pages/booking/calendar_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:conference_app/ui/pages/reviews/reviews_screen.dart';
 
 class BottomNavScreen extends StatelessWidget {
   BottomNavScreen({super.key});
@@ -16,7 +17,7 @@ class BottomNavScreen extends StatelessWidget {
     const SearchPage(),
     const CalendarScreen(),
     const FavoritesPage(),
-    const Center(child: Text('Historial')),
+    const ReviewsScreen(),
   ];
 
   @override
