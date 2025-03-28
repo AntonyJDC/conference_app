@@ -30,7 +30,10 @@ class EventsDB {
           endTime TEXT,
           location TEXT,
           capacity INTEGER,
-          spotsLeft INTEGER
+          spotsLeft INTEGER,
+          categories TEXT,
+          rating REAL,
+          comment TEXT
         )
       ''');
 
@@ -44,42 +47,25 @@ class EventsDB {
 
   Future<void> insertEvent(EventModel event) async {
     final db = await database;
-    await db.insert(
-      'events',
-      {
-        'id': event.id,
-        'title': event.title,
-        'description': event.description,
-        'imageUrl': event.imageUrl,
-        'date': event.date,
-        'startTime': event.startTime,
-        'endTime': event.endTime,
-        'location': event.location,
-        'capacity': event.capacity,
-        'spotsLeft': event.spotsLeft,
-      },
-      conflictAlgorithm: ConflictAlgorithm.replace,
-    );
+    await db.transaction((txn) async {
+      await txn.insert(
+        'events',
+        event.toMap(),
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
+    });
   }
 
   Future<void> updateEvent(EventModel event) async {
     final db = await database;
-    await db.update(
-      'events',
-      {
-        'title': event.title,
-        'description': event.description,
-        'imageUrl': event.imageUrl,
-        'date': event.date,
-        'startTime': event.startTime,
-        'endTime': event.endTime,
-        'location': event.location,
-        'capacity': event.capacity,
-        'spotsLeft': event.spotsLeft,
-      },
-      where: 'id = ?',
-      whereArgs: [event.id],
-    );
+    await db.transaction((txn) async {
+      await txn.update(
+        'events',
+        event.toMap(),
+        where: 'id = ?',
+        whereArgs: [event.id],
+      );
+    });
   }
 
   Future<List<EventModel>> getAllEvents() async {
@@ -97,17 +83,24 @@ class EventsDB {
     return null;
   }
 
-  // BOOKED EVENTS TABLE METHODS
+  // ─── Booked Events ─────────────────────────
 
   Future<void> bookEvent(String id) async {
     final db = await database;
-    await db.insert('booked_events', {'id': id},
-        conflictAlgorithm: ConflictAlgorithm.ignore);
+    await db.transaction((txn) async {
+      await txn.insert(
+        'booked_events',
+        {'id': id},
+        conflictAlgorithm: ConflictAlgorithm.ignore,
+      );
+    });
   }
 
   Future<void> unbookEvent(String id) async {
     final db = await database;
-    await db.delete('booked_events', where: 'id = ?', whereArgs: [id]);
+    await db.transaction((txn) async {
+      await txn.delete('booked_events', where: 'id = ?', whereArgs: [id]);
+    });
   }
 
   Future<bool> isEventBooked(String id) async {

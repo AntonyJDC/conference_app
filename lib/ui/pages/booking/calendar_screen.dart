@@ -48,8 +48,6 @@ class _CalendarScreenState extends State<CalendarScreen> {
       DateTime(date.year, date.month, date.day);
 
   Future<void> _loadEvents() async {
-    await bookedEventsController.loadBookedEvents();
-
     final Map<DateTime, List<EventModel>> newEvents = {};
 
     for (var event in bookedEventsController.tasks) {
