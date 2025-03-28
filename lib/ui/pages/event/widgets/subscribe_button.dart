@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest.dart' as tz;
+import 'animated_dialog.dart';
 
 class SubscribeButton extends StatefulWidget {
   final Rx<EventModel> event;
@@ -94,7 +95,8 @@ class _SubscribeButtonState extends State<SubscribeButton> {
           }
 
           WidgetsBinding.instance.addPostFrameCallback((_) {
-            showTopSnackBar(context, 'Cancelaste tu suscripción al evento');
+            showConfirmationDialog(
+                context, 'Suscripción cancelada', Icons.cancel_outlined);
           });
         };
       } else if (eventValue.spotsLeft > 0) {
@@ -114,7 +116,8 @@ class _SubscribeButtonState extends State<SubscribeButton> {
           }
 
           WidgetsBinding.instance.addPostFrameCallback((_) {
-            showTopSnackBar(context, 'Te has suscrito al evento');
+            showConfirmationDialog(context, 'Te has suscrito al evento',
+                Icons.check_circle_outline_outlined);
           });
         };
       } else {
@@ -152,35 +155,18 @@ class _SubscribeButtonState extends State<SubscribeButton> {
     });
   }
 
-  void showTopSnackBar(BuildContext context, String message) {
-    final overlay = Overlay.of(context);
-    final overlayEntry = OverlayEntry(
-      builder: (context) => Positioned(
-        top: MediaQuery.of(context).padding.top + 10, // Ajusta la posición
-        left: 20,
-        right: 20,
-        child: Material(
-          color: Colors.transparent,
-          child: Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Colors.black.withOpacity(0.6),
-              borderRadius: BorderRadius.circular(15),
-            ),
-            child: Text(
-              message,
-              style: const TextStyle(color: Colors.white, fontSize: 15),
-              textAlign: TextAlign.center,
-            ),
-          ),
-        ),
-      ),
+  void showConfirmationDialog(
+      BuildContext context, String message, IconData icon) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return AnimatedDialog(
+          icon: icon,
+          message: message,
+          onConfirm: () => Navigator.of(context).pop(),
+        );
+      },
     );
-
-    overlay.insert(overlayEntry);
-
-    Future.delayed(const Duration(seconds: 3), () {
-      overlayEntry.remove();
-    });
   }
 }
