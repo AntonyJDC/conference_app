@@ -1,5 +1,7 @@
 import 'package:conference_app/data/models/event_model.dart';
 import 'package:conference_app/domain/use_case/get_event_by_id_use_case.dart';
+import 'package:conference_app/ui/pages/event/widgets/animated_favorite.dart';
+import 'package:conference_app/ui/pages/event/widgets/explosion_animation.dart';
 import 'package:conference_app/ui/pages/event/widgets/event_image.dart';
 import 'package:conference_app/ui/pages/event/widgets/event_info.dart';
 import 'package:conference_app/ui/pages/event/widgets/subscribe_button.dart';
@@ -14,9 +16,13 @@ class EventDetailPage extends StatefulWidget {
   State<EventDetailPage> createState() => EventDetailPageState();
 }
 
-class EventDetailPageState extends State<EventDetailPage> {
+class EventDetailPageState extends State<EventDetailPage>
+    with SingleTickerProviderStateMixin {
   late Rx<EventModel> event;
   late FavoriteController favoriteController;
+  bool _showHeartAnimation = false;
+  bool _showExplosionAnimation = false;
+  Offset _favButtonPosition = Offset.zero;
 
   @override
   void initState() {
@@ -36,8 +42,27 @@ class EventDetailPageState extends State<EventDetailPage> {
     }
   }
 
+  void _toggleFavorite(GlobalKey favButtonKey) {
+    final RenderBox renderBox =
+        favButtonKey.currentContext!.findRenderObject() as RenderBox;
+    final position = renderBox.localToGlobal(Offset.zero);
+
+    setState(() {
+      _favButtonPosition = position;
+      if (favoriteController.isFavorite(event.value)) {
+        _showExplosionAnimation = true;
+      } else {
+        _showHeartAnimation = true;
+      }
+    });
+
+    favoriteController.toggleFavorite(event.value);
+  }
+
   @override
   Widget build(BuildContext context) {
+    final GlobalKey favButtonKey = GlobalKey();
+
     return Obx(() {
       final eventData = event.value;
 
@@ -63,13 +88,30 @@ class EventDetailPageState extends State<EventDetailPage> {
               child: Obx(() {
                 bool isFav = favoriteController.isFavorite(event.value);
                 return _circleButton(
-                  () => favoriteController.toggleFavorite(event.value),
+                  () => _toggleFavorite(favButtonKey),
                   isFav ? Icons.favorite : Icons.favorite_border,
                   color: isFav ? Colors.red : Colors.white,
+                  key: favButtonKey,
                 );
               }),
             ),
             SubscribeButton(event: event),
+
+            if (_showHeartAnimation)
+              FavoriteAnimationWidget(
+                targetPosition: _favButtonPosition,
+                onComplete: () {
+                  setState(() => _showHeartAnimation = false);
+                },
+              ),
+
+            if (_showExplosionAnimation)
+              ExplosionAnimationWidget(
+                targetPosition: _favButtonPosition,
+                onComplete: () {
+                  setState(() => _showExplosionAnimation = false);
+                },
+              ),
           ],
         ),
       );
@@ -77,8 +119,9 @@ class EventDetailPageState extends State<EventDetailPage> {
   }
 
   Widget _circleButton(VoidCallback onTap, IconData icon,
-      {Color color = Colors.white}) {
+      {Color color = Colors.white, Key? key}) {
     return GestureDetector(
+      key: key,
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.all(8),

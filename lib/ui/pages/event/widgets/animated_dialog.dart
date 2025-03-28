@@ -41,7 +41,7 @@ class _AnimatedDialogState extends State<AnimatedDialog>
     _animation = CurvedAnimation(parent: _controller, curve: Curves.easeOut);
 
     // Cerrar automáticamente después de 2 segundos
-    Future.delayed(const Duration(seconds: 2), () {
+    Future.delayed(const Duration(seconds: 1), () {
       if (mounted) {
         Navigator.of(context).pop();
       }
