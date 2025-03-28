@@ -1,12 +1,12 @@
 import 'dart:async';
 import 'package:conference_app/controllers/booked_events_controller.dart';
 import 'package:conference_app/data/models/event_model.dart';
-import 'package:conference_app/domain/use_case/can_subscribe_to_event_use_case.dart';
-import 'package:conference_app/domain/use_case/check_event_status_use_case.dart';
-import 'package:conference_app/domain/use_case/update_event_use_case.dart';
+import 'package:conference_app/data/local/events_data.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest.dart' as tz;
+import 'animated_dialog.dart';
 
 class SubscribeButton extends StatefulWidget {
   final Rx<EventModel> event;
@@ -20,13 +20,16 @@ class _SubscribeButtonState extends State<SubscribeButton> {
   late Timer _timer;
   late BookedEventsController bookedEvtController;
   late ColorScheme theme;
+  late tz.Location _colombiaTZ;
 
   @override
   void initState() {
     super.initState();
     bookedEvtController = Get.find<BookedEventsController>();
     tz.initializeTimeZones();
+    _colombiaTZ = tz.getLocation('America/Bogota');
 
+    // ⏱ Actualiza cada 10 segundos
     _timer = Timer.periodic(const Duration(seconds: 10), (_) {
       if (mounted) setState(() {});
     });
@@ -44,8 +47,27 @@ class _SubscribeButtonState extends State<SubscribeButton> {
 
     return Obx(() {
       final eventValue = widget.event.value;
-      final isPastEvent = CheckEventStatusUseCase().execute(eventValue);
-      final isSubscribed =
+
+      // ✅ Validación con hora de Colombia
+      final eventDate = DateTime.tryParse(eventValue.date);
+      final now = tz.TZDateTime.now(_colombiaTZ);
+      bool isPastEvent = false;
+
+      if (eventDate != null) {
+        final endTimeParts = eventValue.endTime.split(':');
+        final eventEnd = tz.TZDateTime(
+          _colombiaTZ,
+          eventDate.year,
+          eventDate.month,
+          eventDate.day,
+          int.parse(endTimeParts[0]),
+          int.parse(endTimeParts[1]),
+        );
+        isPastEvent =
+            now.isAfter(eventEnd.subtract(const Duration(seconds: 2)));
+      }
+
+      final bool isSubscribed =
           bookedEvtController.tasks.any((e) => e.id == eventValue.id);
 
       String buttonText;
@@ -59,50 +81,55 @@ class _SubscribeButtonState extends State<SubscribeButton> {
       } else if (isSubscribed) {
         buttonText = "Darse de baja";
         buttonColor = Colors.red;
-        onPressed = () async {
-          final updatedEvent = eventValue.copyWith(
-            spotsLeft: (eventValue.spotsLeft + 1).clamp(0, eventValue.capacity),
-          );
-          await UpdateEventUseCase().execute(updatedEvent);
-
+        onPressed = () {
           bookedEvtController.removeTask(eventValue.id);
 
-          widget.event.value = updatedEvent;
+          widget.event.value = widget.event.value.copyWith(
+            spotsLeft: (widget.event.value.spotsLeft + 1)
+                .clamp(0, widget.event.value.capacity),
+          );
+
+          int index = dummyEvents.indexWhere((e) => e.id == eventValue.id);
+          if (index != -1) {
+            dummyEvents[index] = widget.event.value;
+          }
 
           WidgetsBinding.instance.addPostFrameCallback((_) {
-            showTopSnackBar(context, 'Cancelaste tu suscripción al evento');
+            showAnimatedDialog(
+              context,
+              'Suscripción cancelada',
+              isCheck: false,
+            );
+          });
+        };
+      } else if (eventValue.spotsLeft > 0) {
+        buttonText = "Suscribirse";
+        buttonColor = theme.primary;
+        onPressed = () {
+          bookedEvtController.addTask(eventValue);
+
+          widget.event.value = widget.event.value.copyWith(
+            spotsLeft: (widget.event.value.spotsLeft - 1)
+                .clamp(0, widget.event.value.capacity),
+          );
+
+          int index = dummyEvents.indexWhere((e) => e.id == eventValue.id);
+          if (index != -1) {
+            dummyEvents[index] = widget.event.value;
+          }
+
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            showAnimatedDialog(
+              context,
+              'Te has suscrito al evento',
+              isCheck: true,
+            );
           });
         };
       } else {
-        buttonText = eventValue.spotsLeft > 0 ? "Suscribirse" : "Agotado";
-        buttonColor = eventValue.spotsLeft > 0 ? theme.primary : Colors.grey;
-        onPressed = eventValue.spotsLeft > 0
-            ? () async {
-                final canSubscribe =
-                    await CanSubscribeToEventUseCase().execute(eventValue);
-
-                if (!canSubscribe) {
-                  showTopSnackBar(
-                      context, 'No puedes suscribirte a este evento');
-                  return;
-                }
-
-                // 🔄 Reducir cupos y actualizar en DB principal
-                final updatedEvent = eventValue.copyWith(
-                  spotsLeft:
-                      (eventValue.spotsLeft - 1).clamp(0, eventValue.capacity),
-                );
-                await UpdateEventUseCase().execute(updatedEvent);
-
-                await bookedEvtController.addTask(eventValue);
-
-                widget.event.value = updatedEvent;
-
-                WidgetsBinding.instance.addPostFrameCallback((_) {
-                  showTopSnackBar(context, 'Te has suscrito al evento');
-                });
-              }
-            : null;
+        buttonText = "Agotado";
+        buttonColor = Colors.grey;
+        onPressed = null;
       }
 
       return Positioned(
@@ -131,38 +158,6 @@ class _SubscribeButtonState extends State<SubscribeButton> {
           ),
         ),
       );
-    });
-  }
-
-  void showTopSnackBar(BuildContext context, String message) {
-    final overlay = Overlay.of(context);
-    final overlayEntry = OverlayEntry(
-      builder: (context) => Positioned(
-        top: MediaQuery.of(context).padding.top + 10,
-        left: 20,
-        right: 20,
-        child: Material(
-          color: Colors.transparent,
-          child: Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Colors.black.withValues(alpha: 0.6),
-              borderRadius: BorderRadius.circular(15),
-            ),
-            child: Text(
-              message,
-              style: const TextStyle(color: Colors.white, fontSize: 15),
-              textAlign: TextAlign.center,
-            ),
-          ),
-        ),
-      ),
-    );
-
-    overlay.insert(overlayEntry);
-
-    Future.delayed(const Duration(seconds: 3), () {
-      overlayEntry.remove();
     });
   }
 }
