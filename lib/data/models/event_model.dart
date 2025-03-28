@@ -3,82 +3,68 @@ class EventModel {
   final String title;
   final String description;
   final String imageUrl;
-  final String date; // "YYYY-MM-DD"
-  final String startTime; // "HH:MM"
-  final String endTime; // "HH:MM"
+  final String date;
+  final String startTime;
+  final String endTime;
   final String location;
   final int capacity;
-  int spotsLeft;
-  final List<String> categories; // Ej: ["Música", "Tecnología"]
-
-  int? rating;
-  String? comment;
+  final int spotsLeft;
+  final List<String> categories;
+  final double? rating;
+  final String? comment;
 
   EventModel({
     required this.id,
     required this.title,
-    required this.description, // Opcional
+    required this.description,
     required this.imageUrl,
     required this.date,
-    required this.startTime, // Opcional
-    required this.endTime, // Opcional
+    required this.startTime,
+    required this.endTime,
     required this.location,
-    required this.capacity, // Opcional
-    required this.spotsLeft, // Opcional
+    required this.capacity,
+    required this.spotsLeft,
     required this.categories,
     this.rating,
     this.comment,
   });
 
-  Map<String, dynamic> toMap() => {
-        'id': id,
-        'title': title,
-        'description': description,
-        'imageUrl': imageUrl,
-        'date': date,
-        'startTime': startTime,
-        'endTime': endTime,
-        'location': location,
-        'capacity': capacity,
-        'spotsLeft': spotsLeft,
-        'categories': categories.join(','),
-        'rating': rating,
-        'comment': comment,
-      };
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'title': title,
+      'description': description,
+      'imageUrl': imageUrl,
+      'date': date,
+      'startTime': startTime,
+      'endTime': endTime,
+      'location': location,
+      'capacity': capacity,
+      'spotsLeft': spotsLeft,
+      'categories': categories.join(','), // List -> String
+      'rating': rating,
+      'comment': comment,
+    };
+  }
 
-  factory EventModel.fromMap(Map<String, dynamic> map) => EventModel(
-        id: map['id'],
-        title: map['title'],
-        description: map['description'],
-        imageUrl: map['imageUrl'],
-        date: map['date'],
-        startTime: map['startTime'],
-        endTime: map['endTime'],
-        location: map['location'],
-        capacity: map['capacity'],
-        spotsLeft: map['spotsLeft'],
-        categories: map['categories'].toString().split(','),
-        rating: map['rating'],
-        comment: map['comment'],
-      );
+  factory EventModel.fromMap(Map<String, dynamic> map) {
+    return EventModel(
+      id: map['id'],
+      title: map['title'],
+      description: map['description'],
+      imageUrl: map['imageUrl'],
+      date: map['date'],
+      startTime: map['startTime'],
+      endTime: map['endTime'],
+      location: map['location'],
+      capacity: map['capacity'],
+      spotsLeft: map['spotsLeft'],
+      categories: (map['categories'] as String?)?.split(',') ?? [],
+      rating: map['rating'] != null ? map['rating'] * 1.0 : null,
+      comment: map['comment'],
+    );
+  }
 
-  factory EventModel.fromJson(Map<String, dynamic> json) => EventModel(
-        id: json['id'],
-        title: json['title'],
-        description: json['description'],
-        imageUrl: json['image_url'],
-        date: json['date'],
-        startTime: json['start_time'],
-        endTime: json['end_time'],
-        location: json['location']['address'],
-        capacity: json['capacity'],
-        spotsLeft: json['spots_left'],
-        categories: List<String>.from(json['categories']),
-        rating: json['rating'],
-        comment: json['comment'],
-      );
-
-  // Método copyWith
   EventModel copyWith({
     String? id,
     String? title,
@@ -91,7 +77,7 @@ class EventModel {
     int? capacity,
     int? spotsLeft,
     List<String>? categories,
-    int? rating,
+    double? rating,
     String? comment,
   }) {
     return EventModel(
