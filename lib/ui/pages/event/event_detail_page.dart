@@ -8,6 +8,7 @@ import 'package:conference_app/ui/pages/event/widgets/subscribe_button.dart';
 import 'package:conference_app/controllers/favorite_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:conference_app/ui/pages/reviews/reviews/all_reviews_screen.dart';
 
 class EventDetailPage extends StatefulWidget {
   const EventDetailPage({super.key});
@@ -74,7 +75,12 @@ class EventDetailPageState extends State<EventDetailPage>
               padding: const EdgeInsets.only(bottom: 20),
               children: [
                 EventImage(event: eventData),
-                EventInfo(event: event),
+                EventInfo(
+                  event: event,
+                  onTap: () {
+                    Get.to(() => AllReviewsScreen(event: event.value));
+                  },
+                ),
               ],
             ),
             Positioned(
@@ -96,7 +102,6 @@ class EventDetailPageState extends State<EventDetailPage>
               }),
             ),
             SubscribeButton(event: event),
-
             if (_showHeartAnimation)
               FavoriteAnimationWidget(
                 targetPosition: _favButtonPosition,
@@ -104,7 +109,6 @@ class EventDetailPageState extends State<EventDetailPage>
                   setState(() => _showHeartAnimation = false);
                 },
               ),
-
             if (_showExplosionAnimation)
               ExplosionAnimationWidget(
                 targetPosition: _favButtonPosition,

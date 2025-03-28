@@ -87,7 +87,7 @@ class EventInfo extends StatelessWidget {
                       style:
                           TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
                   GestureDetector(
-                    onTap: onTap,
+                    onTap: () => onTap?.call(), // Navigate to reviews page
                     child: Text("Ver todas",
                         style: TextStyle(
                             fontSize: 11,

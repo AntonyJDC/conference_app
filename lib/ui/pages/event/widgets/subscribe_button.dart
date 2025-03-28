@@ -48,7 +48,6 @@ class _SubscribeButtonState extends State<SubscribeButton> {
     return Obx(() {
       final eventValue = widget.event.value;
 
-      // ✅ Validación con hora de Colombia
       final eventDate = DateTime.tryParse(eventValue.date);
       final now = tz.TZDateTime.now(_colombiaTZ);
       bool isPastEvent = false;
@@ -103,8 +102,10 @@ class _SubscribeButtonState extends State<SubscribeButton> {
         buttonText = "Suscribirse";
         buttonColor = theme.primary;
         onPressed = () async {
+          // ✅ Guardar en el historial (para feedbacks)
           bookedEvtController.addTask(eventValue);
 
+          // 🟡 Reducir cupo
           widget.event.value = widget.event.value.copyWith(
             spotsLeft: (widget.event.value.spotsLeft - 1)
                 .clamp(0, widget.event.value.capacity),

@@ -7,12 +7,17 @@ import 'package:intl/intl.dart';
 class EventCard extends StatelessWidget {
   final EventModel event;
   final bool showFavorite, showDate;
+  final double? rating;
+  final String? comment;
 
-  const EventCard(
-      {super.key,
-      required this.event,
-      this.showFavorite = false,
-      this.showDate = false});
+  const EventCard({
+    super.key,
+    required this.event,
+    this.showFavorite = false,
+    this.showDate = false,
+    this.rating,
+    this.comment,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +27,6 @@ class EventCard extends StatelessWidget {
     final isPastEvent = date.isBefore(now);
     final favoriteController = Get.find<FavoriteController>();
 
-    // Color del banderín
     final banderinColor = isPastEvent
         ? const Color.fromARGB(255, 245, 46, 32)
         : theme.colorScheme.primary;
@@ -35,7 +39,6 @@ class EventCard extends StatelessWidget {
       child: Stack(
         clipBehavior: Clip.none,
         children: [
-          // 📸 Imagen del evento
           ClipRRect(
             borderRadius: BorderRadius.circular(16),
             child: Image.asset(
@@ -45,8 +48,6 @@ class EventCard extends StatelessWidget {
               fit: BoxFit.cover,
             ),
           ),
-
-          // 📌 Banderín de la fecha
           if (showDate)
             Positioned(
               top: 12,
@@ -79,8 +80,6 @@ class EventCard extends StatelessWidget {
                 ),
               ),
             ),
-
-          // ❤️ Favorito dinámico
           if (showFavorite)
             Positioned(
               top: 12,
@@ -92,7 +91,7 @@ class EventCard extends StatelessWidget {
                   child: Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: Colors.black.withValues(alpha: 0.4),
+                      color: Colors.black.withOpacity(0.4),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
@@ -106,8 +105,6 @@ class EventCard extends StatelessWidget {
                 );
               }),
             ),
-
-          // 📄 Contenido sobre la imagen
           Positioned(
             bottom: -30,
             left: 10,
@@ -119,15 +116,15 @@ class EventCard extends StatelessWidget {
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
-                    color: theme.colorScheme.outline.withValues(alpha: 0.3),
+                    color: theme.colorScheme.outline.withOpacity(0.3),
                     blurRadius: 6,
                     offset: const Offset(0, 3),
                   ),
                 ],
               ),
               child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // 📃 Info del evento
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -177,11 +174,42 @@ class EventCard extends StatelessWidget {
                             ),
                           ],
                         ),
+                        if (rating != null || comment != null)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 8.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                if (rating != null)
+                                  Row(
+                                    children: List.generate(
+                                      5,
+                                      (index) => Icon(
+                                        Icons.star,
+                                        size: 16,
+                                        color: index < rating!.round()
+                                            ? Colors.amber
+                                            : Colors.grey.shade300,
+                                      ),
+                                    ),
+                                  ),
+                                if (comment != null) ...[
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    comment!,
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      fontStyle: FontStyle.italic,
+                                      color: Colors.grey,
+                                    ),
+                                  ),
+                                ],
+                              ],
+                            ),
+                          ),
                       ],
                     ),
                   ),
-
-                  // 🔗 Botón Ver Detalle
                   Container(
                     margin: const EdgeInsets.only(left: 12),
                     child: ElevatedButton(

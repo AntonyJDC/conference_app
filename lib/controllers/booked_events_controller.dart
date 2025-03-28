@@ -22,6 +22,7 @@ class BookedEventsController extends GetxController {
     if (!isAlreadyBooked) {
       await useCase.subscribe(event);
       tasks.add(event);
+      tasks.refresh(); // 🔄 para asegurar que se muestre
     }
   }
 
@@ -32,5 +33,13 @@ class BookedEventsController extends GetxController {
 
   Future<bool> isEventBooked(String id) async {
     return await useCase.isBooked(id);
+  }
+
+  void updateEvent(EventModel updated) {
+    final index = tasks.indexWhere((e) => e.id == updated.id);
+    if (index != -1) {
+      tasks[index] = updated;
+      tasks.refresh(); // 🔄 actualiza la UI de GetX
+    }
   }
 }
