@@ -1,11 +1,10 @@
 import 'package:conference_app/data/models/event_model.dart';
-import 'package:conference_app/data/services/booked_events_db.dart';
+import 'package:conference_app/domain/use_case/booked_events_use_case.dart';
 import 'package:get/get.dart';
 
 class BookedEventsController extends GetxController {
-  final _db = BookedEventsDB();
-
-  var tasks = <EventModel>[].obs;
+  final tasks = <EventModel>[].obs;
+  final useCase = BookedEventsUseCase();
 
   @override
   void onInit() {
@@ -14,33 +13,24 @@ class BookedEventsController extends GetxController {
   }
 
   Future<void> loadBookedEvents() async {
-    final events = await _db.getAllEvents();
-    tasks.assignAll(events);
+    final data = await useCase.getAllBookedEvents();
+    tasks.assignAll(data);
   }
 
   Future<void> addTask(EventModel event) async {
-    final alreadyExists = tasks.any((e) => e.id == event.id);
-    if (!alreadyExists) {
+    final isAlreadyBooked = await useCase.isBooked(event.id);
+    if (!isAlreadyBooked) {
+      await useCase.subscribe(event);
       tasks.add(event);
-      await _db.insertEvent(event);
     }
   }
 
   Future<void> removeTask(String id) async {
+    await useCase.unsubscribe(id);
     tasks.removeWhere((e) => e.id == id);
-    await _db.deleteEvent(id);
   }
 
-  Future<void> clearTasks() async {
-    tasks.clear();
-    await _db.clearEvents();
-  }
-
-  bool isSubscribed(String id) {
-    return tasks.any((e) => e.id == id);
-  }
-
-  EventModel? getById(String id) {
-    return tasks.firstWhereOrNull((e) => e.id == id);
+  Future<bool> isEventBooked(String id) async {
+    return await useCase.isBooked(id);
   }
 }
