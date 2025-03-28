@@ -16,22 +16,24 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.background,
+      backgroundColor: colorScheme.background,
       body: SafeArea(
         child: Column(
           children: [
             Container(
               width: double.infinity,
               padding: const EdgeInsets.symmetric(vertical: 18),
-              color: Theme.of(context).colorScheme.primary,
-              child: const Center(
+              color: colorScheme.primary,
+              child: Center(
                 child: Text(
                   'Historial',
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                    color: colorScheme.onPrimary,
                   ),
                 ),
               ),
@@ -41,21 +43,24 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Container(
                 decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.surface,
-                  borderRadius: BorderRadius.circular(12),
+                  color: colorScheme.surfaceVariant,
+                  borderRadius: BorderRadius.circular(16),
+                  border:
+                      Border.all(color: colorScheme.outline.withOpacity(0.2)),
                 ),
                 child: Row(
                   children: [
                     Expanded(
                       child: GestureDetector(
                         onTap: () => setState(() => showFeedbacks = true),
-                        child: Container(
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 200),
                           padding: const EdgeInsets.symmetric(vertical: 12),
                           decoration: BoxDecoration(
                             color: showFeedbacks
-                                ? Colors.white
+                                ? colorScheme.primaryContainer
                                 : Colors.transparent,
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(14),
                           ),
                           child: Center(
                             child: Text(
@@ -63,8 +68,8 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 color: showFeedbacks
-                                    ? Colors.black
-                                    : Colors.grey.shade700,
+                                    ? colorScheme.onPrimaryContainer
+                                    : colorScheme.onSurface.withOpacity(0.6),
                               ),
                             ),
                           ),
@@ -74,13 +79,14 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
                     Expanded(
                       child: GestureDetector(
                         onTap: () => setState(() => showFeedbacks = false),
-                        child: Container(
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 200),
                           padding: const EdgeInsets.symmetric(vertical: 12),
                           decoration: BoxDecoration(
                             color: !showFeedbacks
-                                ? Colors.white
+                                ? colorScheme.primaryContainer
                                 : Colors.transparent,
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(14),
                           ),
                           child: Center(
                             child: Text(
@@ -88,8 +94,8 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 color: !showFeedbacks
-                                    ? Colors.black
-                                    : Colors.grey.shade700,
+                                    ? colorScheme.onPrimaryContainer
+                                    : colorScheme.onSurface.withOpacity(0.6),
                               ),
                             ),
                           ),
