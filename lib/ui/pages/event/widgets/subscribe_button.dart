@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:conference_app/controllers/booked_events_controller.dart';
 import 'package:conference_app/data/models/event_model.dart';
-import 'package:conference_app/data/local/events_data.dart';
+import 'package:conference_app/domain/use_case/update_event_use_case.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:timezone/timezone.dart' as tz;
@@ -81,7 +81,7 @@ class _SubscribeButtonState extends State<SubscribeButton> {
       } else if (isSubscribed) {
         buttonText = "Darse de baja";
         buttonColor = Colors.red;
-        onPressed = () {
+        onPressed = () async {
           bookedEvtController.removeTask(eventValue.id);
 
           widget.event.value = widget.event.value.copyWith(
@@ -89,10 +89,7 @@ class _SubscribeButtonState extends State<SubscribeButton> {
                 .clamp(0, widget.event.value.capacity),
           );
 
-          int index = dummyEvents.indexWhere((e) => e.id == eventValue.id);
-          if (index != -1) {
-            dummyEvents[index] = widget.event.value;
-          }
+          await UpdateEventUseCase().execute(widget.event.value);
 
           WidgetsBinding.instance.addPostFrameCallback((_) {
             showAnimatedDialog(
@@ -105,7 +102,7 @@ class _SubscribeButtonState extends State<SubscribeButton> {
       } else if (eventValue.spotsLeft > 0) {
         buttonText = "Suscribirse";
         buttonColor = theme.primary;
-        onPressed = () {
+        onPressed = () async {
           bookedEvtController.addTask(eventValue);
 
           widget.event.value = widget.event.value.copyWith(
@@ -113,10 +110,7 @@ class _SubscribeButtonState extends State<SubscribeButton> {
                 .clamp(0, widget.event.value.capacity),
           );
 
-          int index = dummyEvents.indexWhere((e) => e.id == eventValue.id);
-          if (index != -1) {
-            dummyEvents[index] = widget.event.value;
-          }
+          await UpdateEventUseCase().execute(widget.event.value);
 
           WidgetsBinding.instance.addPostFrameCallback((_) {
             showAnimatedDialog(
