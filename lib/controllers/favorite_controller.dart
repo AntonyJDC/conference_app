@@ -1,10 +1,10 @@
 import 'package:conference_app/data/models/event_model.dart';
-import 'package:conference_app/data/services/favorites_db.dart';
+import 'package:conference_app/domain/use_case/favorites_use_case.dart';
 import 'package:get/get.dart';
 
 class FavoriteController extends GetxController {
   var favorites = <EventModel>[].obs;
-  final dbHelper = FavoritesDB();
+  final _useCase = FavoritesUseCase();
 
   @override
   void onInit() {
@@ -13,17 +13,17 @@ class FavoriteController extends GetxController {
   }
 
   Future<void> loadFavorites() async {
-    final data = await dbHelper.getFavorites();
+    final data = await _useCase.getFavorites();
     favorites.assignAll(data);
   }
 
-  void toggleFavorite(EventModel event) async {
+  Future<void> toggleFavorite(EventModel event) async {
     if (isFavorite(event)) {
       favorites.removeWhere((e) => e.id == event.id);
-      await dbHelper.deleteFavorite(event.id);
+      await _useCase.removeFavorite(event.id);
     } else {
       favorites.add(event);
-      await dbHelper.insertFavorite(event);
+      await _useCase.addFavorite(event);
     }
   }
 
