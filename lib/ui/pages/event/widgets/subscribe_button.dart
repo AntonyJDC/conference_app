@@ -156,7 +156,8 @@ class _SubscribeButtonState extends State<SubscribeButton> {
   }
 
   void showConfirmationDialog(
-      BuildContext context, String message, IconData icon) {
+      BuildContext context, String message, IconData icon,
+      {bool isCancellation = false}) {
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -164,6 +165,7 @@ class _SubscribeButtonState extends State<SubscribeButton> {
         return AnimatedDialog(
           icon: icon,
           message: message,
+          isCancellation: isCancellation,
           onConfirm: () => Navigator.of(context).pop(),
         );
       },

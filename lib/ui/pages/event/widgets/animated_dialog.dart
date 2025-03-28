@@ -86,7 +86,8 @@ class _AnimatedDialogState extends State<AnimatedDialog>
               const SizedBox(height: 15),
               Text(
                 widget.message,
-                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                style:
+                    const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 15),

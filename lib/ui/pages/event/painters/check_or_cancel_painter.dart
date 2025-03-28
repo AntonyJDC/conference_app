@@ -34,14 +34,12 @@ class CheckOrCancelPainter extends CustomPainter {
 
     if (progress < 0.5) {
       path.moveTo(startX, startY);
-      path.lineTo(
-          startX + (midX - startX) * (progress * 2),
+      path.lineTo(startX + (midX - startX) * (progress * 2),
           startY + (midY - startY) * (progress * 2));
     } else {
       path.moveTo(startX, startY);
       path.lineTo(midX, midY);
-      path.lineTo(
-          midX + (endX - midX) * ((progress - 0.5) * 2),
+      path.lineTo(midX + (endX - midX) * ((progress - 0.5) * 2),
           midY + (endY - midY) * ((progress - 0.5) * 2));
     }
 
@@ -60,8 +58,10 @@ class CheckOrCancelPainter extends CustomPainter {
     path1.moveTo(startX, startY);
     path2.moveTo(startX, endY);
 
-    path1.lineTo(startX + (endX - startX) * progress, startY + (endY - startY) * progress);
-    path2.lineTo(startX + (endX - startX) * progress, endY - (endY - startY) * progress);
+    path1.lineTo(startX + (endX - startX) * progress,
+        startY + (endY - startY) * progress);
+    path2.lineTo(
+        startX + (endX - startX) * progress, endY - (endY - startY) * progress);
 
     canvas.drawPath(path1, paint);
     canvas.drawPath(path2, paint);
