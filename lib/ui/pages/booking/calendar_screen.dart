@@ -25,7 +25,6 @@ class _CalendarScreenState extends State<CalendarScreen> {
   void initState() {
     super.initState();
     bookedEventsController = Get.find<BookedEventsController>();
-
     _events = {};
     _selectedEvents = [];
     _selectedDay = _focusedDay;
@@ -37,8 +36,6 @@ class _CalendarScreenState extends State<CalendarScreen> {
     });
 
     _loadEvents();
-
-    _selectedEvents = _getEventsForDay(_selectedDay!);
   }
 
   @override
@@ -47,18 +44,23 @@ class _CalendarScreenState extends State<CalendarScreen> {
     super.dispose();
   }
 
-  void _loadEvents() {
+  DateTime _normalizeDate(DateTime date) =>
+      DateTime(date.year, date.month, date.day);
+
+  Future<void> _loadEvents() async {
+    await bookedEventsController.loadBookedEvents();
+
     final Map<DateTime, List<EventModel>> newEvents = {};
 
     for (var event in bookedEventsController.tasks) {
-      DateTime eventDate = DateTime.parse(event.date);
+      final eventDate = _normalizeDate(DateTime.parse(event.date));
       newEvents.putIfAbsent(eventDate, () => []).add(event);
     }
 
     if (mounted) {
       setState(() {
         _events = newEvents;
-        _selectedEvents = _events[_selectedDay] ?? [];
+        _selectedEvents = _getEventsForDay(_selectedDay!);
       });
     }
   }
@@ -74,18 +76,19 @@ class _CalendarScreenState extends State<CalendarScreen> {
   }
 
   List<EventModel> _getEventsForDay(DateTime day) {
-    DateTime normalizedDay = DateTime(day.year, day.month, day.day);
+    final normalizedDay = _normalizeDate(day);
     return _events[normalizedDay] ?? [];
   }
 
   DateTime? _getNearestEventDate() {
     if (bookedEventsController.tasks.isEmpty) return null;
 
-    DateTime now = DateTime.now();
-    List<EventModel> sortedEvents = List.from(bookedEventsController.tasks)
+    final now = DateTime.now();
+
+    final sortedEvents = List.from(bookedEventsController.tasks)
       ..sort((a, b) {
-        DateTime dateA = DateTime.parse(a.date);
-        DateTime dateB = DateTime.parse(b.date);
+        final dateA = DateTime.parse(a.date);
+        final dateB = DateTime.parse(b.date);
         return dateA
             .difference(now)
             .inSeconds
@@ -97,7 +100,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
   }
 
   void _goToNearestEvent() {
-    DateTime? nearestDate = _getNearestEventDate();
+    final nearestDate = _getNearestEventDate();
     if (nearestDate != null && mounted) {
       setState(() {
         _focusedDay = nearestDate;
@@ -109,9 +112,9 @@ class _CalendarScreenState extends State<CalendarScreen> {
 
   @override
   Widget build(BuildContext context) {
-    bool hasEvents = bookedEventsController.tasks.isNotEmpty;
-    double screenWidth = MediaQuery.of(context).size.width;
-    double daysOfWeekHeight = screenWidth < 400 ? 50 : 70;
+    final hasEvents = bookedEventsController.tasks.isNotEmpty;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final daysOfWeekHeight = screenWidth < 400 ? 50 : 70;
 
     return Scaffold(
       appBar: AppBar(
@@ -147,9 +150,9 @@ class _CalendarScreenState extends State<CalendarScreen> {
                 ),
                 markersMaxCount: 3,
               ),
-              daysOfWeekHeight: daysOfWeekHeight,
+              daysOfWeekHeight: daysOfWeekHeight.toDouble(),
               headerStyle: HeaderStyle(
-                headerPadding: EdgeInsets.only(top: 10),
+                headerPadding: const EdgeInsets.only(top: 10),
                 titleCentered: true,
                 titleTextStyle: TextStyle(
                   color: Theme.of(context).colorScheme.primary,
@@ -185,18 +188,14 @@ class _CalendarScreenState extends State<CalendarScreen> {
               },
               calendarBuilders: CalendarBuilders(
                 markerBuilder: (context, day, events) {
-                  if (events.isEmpty) {
-                    return SizedBox(); // No mostrar nada si no hay eventos
-                  }
-
-                  Brightness brightness = Theme.of(context).brightness;
-                  Color eventColor = brightness == Brightness.dark
+                  if (events.isEmpty) return const SizedBox();
+                  final brightness = Theme.of(context).brightness;
+                  final color = brightness == Brightness.dark
                       ? Colors.white
                       : Theme.of(context).colorScheme.inversePrimary;
 
                   return Padding(
-                    padding: const EdgeInsets.only(
-                        top: 30), // Ajusta la posición de los puntos
+                    padding: const EdgeInsets.only(top: 30),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: List.generate(
@@ -206,7 +205,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                           width: 6,
                           height: 6,
                           decoration: BoxDecoration(
-                            color: eventColor,
+                            color: color,
                             shape: BoxShape.circle,
                           ),
                         ),
@@ -249,8 +248,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
       ),
       floatingActionButton: hasEvents
           ? FloatingActionButton(
-              backgroundColor:
-                  Theme.of(context).colorScheme.primary.withValues(alpha: 0.99),
+              backgroundColor: Theme.of(context).colorScheme.primary,
               onPressed: _goToNearestEvent,
               child:
                   const Icon(Icons.arrow_upward_rounded, color: Colors.white),
