@@ -25,4 +25,8 @@ class ReviewController extends GetxController {
   Future<bool> hasReviewed(String eventId) async {
     return await _hasReviewedUseCase.execute(eventId);
   }
+
+  List<ReviewModel> getReviewsForEvent(String eventId) {
+    return _reviews.where((r) => r.eventId == eventId).toList();
+  }
 }
