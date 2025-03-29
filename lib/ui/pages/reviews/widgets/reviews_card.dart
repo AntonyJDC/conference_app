@@ -3,12 +3,19 @@ import 'package:flutter/material.dart';
 class ReviewCard extends StatelessWidget {
   final String review;
   final String date;
+  final int rating;
 
-  const ReviewCard({super.key, required this.review, required this.date});
+  const ReviewCard({
+    super.key,
+    required this.review,
+    required this.date,
+    required this.rating,
+  });
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+
     return Container(
       padding: const EdgeInsets.all(14),
       width: 300,
@@ -19,42 +26,39 @@ class ReviewCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // ⭐ Título
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          /// Usuario + Fecha
+          Row(
             children: [
-              Row(
-                children: [
-                  const Icon(Icons.person, color: Colors.grey, size: 20),
-                  const SizedBox(width: 8),
-                  const Text(
-                    "Anónimo",
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
-                  ),
-                  const Spacer(),
-                  Text(
-                    date,
-                    style: const TextStyle(color: Colors.grey, fontSize: 10),
-                  ),
-                ],
+              const Icon(Icons.person, color: Colors.grey, size: 20),
+              const SizedBox(width: 8),
+              const Text(
+                "Anónimo",
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
               ),
-              const SizedBox(height: 4),
-              Row(
-                children: List.generate(
-                  5,
-                  (index) => const Icon(
-                    Icons.star,
-                    size: 14,
-                    color: Colors.amber,
-                  ),
-                ),
+              const Spacer(),
+              Text(
+                date,
+                style: const TextStyle(color: Colors.grey, fontSize: 10),
               ),
             ],
           ),
 
+          const SizedBox(height: 6),
+
+          /// Estrellas según el rating
+          Row(
+            children: List.generate(5, (index) {
+              return Icon(
+                index < rating ? Icons.star : Icons.star_border,
+                size: 14,
+                color: Colors.amber,
+              );
+            }),
+          ),
+
           const SizedBox(height: 8),
 
-          // ⭐ Reseña
+          /// Comentario
           Text(
             review,
             style: const TextStyle(fontSize: 12),
