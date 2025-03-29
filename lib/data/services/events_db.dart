@@ -1,3 +1,4 @@
+import 'package:conference_app/data/models/review_model.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:conference_app/data/models/event_model.dart';
@@ -32,13 +33,28 @@ class EventsDB {
           capacity INTEGER,
           spotsLeft INTEGER,
           categories TEXT,
-          rating REAL,
-          comment TEXT
+          averageRating REAL
         )
       ''');
 
       await db.execute('''
         CREATE TABLE booked_events (
+          id TEXT PRIMARY KEY
+        )
+      ''');
+
+      await db.execute('''
+        CREATE TABLE reviews (
+          id TEXT PRIMARY KEY,
+          eventId TEXT,
+          rating INTEGER,
+          comment TEXT,
+          createdAt TEXT
+        )
+      ''');
+
+      await db.execute('''
+        CREATE TABLE favorites (
           id TEXT PRIMARY KEY
         )
       ''');
@@ -129,5 +145,79 @@ class EventsDB {
     );
 
     return result.map((map) => EventModel.fromMap(map)).toList();
+  }
+
+  // ─── Reviews ─────────────────────────
+
+  Future<void> insertReview(ReviewModel review) async {
+    final db = await database;
+    await db.insert(
+      'reviews',
+      review.toMap(),
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
+  Future<List<ReviewModel>> getReviewsByEventId(String eventId) async {
+    final db = await database;
+    final result = await db.query(
+      'reviews',
+      where: 'eventId = ?',
+      whereArgs: [eventId],
+    );
+    return result.map((e) => ReviewModel.fromMap(e)).toList();
+  }
+
+  Future<bool> hasReviewed(String eventId) async {
+    final db = await database;
+    final result = await db.query(
+      'reviews',
+      where: 'eventId = ?',
+      whereArgs: [eventId],
+      limit: 1,
+    );
+    return result.isNotEmpty;
+  }
+
+  // ─── Favorites ─────────────────────────
+
+  Future<void> addFavorite(String id) async {
+    final db = await database;
+    await db.insert(
+      'favorites',
+      {'id': id},
+      conflictAlgorithm: ConflictAlgorithm.ignore,
+    );
+  }
+
+  Future<void> removeFavorite(String id) async {
+    final db = await database;
+    await db.delete('favorites', where: 'id = ?', whereArgs: [id]);
+  }
+
+  Future<bool> isFavorite(String id) async {
+    final db = await database;
+    final result = await db.query(
+      'favorites',
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+    return result.isNotEmpty;
+  }
+
+  Future<List<EventModel>> getFavoriteEvents() async {
+    final db = await database;
+    final result = await db.query('favorites');
+
+    if (result.isEmpty) return [];
+
+    final ids = result.map((e) => e['id'] as String).toList();
+    final eventResults = await db.query(
+      'events',
+      where: 'id IN (${List.filled(ids.length, '?').join(',')})',
+      whereArgs: ids,
+    );
+
+    return eventResults.map((e) => EventModel.fromMap(e)).toList();
   }
 }
