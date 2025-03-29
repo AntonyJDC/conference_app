@@ -13,6 +13,7 @@ List<EventModel> dummyEvents = [
     capacity: 80,
     spotsLeft: 5,
     categories: ['Tecnología', 'Arte'],
+    averageRating: 4.5,
   ),
   EventModel(
     id: 'evt002',
