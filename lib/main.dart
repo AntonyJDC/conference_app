@@ -1,5 +1,6 @@
 import 'package:conference_app/controllers/booked_events_controller.dart';
 import 'package:conference_app/controllers/favorite_controller.dart';
+import 'package:conference_app/controllers/review_controller.dart';
 import 'package:conference_app/domain/use_case/events/initialize_events_use_case.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -19,6 +20,8 @@ void main() async {
 
   Get.put(BookedEventsController());
   Get.put(FavoriteController());
+  Get.put(ReviewController());
+
   await initializeDateFormatting('es_CO', null);
   await InitializeEventsUseCase().execute();
   runApp(MyApp(onboardingSeen: onboardingSeen));

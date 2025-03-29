@@ -3,6 +3,7 @@ import 'package:conference_app/domain/use_case/events/check_event_status_use_cas
 import 'package:conference_app/ui/pages/event/widgets/detail_icon.dart';
 import 'package:conference_app/ui/pages/event/widgets/event_category_tags.dart';
 import 'package:conference_app/ui/pages/reviews/widgets/reviews_carousel.dart';
+import 'package:conference_app/ui/widgets/event_rating_stars.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -18,7 +19,6 @@ class EventInfo extends StatelessWidget {
     final theme = Theme.of(context).colorScheme;
     final size = MediaQuery.of(context).size;
     final overlap = size.height * 0.35 * 0.15;
-
     return Obx(() {
       final e = event.value;
       final percentage = e.spotsLeft / e.capacity;
@@ -46,9 +46,32 @@ class EventInfo extends StatelessWidget {
               Text(e.title,
                   style: const TextStyle(
                       fontSize: 16, fontWeight: FontWeight.bold)),
-              Text(e.description,
-                  style: TextStyle(color: Colors.grey.shade600, fontSize: 12)),
-              const SizedBox(height: 25),
+              const SizedBox(height: 8), // nuevo
+              EventRatingStars(
+                event: event.value,
+                textColor: theme.primary,
+              ),
+              const SizedBox(height: 24),
+              if (!isPastEvent)
+                _spotsAvailable(context, e.spotsLeft, spotColor, theme),
+              const SizedBox(height: 24),
+              const Text("Descripción del evento",
+                  style:
+                      TextStyle(fontSize: 14.5, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 12),
+              Text(e.description, style: TextStyle(fontSize: 12)),
+              const SizedBox(height: 24),
+              Divider(
+                thickness: 1,
+                height: 1,
+                color: Theme.of(context).colorScheme.outline.withValues(
+                    alpha: 0.3), // o usa Theme.of(context).dividerColor
+              ),
+              const SizedBox(height: 24),
+              const Text("Acerca del evento",
+                  style:
+                      TextStyle(fontSize: 14.5, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 12),
               DetailIcon(
                 icon: Icons.calendar_today,
                 title: e.date,
@@ -75,10 +98,14 @@ class EventInfo extends StatelessWidget {
                 subtitleStyle: null,
               ),
               const SizedBox(height: 24),
-              if (!isPastEvent)
-                _spotsAvailable(context, e.spotsLeft, spotColor),
-              const SizedBox(height: 24),
               EventCategoryTags(event: e),
+              const SizedBox(height: 12),
+              Divider(
+                thickness: 1,
+                height: 1,
+                color: theme.outline.withValues(alpha: 0.3),
+              ),
+              const SizedBox(height: 24),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -96,7 +123,7 @@ class EventInfo extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 16),
-              const ReviewsCarousel(),
+              ReviewsCarousel(event: event.value),
             ],
           ),
         ),
@@ -104,11 +131,12 @@ class EventInfo extends StatelessWidget {
     });
   }
 
-  Widget _spotsAvailable(BuildContext context, int spotsLeft, Color color) {
+  Widget _spotsAvailable(
+      BuildContext context, int spotsLeft, Color color, dynamic theme) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.outline,
+        color: theme.outline,
         borderRadius: BorderRadius.circular(16),
       ),
       child: Row(
@@ -116,7 +144,7 @@ class EventInfo extends StatelessWidget {
         children: [
           Row(
             children: [
-              Icon(Icons.chair, color: Theme.of(context).colorScheme.primary),
+              Icon(Icons.chair, color: theme.primary),
               const SizedBox(width: 12),
               const Text('Cupos disponibles',
                   style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),

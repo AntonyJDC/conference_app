@@ -6,10 +6,10 @@ class FavoriteAnimationWidget extends StatefulWidget {
   final Offset targetPosition;
 
   const FavoriteAnimationWidget({
-    Key? key,
+    super.key,
     required this.onComplete,
     required this.targetPosition,
-  }) : super(key: key);
+  });
 
   @override
   _FavoriteAnimationWidgetState createState() =>
@@ -44,8 +44,8 @@ class _FavoriteAnimationWidgetState extends State<FavoriteAnimationWidget>
           widget.targetPosition.dy - Get.height / 2),
     ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
 
-    _fadeAnimation = Tween<double>(begin: 1.0, end: 0.0).animate(
-        CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
+    _fadeAnimation = Tween<double>(begin: 1.0, end: 0.0)
+        .animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
 
     _controller.forward().whenComplete(() => widget.onComplete());
   }
