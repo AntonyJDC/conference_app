@@ -1,6 +1,6 @@
 import 'package:conference_app/controllers/booked_events_controller.dart';
 import 'package:conference_app/controllers/favorite_controller.dart';
-import 'package:conference_app/domain/use_case/initialize_events_use_case.dart';
+import 'package:conference_app/domain/use_case/events/initialize_events_use_case.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:conference_app/routes/routes.dart';

@@ -1,5 +1,5 @@
 import 'package:conference_app/data/models/event_model.dart';
-import 'package:conference_app/domain/use_case/check_event_status_use_case.dart';
+import 'package:conference_app/domain/use_case/events/check_event_status_use_case.dart';
 import 'package:conference_app/ui/pages/event/widgets/detail_icon.dart';
 import 'package:conference_app/ui/pages/event/widgets/event_category_tags.dart';
 import 'package:conference_app/ui/pages/reviews/widgets/reviews_carousel.dart';

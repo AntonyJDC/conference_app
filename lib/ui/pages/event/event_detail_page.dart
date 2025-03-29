@@ -1,5 +1,5 @@
 import 'package:conference_app/data/models/event_model.dart';
-import 'package:conference_app/domain/use_case/get_event_by_id_use_case.dart';
+import 'package:conference_app/domain/use_case/events/get_event_by_id_use_case.dart';
 import 'package:conference_app/ui/pages/event/widgets/animated_favorite.dart';
 import 'package:conference_app/ui/pages/event/widgets/explosion_animation.dart';
 import 'package:conference_app/ui/pages/event/widgets/event_image.dart';
@@ -96,7 +96,6 @@ class EventDetailPageState extends State<EventDetailPage>
               }),
             ),
             SubscribeButton(event: event),
-
             if (_showHeartAnimation)
               FavoriteAnimationWidget(
                 targetPosition: _favButtonPosition,
@@ -104,7 +103,6 @@ class EventDetailPageState extends State<EventDetailPage>
                   setState(() => _showHeartAnimation = false);
                 },
               ),
-
             if (_showExplosionAnimation)
               ExplosionAnimationWidget(
                 targetPosition: _favButtonPosition,
