@@ -79,7 +79,6 @@ class EventInfo extends StatelessWidget {
                 _spotsAvailable(context, e.spotsLeft, spotColor),
               const SizedBox(height: 24),
               EventCategoryTags(event: e),
-              const SizedBox(height: 24),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
