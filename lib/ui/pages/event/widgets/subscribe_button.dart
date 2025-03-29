@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:conference_app/controllers/booked_events_controller.dart';
 import 'package:conference_app/data/models/event_model.dart';
-import 'package:conference_app/domain/use_case/update_event_use_case.dart';
+import 'package:conference_app/domain/use_case/events/update_event_use_case.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:timezone/timezone.dart' as tz;

@@ -1,5 +1,5 @@
 import 'package:conference_app/data/models/event_model.dart';
-import 'package:conference_app/domain/use_case/get_all_events_use_case.dart';
+import 'package:conference_app/domain/use_case/events/get_all_events_use_case.dart';
 import 'package:conference_app/ui/widgets/event_card.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';

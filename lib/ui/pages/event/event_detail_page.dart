@@ -1,5 +1,5 @@
 import 'package:conference_app/data/models/event_model.dart';
-import 'package:conference_app/domain/use_case/get_event_by_id_use_case.dart';
+import 'package:conference_app/domain/use_case/events/get_event_by_id_use_case.dart';
 import 'package:conference_app/ui/pages/event/widgets/animated_favorite.dart';
 import 'package:conference_app/ui/pages/event/widgets/explosion_animation.dart';
 import 'package:conference_app/ui/pages/event/widgets/event_image.dart';
