@@ -18,7 +18,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
   late List<EventModel> _selectedEvents;
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
-  CalendarFormat _calendarFormat = CalendarFormat.month;
+  CalendarFormat _calendarFormat = CalendarFormat.week;
   late Worker _taskListener;
 
   @override
@@ -143,7 +143,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                   color: Theme.of(context)
                       .colorScheme
                       .primary
-                      .withValues(alpha: 0.5),
+                      .withValues(alpha: 0.7),
                   shape: BoxShape.circle,
                 ),
                 markersMaxCount: 3,
