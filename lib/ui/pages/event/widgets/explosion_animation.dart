@@ -12,8 +12,11 @@ class ExplosionAnimationWidget extends StatefulWidget {
   });
 
   @override
-  _ExplosionAnimationWidgetState createState() =>
-      _ExplosionAnimationWidgetState();
+  @override
+  // ignore: library_private_types_in_public_api
+  _ExplosionAnimationWidgetState createState() {
+    return _ExplosionAnimationWidgetState();
+  }
 }
 
 class _ExplosionAnimationWidgetState extends State<ExplosionAnimationWidget>
