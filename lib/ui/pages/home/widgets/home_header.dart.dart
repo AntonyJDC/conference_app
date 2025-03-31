@@ -10,18 +10,20 @@ class HomeHeader extends StatelessWidget {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            Theme.of(context).colorScheme.primary,
-            Theme.of(context).colorScheme.primary.withValues(alpha: 0.5),
+            Theme.of(context).colorScheme.surface,
+            Theme.of(context).colorScheme.surface,
           ],
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
         ),
         borderRadius: const BorderRadius.vertical(bottom: Radius.circular(28)),
       ),
-      child: const Text(
+      child: Text(
         "Descubre eventos cerca de ti",
         style: TextStyle(
-            fontSize: 17, fontWeight: FontWeight.bold, color: Colors.white),
+            fontSize: 17,
+            fontWeight: FontWeight.bold,
+            color: Theme.of(context).colorScheme.primary),
       ),
     );
   }

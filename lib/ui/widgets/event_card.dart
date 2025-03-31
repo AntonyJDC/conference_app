@@ -110,13 +110,13 @@ class EventCard extends StatelessWidget {
             left: 10,
             right: 10,
             child: Container(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(
-                color: theme.colorScheme.surface,
+                color: theme.colorScheme.tertiary,
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
-                    color: theme.colorScheme.outline.withOpacity(0.3),
+                    color: theme.colorScheme.shadow.withValues(alpha: 0.3),
                     blurRadius: 6,
                     offset: const Offset(0, 3),
                   ),
@@ -220,10 +220,10 @@ class EventCard extends StatelessWidget {
                         ),
                       ),
                       onPressed: () => Get.toNamed('/detail', arguments: event),
-                      child: const Icon(
+                      child: Icon(
                         Icons.arrow_forward_rounded,
                         size: 18,
-                        color: Colors.white,
+                        color: Theme.of(context).colorScheme.onPrimary,
                       ),
                     ),
                   ),

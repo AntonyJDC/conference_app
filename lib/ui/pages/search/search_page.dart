@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:conference_app/data/models/event_model.dart';
 import 'package:conference_app/domain/use_case/events/get_all_events_use_case.dart';
 import 'package:conference_app/ui/widgets/event_card.dart';
@@ -52,30 +54,69 @@ class _SearchPageState extends State<SearchPage> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    // Agrupamos por fecha
+    // Agrupar eventos por fecha
     filteredEvents.sort(
         (a, b) => DateTime.parse(a.date).compareTo(DateTime.parse(b.date)));
     final groupedEvents = groupBy(filteredEvents, (e) => e.date);
 
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: theme.colorScheme.primary,
-        centerTitle: true,
-        elevation: 0,
-        title: Text(
-          'Buscar Eventos',
-          style: TextStyle(
-            color: theme.colorScheme.onPrimary,
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
+      body: CustomScrollView(
+        slivers: [
+          SliverAppBar.medium(
+            pinned: true,
+            backgroundColor: theme.colorScheme.surface,
+            foregroundColor: theme.colorScheme.primary,
+            centerTitle: true,
+            expandedHeight: 100,
+            flexibleSpace: LayoutBuilder(
+              builder: (context, constraints) {
+                final collapsedHeight =
+                    64.0 + MediaQuery.of(context).padding.top;
+                final bool isCollapsed =
+                    constraints.maxHeight <= collapsedHeight;
+
+                return Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    if (isCollapsed)
+                      ClipRect(
+                        child: BackdropFilter(
+                          filter: ImageFilter.blur(sigmaX: 35.0, sigmaY: 35.0),
+                          child: Container(
+                            color:
+                                theme.colorScheme.shadow.withValues(alpha: 0.1),
+                          ),
+                        ),
+                      ),
+
+                    // Título
+                    Padding(
+                      padding: EdgeInsets.only(
+                        left: isCollapsed ? 0 : 16,
+                        bottom: 10,
+                      ),
+                      child: Align(
+                        alignment: isCollapsed
+                            ? Alignment.bottomCenter
+                            : Alignment.bottomLeft,
+                        child: Text(
+                          "Buscar eventos",
+                          style: TextStyle(
+                            fontSize: isCollapsed ? 14 : 22,
+                            fontWeight: FontWeight.w600,
+                            color: theme.colorScheme.primary,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                );
+              },
+            ),
           ),
-        ),
-      ),
-      body: Column(
-        children: [
-          // 🔎 Barra de búsqueda
-          SizedBox(
-            height: 60,
+
+          // 🔍 Barra de búsqueda
+          SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.all(10),
               child: TextField(
@@ -99,42 +140,46 @@ class _SearchPageState extends State<SearchPage> {
             ),
           ),
 
-          // 🔥 Lista de eventos
-          Expanded(
-            child: groupedEvents.isEmpty
-                ? const Center(child: Text('No se encontraron eventos.'))
-                : ListView.builder(
-                    padding: const EdgeInsets.symmetric(horizontal: 14),
-                    itemCount: groupedEvents.keys.length,
-                    itemBuilder: (context, index) {
-                      final dateKey = groupedEvents.keys.elementAt(index);
-                      final eventsForDate = groupedEvents[dateKey]!;
+          // 📅 Lista de eventos agrupados por fecha
+          if (groupedEvents.isEmpty)
+            const SliverFillRemaining(
+              child: Center(child: Text('No se encontraron eventos.')),
+            )
+          else
+            SliverList(
+              delegate: SliverChildBuilderDelegate(
+                (context, index) {
+                  final dateKey = groupedEvents.keys.elementAt(index);
+                  final eventsForDate = groupedEvents[dateKey]!;
 
-                      return Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // 📅 Fecha como separador
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 12, top: 20),
-                            child: Text(
-                              DateFormat('dd MMMM yyyy', 'es_CO')
-                                  .format(DateTime.parse(dateKey)),
-                              style: TextStyle(
-                                fontSize: 15,
-                                fontWeight: FontWeight.w700,
-                                color: theme.colorScheme.primary,
-                              ),
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 14),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // 📅 Fecha como separador
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 12, top: 20),
+                          child: Text(
+                            DateFormat('dd MMMM yyyy', 'es_CO')
+                                .format(DateTime.parse(dateKey)),
+                            style: TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w700,
+                              color: theme.colorScheme.primary,
                             ),
                           ),
+                        ),
 
-                          // 🔥 Tarjetas de eventos
-                          ...eventsForDate
-                              .map((event) => EventCard(event: event))
-                        ],
-                      );
-                    },
-                  ),
-          ),
+                        // 🔥 Tarjetas de eventos
+                        ...eventsForDate.map((event) => EventCard(event: event))
+                      ],
+                    ),
+                  );
+                },
+                childCount: groupedEvents.keys.length,
+              ),
+            ),
         ],
       ),
     );
