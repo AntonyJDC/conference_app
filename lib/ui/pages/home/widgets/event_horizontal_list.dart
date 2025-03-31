@@ -27,6 +27,7 @@ class EventHorizontalList extends StatelessWidget {
               ),
               child: Card(
                 elevation: 3,
+                color: Theme.of(context).colorScheme.tertiary,
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16)),
                 child: Column(

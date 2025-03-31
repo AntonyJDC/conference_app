@@ -45,11 +45,12 @@ class CategoryList extends StatelessWidget {
                   ),
                   child: Center(
                     child: Icon(categoryIcons[category] ?? Icons.category,
-                        color: Colors.white, size: 30),
+                        color: Theme.of(context).colorScheme.onPrimary,
+                        size: 30),
                   ),
                 ),
                 const SizedBox(height: 6),
-                Text(category, style: const TextStyle(fontSize: 9)),
+                Text(category, style: TextStyle(fontSize: 9)),
               ],
             ),
           );
