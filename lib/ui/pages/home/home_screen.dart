@@ -14,6 +14,7 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
+import 'package:flutter_svg/flutter_svg.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -56,10 +57,12 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      extendBodyBehindAppBar: false,
       appBar: AppBar(
+        scrolledUnderElevation: 0,
         automaticallyImplyLeading: false,
         elevation: 0,
-        backgroundColor: Theme.of(context).colorScheme.primary,
+        backgroundColor: Theme.of(context).colorScheme.surface,
         title: Row(
           children: [
             Container(
@@ -67,24 +70,42 @@ class _HomeScreenState extends State<HomeScreen> {
               height: 36,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(8),
-                image: const DecorationImage(
-                  image: AssetImage('assets/images/logo.png'),
-                  fit: BoxFit.cover,
-                ),
+              ),
+              child: SvgPicture.asset(
+                'assets/images/logo.svg',
+                // ignore: deprecated_member_use
+                color: Theme.of(context).colorScheme.primary,
+                width: 100,
+                height: 100,
               ),
             ),
             const SizedBox(width: 8),
-            const Text("BizEvents",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+            Text("BizEvents",
+                style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                    color: Theme.of(context).colorScheme.primary)),
           ],
         ),
         actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 8.0),
-            child: IconButton(
-              icon: const Icon(Icons.notifications_none, color: Colors.white),
-              onPressed: () {},
-            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              IconButton(
+                icon: Icon(Icons.notifications,
+                    color: Theme.of(context).colorScheme.primary),
+                onPressed: () {
+                  Get.toNamed('/search');
+                },
+              ),
+              IconButton(
+                icon: Icon(Icons.more_vert,
+                    color: Theme.of(context).colorScheme.primary),
+                onPressed: () {
+                  Get.toNamed('/search');
+                },
+              ),
+            ],
           ),
         ],
       ),
