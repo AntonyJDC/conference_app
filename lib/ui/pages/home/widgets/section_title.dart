@@ -22,8 +22,8 @@ class SectionTitle extends StatelessWidget {
               child: Text("Ver todos",
                   style: TextStyle(
                       fontSize: 11,
-                      fontWeight: FontWeight.w600,
-                      color: Theme.of(context).colorScheme.primary)),
+                      fontWeight: FontWeight.w500,
+                      color: Theme.of(context).colorScheme.secondary)),
             ),
         ],
       ),
