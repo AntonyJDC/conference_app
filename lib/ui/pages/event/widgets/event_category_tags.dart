@@ -56,7 +56,7 @@ class EventCategoryTags extends StatelessWidget {
                     child: Icon(
                       categoryIcons[category] ?? Icons.category,
                       size: 14,
-                      color: Colors.white,
+                      color: theme.colorScheme.inversePrimary,
                     ),
                   ),
                   const SizedBox(width: 8),

@@ -41,7 +41,7 @@ class MaterialTheme {
       scrim: Colors.black12,
 
       inverseSurface: Color(0xFF121212),
-      inversePrimary: Color(0xFF8BBBE2),
+      inversePrimary: Color.fromARGB(255, 255, 255, 255),
     );
   }
 
