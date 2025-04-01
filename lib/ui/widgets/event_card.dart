@@ -23,9 +23,12 @@ class EventCard extends StatelessWidget {
     final favoriteController = Get.find<FavoriteController>();
 
     // Color del banderín
-    final banderinColor = isPastEvent
-        ? const Color.fromARGB(255, 245, 46, 32)
-        : theme.colorScheme.primary;
+    final banderinColor =
+        isPastEvent ? theme.colorScheme.errorContainer : Colors.green;
+
+    final banderinTextColor = isPastEvent
+        ? theme.colorScheme.onErrorContainer
+        : theme.colorScheme.onPrimary;
 
     final day = DateFormat('dd').format(date);
     final month = DateFormat('MMM', 'es_CO').format(date).toUpperCase();
@@ -63,15 +66,15 @@ class EventCard extends StatelessWidget {
                   children: [
                     Text(
                       day,
-                      style: const TextStyle(
-                          color: Colors.white,
+                      style: TextStyle(
+                          color: banderinTextColor,
                           fontSize: 14,
                           fontWeight: FontWeight.bold),
                     ),
                     Text(
                       month,
-                      style: const TextStyle(
-                          color: Colors.white,
+                      style: TextStyle(
+                          color: banderinTextColor,
                           fontSize: 10,
                           fontWeight: FontWeight.w500),
                     ),
