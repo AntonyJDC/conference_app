@@ -136,7 +136,7 @@ class EventInfo extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-        color: theme.outline,
+        color: theme.tertiary,
         borderRadius: BorderRadius.circular(16),
       ),
       child: Row(
