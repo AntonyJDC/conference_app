@@ -41,7 +41,7 @@ class EventCategoryTags extends StatelessWidget {
             return Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
               decoration: BoxDecoration(
-                color: theme.colorScheme.outline.withValues(alpha: 0.2),
+                color: theme.colorScheme.tertiary,
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Row(
@@ -56,7 +56,7 @@ class EventCategoryTags extends StatelessWidget {
                     child: Icon(
                       categoryIcons[category] ?? Icons.category,
                       size: 14,
-                      color: Colors.white,
+                      color: Theme.of(context).colorScheme.onPrimary,
                     ),
                   ),
                   const SizedBox(width: 8),
