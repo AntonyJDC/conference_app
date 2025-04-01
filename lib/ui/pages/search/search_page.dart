@@ -7,6 +7,8 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+enum EventFilterType { all, upcoming, past }
+
 class SearchPage extends StatefulWidget {
   const SearchPage({super.key});
 
@@ -18,6 +20,7 @@ class _SearchPageState extends State<SearchPage> {
   final TextEditingController searchController = TextEditingController();
   List<EventModel> allEvents = [];
   List<EventModel> filteredEvents = [];
+  EventFilterType selectedFilter = EventFilterType.all;
 
   @override
   void initState() {
@@ -50,14 +53,31 @@ class _SearchPageState extends State<SearchPage> {
     });
   }
 
+  List<EventModel> getFilteredEventsByType() {
+    final now = DateTime.now();
+    switch (selectedFilter) {
+      case EventFilterType.upcoming:
+        return filteredEvents
+            .where((e) => DateTime.parse(e.date).isAfter(now))
+            .toList();
+      case EventFilterType.past:
+        return filteredEvents
+            .where((e) => DateTime.parse(e.date).isBefore(now))
+            .toList();
+      case EventFilterType.all:
+        return filteredEvents;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    // Agrupar eventos por fecha
-    filteredEvents.sort(
-        (a, b) => DateTime.parse(a.date).compareTo(DateTime.parse(b.date)));
-    final groupedEvents = groupBy(filteredEvents, (e) => e.date);
+    final filteredByType = getFilteredEventsByType();
+    filteredByType.sort(
+      (a, b) => DateTime.parse(a.date).compareTo(DateTime.parse(b.date)),
+    );
+    final groupedEvents = groupBy(filteredByType, (e) => e.date);
 
     return Scaffold(
       body: CustomScrollView(
@@ -83,13 +103,10 @@ class _SearchPageState extends State<SearchPage> {
                         child: BackdropFilter(
                           filter: ImageFilter.blur(sigmaX: 35.0, sigmaY: 35.0),
                           child: Container(
-                            color:
-                                theme.colorScheme.shadow.withValues(alpha: 0.1),
+                            color: theme.colorScheme.shadow.withAlpha(10),
                           ),
                         ),
                       ),
-
-                    // Título
                     Padding(
                       padding: EdgeInsets.only(
                         left: isCollapsed ? 0 : 16,
@@ -115,28 +132,88 @@ class _SearchPageState extends State<SearchPage> {
             ),
           ),
 
-          // 🔍 Barra de búsqueda
+          // 🔍 Barra de búsqueda + filtros
           SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.all(10),
-              child: TextField(
-                controller: searchController,
-                onChanged: filterEvents,
-                style: const TextStyle(fontSize: 14),
-                decoration: InputDecoration(
-                  hintText: 'Buscar eventos',
-                  hintStyle: const TextStyle(fontSize: 14),
-                  prefixIcon: const Icon(Icons.search),
-                  filled: true,
-                  fillColor: theme.colorScheme.outline,
-                  contentPadding:
-                      const EdgeInsets.symmetric(vertical: 0, horizontal: 16),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide.none,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: TextField(
+                    controller: searchController,
+                    onChanged: filterEvents,
+                    style: TextStyle(
+                        fontSize: 14, color: theme.colorScheme.onPrimary),
+                    decoration: InputDecoration(
+                      hintText: 'Buscar un evento',
+                      hintStyle: TextStyle(
+                          fontSize: 14, color: theme.colorScheme.onPrimary),
+                      prefixIcon: Icon(
+                        Icons.search,
+                        color: theme.colorScheme.onPrimary,
+                      ),
+                      filled: true,
+                      fillColor: theme.colorScheme.primary,
+                      contentPadding: const EdgeInsets.symmetric(
+                          vertical: 0, horizontal: 16),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide.none,
+                      ),
+                    ),
                   ),
                 ),
-              ),
+
+                // 🏷️ Filtros de eventos
+                Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: SizedBox(
+                    height: 42,
+                    child: LayoutBuilder(
+                      builder: (context, constraints) {
+                        final tabWidth = (constraints.maxWidth - 20) / 3;
+
+                        return Stack(
+                          children: [
+                            // Fondo animado que se desliza
+                            AnimatedPositioned(
+                              duration: const Duration(milliseconds: 250),
+                              curve: Curves.easeInOut,
+                              left: selectedFilter == EventFilterType.all
+                                  ? 0
+                                  : selectedFilter == EventFilterType.upcoming
+                                      ? tabWidth + 10
+                                      : (tabWidth + 10) * 2,
+                              top: 0,
+                              height: 42,
+                              width: tabWidth,
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: theme.colorScheme.primary,
+                                  borderRadius: BorderRadius.circular(25),
+                                ),
+                              ),
+                            ),
+
+                            // Filtros encima del fondo
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                _buildFilterLabel(
+                                    'Todos', EventFilterType.all, tabWidth),
+                                _buildFilterLabel('Próximos',
+                                    EventFilterType.upcoming, tabWidth),
+                                _buildFilterLabel(
+                                    'Pasados', EventFilterType.past, tabWidth),
+                              ],
+                            ),
+                          ],
+                        );
+                      },
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
 
@@ -181,6 +258,42 @@ class _SearchPageState extends State<SearchPage> {
               ),
             ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildFilterLabel(String label, EventFilterType type, double width) {
+    final isSelected = selectedFilter == type;
+    final theme = Theme.of(context);
+
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          selectedFilter = type;
+        });
+      },
+      child: Container(
+        width: width,
+        alignment: Alignment.center,
+        decoration: !isSelected
+            ? BoxDecoration(
+                border: Border.all(
+                  color: theme.colorScheme.outline.withValues(alpha: 0.7),
+                  width: 1,
+                ),
+                borderRadius: BorderRadius.circular(25),
+              )
+            : null,
+        child: Text(
+          label,
+          style: TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.w500,
+            color: isSelected
+                ? theme.colorScheme.onPrimary
+                : theme.colorScheme.primary,
+          ),
+        ),
       ),
     );
   }
