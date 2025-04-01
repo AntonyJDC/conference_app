@@ -294,8 +294,8 @@ class _CalendarScreenState extends State<CalendarScreen> {
           ? FloatingActionButton(
               backgroundColor: theme.colorScheme.primary,
               onPressed: _goToNearestEvent,
-              child:
-                  const Icon(Icons.arrow_upward_rounded, color: Colors.white),
+              child: Icon(Icons.arrow_upward_rounded,
+                  color: theme.colorScheme.onPrimary),
             )
           : null,
     );
