@@ -20,7 +20,7 @@ class DetailIcon extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.outline,
+            color: Theme.of(context).colorScheme.tertiary,
             shape: BoxShape.circle,
           ),
           child: Icon(
