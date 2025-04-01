@@ -161,7 +161,11 @@ class _SubscribeButtonState extends State<SubscribeButton> {
               onPressed: onPressed,
               child: Text(
                 buttonText,
-                style: const TextStyle(color: Colors.white, fontSize: 16),
+                style: TextStyle(
+                  color: textColor,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ),
           ),
