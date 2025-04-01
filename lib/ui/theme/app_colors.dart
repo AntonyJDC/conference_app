@@ -22,7 +22,7 @@ class MaterialTheme {
       tertiary: Color(0xFFF7F7F7), //base-200
       onTertiary: Color(0xFFF0F0F0), //base-300
       tertiaryContainer: Color(0xFF5E5E5E),
-      onTertiaryContainer: Color(0xFFFFFFFF),
+      onTertiaryContainer: Color(0xFF000000),
 
       error: Color(0xFFF6A59B),
       onError: Color(0xFF29100E),
