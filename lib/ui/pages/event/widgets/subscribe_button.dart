@@ -19,7 +19,6 @@ class SubscribeButton extends StatefulWidget {
 class _SubscribeButtonState extends State<SubscribeButton> {
   late Timer _timer;
   late BookedEventsController bookedEvtController;
-  late ColorScheme theme;
   late tz.Location _colombiaTZ;
 
   @override
@@ -43,12 +42,11 @@ class _SubscribeButtonState extends State<SubscribeButton> {
 
   @override
   Widget build(BuildContext context) {
-    theme = Theme.of(context).colorScheme;
+    final colorScheme = Theme.of(context).colorScheme;
 
     return Obx(() {
       final eventValue = widget.event.value;
 
-      // ✅ Validación con hora de Colombia
       final eventDate = DateTime.tryParse(eventValue.date);
       final now = tz.TZDateTime.now(_colombiaTZ);
       bool isPastEvent = false;
@@ -72,15 +70,18 @@ class _SubscribeButtonState extends State<SubscribeButton> {
 
       String buttonText;
       Color buttonColor;
+      Color textColor;
       VoidCallback? onPressed;
 
       if (isPastEvent) {
         buttonText = "Evento finalizado";
-        buttonColor = Colors.grey;
+        buttonColor = colorScheme.tertiaryContainer;
+        textColor = colorScheme.onTertiaryContainer;
         onPressed = null;
       } else if (isSubscribed) {
         buttonText = "Darse de baja";
-        buttonColor = Colors.red;
+        buttonColor = colorScheme.errorContainer;
+        textColor = colorScheme.onErrorContainer;
         onPressed = () async {
           bookedEvtController.removeTask(eventValue.id);
 
@@ -101,7 +102,8 @@ class _SubscribeButtonState extends State<SubscribeButton> {
         };
       } else if (eventValue.spotsLeft > 0) {
         buttonText = "Suscribirse";
-        buttonColor = theme.primary;
+        buttonColor = colorScheme.primary;
+        textColor = colorScheme.onPrimary;
         onPressed = () async {
           bookedEvtController.addTask(eventValue);
 
@@ -122,7 +124,8 @@ class _SubscribeButtonState extends State<SubscribeButton> {
         };
       } else {
         buttonText = "Agotado";
-        buttonColor = Colors.grey;
+        buttonColor = Theme.of(context).colorScheme.primaryContainer;
+        textColor = colorScheme.onTertiaryContainer.withValues(alpha: 0.8);
         onPressed = null;
       }
 
@@ -132,13 +135,23 @@ class _SubscribeButtonState extends State<SubscribeButton> {
         right: 0,
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-          decoration: BoxDecoration(color: theme.surface),
+          decoration: BoxDecoration(
+            color: colorScheme.surface,
+            boxShadow: [
+              BoxShadow(
+                color: colorScheme.shadow.withValues(alpha: 0.1),
+                blurRadius: 10,
+                offset: const Offset(0, -2),
+              ),
+            ],
+          ),
           child: SizedBox(
             width: double.infinity,
             height: 50,
             child: ElevatedButton(
               style: ElevatedButton.styleFrom(
                 backgroundColor: buttonColor,
+                foregroundColor: textColor,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(30),
                 ),
@@ -146,7 +159,11 @@ class _SubscribeButtonState extends State<SubscribeButton> {
               onPressed: onPressed,
               child: Text(
                 buttonText,
-                style: const TextStyle(color: Colors.white, fontSize: 16),
+                style: TextStyle(
+                  color: textColor,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ),
           ),
