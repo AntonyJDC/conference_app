@@ -105,8 +105,10 @@ class _SubscribeButtonState extends State<SubscribeButton> {
         buttonColor = colorScheme.primary;
         textColor = colorScheme.onPrimary;
         onPressed = () async {
+          // ✅ Guardar en el historial (para feedbacks)
           bookedEvtController.addTask(eventValue);
 
+          // 🟡 Reducir cupo
           widget.event.value = widget.event.value.copyWith(
             spotsLeft: (widget.event.value.spotsLeft - 1)
                 .clamp(0, widget.event.value.capacity),
@@ -159,11 +161,7 @@ class _SubscribeButtonState extends State<SubscribeButton> {
               onPressed: onPressed,
               child: Text(
                 buttonText,
-                style: TextStyle(
-                  color: textColor,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                ),
+                style: const TextStyle(color: Colors.white, fontSize: 16),
               ),
             ),
           ),

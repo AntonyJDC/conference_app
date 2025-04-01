@@ -1,3 +1,4 @@
+
 import 'package:conference_app/ui/pages/event/event_detail_page.dart';
 import 'package:conference_app/ui/pages/event/event_list_page.dart';
 import 'package:conference_app/ui/pages/favorites/favorites_screen.dart';
