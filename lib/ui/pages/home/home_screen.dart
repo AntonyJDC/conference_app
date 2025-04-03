@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ui';
 import 'package:conference_app/data/models/event_model.dart';
 import 'package:conference_app/domain/use_case/events/get_all_events_use_case.dart';
 import 'package:conference_app/domain/use_case/events/get_nearby_events_use_case.dart';
@@ -35,9 +36,7 @@ class _HomeScreenState extends State<HomeScreen> {
     tz.initializeTimeZones();
     _colombiaTZ = tz.getLocation('America/Bogota');
     dateFormat = DateFormat.yMMMMd('es_CO');
-
     _futureEvents = _loadSortedEvents();
-
     _timer = Timer.periodic(const Duration(seconds: 10), (_) {
       if (mounted) setState(() {});
     });
@@ -56,109 +55,173 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Scaffold(
-      extendBodyBehindAppBar: false,
-      appBar: AppBar(
-        scrolledUnderElevation: 0,
-        automaticallyImplyLeading: false,
-        elevation: 0,
-        backgroundColor: Theme.of(context).colorScheme.surface,
-        title: Row(
-          children: [
-            Container(
-              width: 36,
-              height: 36,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: SvgPicture.asset(
-                'assets/images/logo.svg',
-                // ignore: deprecated_member_use
-                color: Theme.of(context).colorScheme.primary,
-                width: 100,
-                height: 100,
-              ),
-            ),
-            const SizedBox(width: 8),
-            Text("BizEvents",
-                style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                    color: Theme.of(context).colorScheme.primary)),
-          ],
-        ),
-        actions: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              IconButton(
-                icon: Icon(Icons.notifications,
-                    color: Theme.of(context).colorScheme.primary),
-                onPressed: () {
-                  Get.toNamed('/search');
-                },
-              ),
-              IconButton(
-                icon: Icon(Icons.more_vert,
-                    color: Theme.of(context).colorScheme.primary),
-                onPressed: () {
-                  Get.toNamed('/search');
-                },
-              ),
-            ],
-          ),
-        ],
-      ),
       body: FutureBuilder<List<EventModel>>(
         future: _futureEvents,
         builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
-
-          if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const Center(child: Text("No hay eventos disponibles"));
-          }
-
-          final sortedEvents = snapshot.data!;
+          final sortedEvents = snapshot.data ?? [];
           final nearbyEvents =
               GetNearbyEventsUseCase().execute(sortedEvents).take(10).toList();
 
-          return ListView(
-            padding: EdgeInsets.zero,
-            children: [
-              const HomeHeader(),
-              const SizedBox(height: 16),
-              SectionTitle(
-                title: "Eventos Cercanos",
-                onTap: () {
-                  Get.to(() => EventListPage(
-                        title: 'Eventos Cercanos',
-                        emptyMessage: 'No hay eventos cercanos disponibles.',
-                        events: nearbyEvents,
-                      ));
-                },
+          return CustomScrollView(
+            slivers: [
+              SliverAppBar(
+                pinned: true,
+                expandedHeight: 120,
+                backgroundColor: theme.colorScheme.surface,
+                elevation: 0,
+                automaticallyImplyLeading: false,
+                flexibleSpace: LayoutBuilder(
+                  builder: (context, constraints) {
+                    final collapsedHeight =
+                        kToolbarHeight + MediaQuery.of(context).padding.top;
+                    final isCollapsed =
+                        constraints.maxHeight <= collapsedHeight;
+
+                    return Stack(
+                      fit: StackFit.expand,
+                      children: [
+                        if (isCollapsed)
+                          ClipRect(
+                            child: BackdropFilter(
+                              filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
+                              child: Container(
+                                color:
+                                    theme.colorScheme.surface.withOpacity(0.1),
+                              ),
+                            ),
+                          ),
+
+                        // Íconos parte superior derecha (siempre visibles)
+                        Positioned(
+                          top: MediaQuery.of(context).padding.top + 8,
+                          right: 8,
+                          child: Row(
+                            children: [
+                              IconButton(
+                                icon: Icon(Icons.notifications,
+                                    color: theme.colorScheme.primary),
+                                onPressed: () => Get.toNamed('/notifications'),
+                              ),
+                              IconButton(
+                                icon: Icon(Icons.more_vert,
+                                    color: theme.colorScheme.primary),
+                                onPressed: () => Get.toNamed('/search'),
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        // Título y logo
+                        Padding(
+                          padding: EdgeInsets.only(
+                            top: MediaQuery.of(context).padding.top + 16,
+                            left: 16,
+                            right: 16,
+                            bottom: 16,
+                          ),
+                          child: Align(
+                            alignment: isCollapsed
+                                ? Alignment.bottomCenter
+                                : Alignment.bottomLeft,
+                            child: Row(
+                              mainAxisAlignment: isCollapsed
+                                  ? MainAxisAlignment.center
+                                  : MainAxisAlignment.start,
+                              children: [
+                                if (!isCollapsed) ...[
+                                  SvgPicture.asset(
+                                    'assets/images/logo.svg',
+                                    width: 32,
+                                    height: 32,
+                                    color: theme.colorScheme.primary,
+                                  ),
+                                  const SizedBox(width: 8),
+                                ],
+                                Text(
+                                  "BizEvents",
+                                  style: TextStyle(
+                                    fontSize: isCollapsed ? 15 : 22,
+                                    fontWeight: FontWeight.bold,
+                                    color: theme.colorScheme.primary,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    );
+                  },
+                ),
               ),
-              const SizedBox(height: 16),
-              _buildNearbyList(context, nearbyEvents),
-              const SizedBox(height: 22),
-              const SectionTitle(title: "Categorías"),
-              const SizedBox(height: 16),
-              const CategoryList(),
-              const SizedBox(height: 16),
-              SectionTitle(
-                title: "Eventos próximos",
-                onTap: () {
-                  Get.to(() => EventListPage(
-                        title: 'Eventos Próximos',
-                        emptyMessage: 'No hay eventos próximos disponibles.',
-                        events: sortedEvents,
-                      ));
-                },
-              ),
-              const SizedBox(height: 16),
-              EventHorizontalList(events: sortedEvents),
-              const SizedBox(height: 16),
+
+              // Si está cargando
+              if (snapshot.connectionState == ConnectionState.waiting)
+                const SliverToBoxAdapter(
+                  child: Padding(
+                    padding: EdgeInsets.only(top: 100),
+                    child: Center(child: CircularProgressIndicator()),
+                  ),
+                ),
+
+              // Si no hay eventos
+              if (snapshot.connectionState == ConnectionState.done &&
+                  sortedEvents.isEmpty)
+                const SliverToBoxAdapter(
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(vertical: 80),
+                    child: Center(child: Text("No hay eventos disponibles")),
+                  ),
+                ),
+
+              // Contenido si hay eventos
+              if (sortedEvents.isNotEmpty) ...[
+                const SliverToBoxAdapter(child: SizedBox(height: 16)),
+                const SliverToBoxAdapter(child: HomeHeader()),
+                const SliverToBoxAdapter(child: SizedBox(height: 16)),
+                SliverToBoxAdapter(
+                  child: SectionTitle(
+                    title: "Eventos Cercanos",
+                    onTap: () {
+                      Get.to(() => EventListPage(
+                            title: 'Eventos Cercanos',
+                            emptyMessage:
+                                'No hay eventos cercanos disponibles.',
+                            events: nearbyEvents,
+                          ));
+                    },
+                  ),
+                ),
+                const SliverToBoxAdapter(child: SizedBox(height: 16)),
+                SliverToBoxAdapter(
+                    child: _buildNearbyList(context, nearbyEvents)),
+                const SliverToBoxAdapter(child: SizedBox(height: 22)),
+                const SliverToBoxAdapter(
+                    child: SectionTitle(title: "Categorías")),
+                const SliverToBoxAdapter(child: SizedBox(height: 16)),
+                const SliverToBoxAdapter(child: CategoryList()),
+                const SliverToBoxAdapter(child: SizedBox(height: 16)),
+                SliverToBoxAdapter(
+                  child: SectionTitle(
+                    title: "Eventos próximos",
+                    onTap: () {
+                      Get.to(() => EventListPage(
+                            title: 'Eventos Próximos',
+                            emptyMessage:
+                                'No hay eventos próximos disponibles.',
+                            events: sortedEvents,
+                          ));
+                    },
+                  ),
+                ),
+                const SliverToBoxAdapter(child: SizedBox(height: 16)),
+                SliverToBoxAdapter(
+                    child: EventHorizontalList(events: sortedEvents)),
+                const SliverToBoxAdapter(child: SizedBox(height: 16)),
+              ],
             ],
           );
         },
