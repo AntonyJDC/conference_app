@@ -142,7 +142,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                           filter: ImageFilter.blur(sigmaX: 30.0, sigmaY: 30.0),
                           child: Container(
                             color: theme.colorScheme.surface
-                                .withValues(alpha: 0.8),
+                                .withValues(alpha: 0.1),
                           ),
                         ),
                       ),
