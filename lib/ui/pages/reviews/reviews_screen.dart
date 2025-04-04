@@ -175,7 +175,7 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
           style: TextStyle(
             fontWeight: FontWeight.w400,
             color: selected
-                ? Colors.white
+                ? Theme.of(context).colorScheme.onPrimary
                 : Theme.of(context).brightness == Brightness.dark
                     ? Colors.white.withOpacity(0.7)
                     : Colors.black.withOpacity(0.7),
