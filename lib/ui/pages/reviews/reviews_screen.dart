@@ -1,6 +1,6 @@
 import 'dart:ui';
 import 'package:conference_app/controllers/booked_events_controller.dart';
-import 'package:conference_app/ui/widgets/event_card.dart';
+import 'package:conference_app/ui/pages/reviews/widgets/event_cards.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -143,19 +143,33 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
                       const Text("No tienes eventos finalizados aún.",
                           style: TextStyle(fontSize: 16))
                     else
-                      Column(
-                        children: finishedEvents
-                            .map((event) => Padding(
-                                  padding:
-                                      const EdgeInsets.symmetric(vertical: 8.0),
-                                  child: EventCard(
-                                    event: event,
-                                    showDate: true,
-                                    showFavorite: false,
-                                  ),
-                                ))
-                            .toList(),
-                      ),
+                      Column(children: [
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 12),
+                          child: Text(
+                            "Los eventos a los que has hecho feedback tendrán un ícono de estrella de color verde.",
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                        Column(
+                          children: finishedEvents
+                              .map((event) => Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 8.0),
+                                    child: EventCardReviews(
+                                      event: event,
+                                      showDate: true,
+                                      showFavorite: false,
+                                      showRating: true,
+                                    ),
+                                  ))
+                              .toList(),
+                        )
+                      ]),
                   ],
                 ),
               ),
