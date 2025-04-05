@@ -14,8 +14,8 @@ class EventCard extends StatelessWidget {
     return InkWell(
       onTap: () => Get.toNamed('/detail', arguments: event),
       child: Card(
-        color: theme.colorScheme.surface.withValues(alpha: 0.7),
-        elevation: 1,
+        color: theme.colorScheme.tertiary,
+        elevation: 2,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         child: Stack(
           children: [
@@ -47,20 +47,49 @@ class EventCard extends StatelessWidget {
                             event.title,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                                fontSize: 14, fontWeight: FontWeight.w600),
+                            style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                                color: theme.colorScheme.primary),
                           ),
-                          const SizedBox(height: 8),
+                          const SizedBox(height: 5),
                           Row(
                             children: [
-                              const Icon(Icons.location_on, size: 16),
+                              Icon(
+                                Icons.location_on,
+                                size: 16,
+                                color: theme.colorScheme.primary,
+                              ),
                               const SizedBox(width: 5),
                               Expanded(
                                 child: Text(
                                   event.location,
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(fontSize: 13),
+                                  style: TextStyle(
+                                      fontSize: 13,
+                                      color: theme.colorScheme.primary),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 5),
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.timer,
+                                size: 16,
+                                color: theme.colorScheme.primary,
+                              ),
+                              const SizedBox(width: 5),
+                              Expanded(
+                                child: Text(
+                                  '${event.startTime} - ${event.endTime}',
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                      fontSize: 13,
+                                      color: theme.colorScheme.primary),
                                 ),
                               ),
                             ],
@@ -75,7 +104,7 @@ class EventCard extends StatelessWidget {
                     margin: const EdgeInsets.only(left: 6),
                     child: Icon(
                       Icons.arrow_forward_rounded,
-                      size: 20,
+                      size: 25,
                       color: theme.colorScheme.primary,
                     ),
                   ),

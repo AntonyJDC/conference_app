@@ -103,7 +103,8 @@ class _SearchPageState extends State<SearchPage> {
                         child: BackdropFilter(
                           filter: ImageFilter.blur(sigmaX: 35.0, sigmaY: 35.0),
                           child: Container(
-                            color: theme.colorScheme.shadow.withAlpha(10),
+                            color: theme.colorScheme.surface
+                                .withValues(alpha: 0.1),
                           ),
                         ),
                       ),
@@ -147,7 +148,9 @@ class _SearchPageState extends State<SearchPage> {
                     decoration: InputDecoration(
                       hintText: 'Buscar un evento',
                       hintStyle: TextStyle(
-                          fontSize: 14, color: theme.colorScheme.onPrimary),
+                          fontSize: 14,
+                          color: theme.colorScheme.onPrimary
+                              .withValues(alpha: 0.5)),
                       prefixIcon: Icon(
                         Icons.search,
                         color: theme.colorScheme.onPrimary,

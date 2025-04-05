@@ -1,33 +1,45 @@
 import 'package:conference_app/controllers/favorite_controller.dart';
 import 'package:conference_app/data/models/event_model.dart';
 import 'package:conference_app/domain/use_case/events/check_event_status_use_case.dart';
+import 'package:conference_app/domain/use_case/reviews/get_review_for_event_use_case.dart';
+import 'package:conference_app/ui/pages/reviews/widgets/add_review.dart';
+import 'package:conference_app/ui/widgets/event_rating_stars.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:conference_app/domain/use_case/reviews/has_reviewed_use_case.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
-class EventCard extends StatefulWidget {
+class EventCardReviews extends StatefulWidget {
   final EventModel event;
   final bool showFavorite, showDate, showRating;
+  final double? rating;
 
-  const EventCard({
+  const EventCardReviews({
     super.key,
     required this.event,
     this.showFavorite = false,
     this.showDate = false,
     this.showRating = false,
+    this.rating,
   });
 
   @override
   EventCardState createState() => EventCardState();
 }
 
-class EventCardState extends State<EventCard> {
-  bool isStarReviewed = false;
+class EventCardState extends State<EventCardReviews> {
+  RxBool hasReviewed = false.obs;
 
-  void updateStarReview() {
-    setState(() {
-      isStarReviewed = true;
-    });
+  @override
+  void initState() {
+    super.initState();
+    _checkIfReviewed();
+  }
+
+  Future<void> _checkIfReviewed() async {
+    bool reviewed = await HasReviewedUseCase().execute(widget.event.id);
+    hasReviewed.value = reviewed;
   }
 
   @override
@@ -110,6 +122,36 @@ class EventCardState extends State<EventCard> {
                           ? const Color.fromARGB(255, 255, 17, 0)
                           : Colors.white,
                       size: 20,
+                    ),
+                  ),
+                );
+              }),
+            ),
+          if (widget.showRating)
+            Positioned(
+              top: 12,
+              right: 12,
+              child: Obx(() {
+                final reviewed = hasReviewed.value;
+
+                return GestureDetector(
+                  onTap: () async {
+                    if (!reviewed && context.mounted) {
+                      _showAddReview(context, widget.event.id);
+                    } else {
+                      _showReview(context, widget.event.id);
+                    }
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.black.withOpacity(0.4),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      reviewed ? Icons.star : Icons.star_border,
+                      color: reviewed ? Colors.green : Colors.white,
+                      size: 24,
                     ),
                   ),
                 );
@@ -212,5 +254,136 @@ class EventCardState extends State<EventCard> {
         ],
       ),
     );
+  }
+
+  void _showAddReview(BuildContext context, String eventId) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => AddReviewPage(eventId: eventId),
+      ),
+    ).then((_) {
+      _checkIfReviewed();
+    });
+  }
+
+  void _showReview(BuildContext context, String eventId) {
+    TextEditingController commentController = TextEditingController();
+    double rating = 0;
+
+    // Ejecutar el use case para obtener la reseña
+    GetReviewForEventUseCase().execute(eventId).then((review) {
+      if (review != null) {
+        // Si existe una reseña, mostramos la calificación y el comentario
+        rating = review.rating.toDouble();
+        commentController.text = review.comment;
+      }
+
+      showMaterialModalBottomSheet(
+        context: context,
+        backgroundColor: Colors.transparent,
+        builder: (context) {
+          return GestureDetector(
+            onTap: () {
+              FocusScope.of(context).requestFocus(
+                  FocusNode()); // Dismiss keyboard when tapping outside
+            },
+            child: SingleChildScrollView(
+              child: Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.surface,
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize
+                      .min, // Ajusta el tamaño del modal según el contenido
+                  children: [
+                    // Línea superior para indicar deslizar
+                    Container(
+                      width: 40,
+                      height: 4,
+                      margin: const EdgeInsets.only(bottom: 16),
+                      decoration: BoxDecoration(
+                        color: Colors.grey.withOpacity(0.4),
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
+                    // Título
+                    Center(
+                      child: Text(
+                        "Tu reseña de este evento",
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    // RatingBar con la calificación existente
+                    Center(
+                      child: EventRatingStars(
+                          event: widget.event,
+                          average: rating,
+                          iconSize: 40,
+                          showReviewCount: false,
+                          mainAxisAlignment: MainAxisAlignment.center),
+                    ),
+
+                    const SizedBox(height: 24),
+                    Text(
+                      "Tus comentarios:",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 18),
+                    // Área de comentarios (solo lectura)
+                    TextField(
+                      controller: commentController,
+                      cursorColor: Theme.of(context).colorScheme.primary,
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        filled: true,
+                        fillColor: Theme.of(context).colorScheme.outlineVariant,
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 16,
+                        ),
+                      ),
+                      maxLines: 4,
+                      readOnly: true, // El TextField es solo lectura
+                    ),
+                    const SizedBox(height: 16),
+                    // Botón para cerrar el modal
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        TextButton(
+                          onPressed: () {
+                            Navigator.pop(context); // Cerrar el modal
+                          },
+                          child: Text("Cerrar"),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        },
+      );
+    });
   }
 }

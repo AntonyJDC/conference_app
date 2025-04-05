@@ -40,7 +40,7 @@ class FavoritesPage extends StatelessWidget {
                             filter:
                                 ImageFilter.blur(sigmaX: 35.0, sigmaY: 35.0),
                             child: Container(
-                              color: theme.colorScheme.shadow
+                              color: theme.colorScheme.surface
                                   .withValues(alpha: 0.1),
                             ),
                           ),
@@ -74,18 +74,22 @@ class FavoritesPage extends StatelessWidget {
 
             // Lista de eventos favoritos o mensaje vacío
             if (favorites.isEmpty)
-              const SliverFillRemaining(
-                child: Center(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(Icons.favorite_border, size: 80, color: Colors.grey),
-                      SizedBox(height: 16),
-                      Padding(
-                        padding: EdgeInsets.all(32),
-                        child: Text('No tienes eventos favoritos'),
-                      ),
-                    ],
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 100),
+                  child: Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: const [
+                        Icon(Icons.favorite_border,
+                            size: 80, color: Colors.grey),
+                        SizedBox(height: 16),
+                        Padding(
+                          padding: EdgeInsets.all(32),
+                          child: Text('No tienes eventos favoritos'),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               )

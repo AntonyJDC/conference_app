@@ -25,6 +25,7 @@ class EventRatingStars extends StatelessWidget {
   final Color? textColor;
   final double iconSize;
   final double spacing;
+  final MainAxisAlignment mainAxisAlignment;
 
   const EventRatingStars({
     super.key,
@@ -35,6 +36,7 @@ class EventRatingStars extends StatelessWidget {
     this.textColor,
     this.iconSize = 20,
     this.spacing = 8,
+    this.mainAxisAlignment = MainAxisAlignment.start,
   });
 
   @override
@@ -49,6 +51,7 @@ class EventRatingStars extends StatelessWidget {
 
       return Row(
         crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: mainAxisAlignment,
         children: [
           ...List.generate(5, (index) {
             final fullStarColor =
