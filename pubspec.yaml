@@ -49,6 +49,8 @@ dependencies:
   table_calendar: ^3.2.0
   timezone: ^0.10.0
   flutter_svg: ^2.0.17
+  flutter_rating_bar: ^4.0.1
+  modal_bottom_sheet: ^3.0.0
 
 dev_dependencies:
   flutter_test:
