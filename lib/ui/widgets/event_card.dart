@@ -1,42 +1,48 @@
 import 'package:conference_app/controllers/favorite_controller.dart';
 import 'package:conference_app/data/models/event_model.dart';
+import 'package:conference_app/domain/use_case/events/check_event_status_use_case.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
-class EventCard extends StatelessWidget {
+class EventCard extends StatefulWidget {
   final EventModel event;
-  final bool showFavorite, showDate;
-  final double? rating;
-  final String? comment;
+  final bool showFavorite, showDate, showRating;
 
   const EventCard({
     super.key,
     required this.event,
     this.showFavorite = false,
     this.showDate = false,
-    this.rating,
-    this.comment,
+    this.showRating = false,
   });
+
+  @override
+  EventCardState createState() => EventCardState();
+}
+
+class EventCardState extends State<EventCard> {
+  bool isStarReviewed = false;
+
+  void updateStarReview() {
+    setState(() {
+      isStarReviewed = true;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final date = DateTime.parse(event.date);
-    final now = DateTime.now();
-    final isPastEvent = date.isBefore(now);
+    final date = DateTime.parse(widget.event.date);
+    final isPastEvent = CheckEventStatusUseCase().execute(widget.event);
     final favoriteController = Get.find<FavoriteController>();
 
-    // Color del banderín
     final banderinColor =
         isPastEvent ? theme.colorScheme.errorContainer : Colors.green;
 
     final banderinTextColor = isPastEvent
         ? theme.colorScheme.onErrorContainer
         : theme.colorScheme.onPrimary;
-
-    final day = DateFormat('dd').format(date);
-    final month = DateFormat('MMM', 'es_CO').format(date).toUpperCase();
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 50),
@@ -46,13 +52,13 @@ class EventCard extends StatelessWidget {
           ClipRRect(
             borderRadius: BorderRadius.circular(16),
             child: Image.asset(
-              event.imageUrl,
+              widget.event.imageUrl,
               width: double.infinity,
               height: MediaQuery.of(context).size.width * 0.5,
               fit: BoxFit.cover,
             ),
           ),
-          if (showDate)
+          if (widget.showDate)
             Positioned(
               top: 12,
               left: 12,
@@ -67,14 +73,14 @@ class EventCard extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      day,
+                      DateFormat('dd').format(date),
                       style: TextStyle(
                           color: banderinTextColor,
                           fontSize: 14,
                           fontWeight: FontWeight.bold),
                     ),
                     Text(
-                      month,
+                      DateFormat('MMM', 'es_CO').format(date).toUpperCase(),
                       style: TextStyle(
                           color: banderinTextColor,
                           fontSize: 10,
@@ -84,14 +90,14 @@ class EventCard extends StatelessWidget {
                 ),
               ),
             ),
-          if (showFavorite)
+          if (widget.showFavorite)
             Positioned(
               top: 12,
               right: 12,
               child: Obx(() {
-                final isFavorite = favoriteController.isFavorite(event);
+                final isFavorite = favoriteController.isFavorite(widget.event);
                 return GestureDetector(
-                  onTap: () => favoriteController.toggleFavorite(event),
+                  onTap: () => favoriteController.toggleFavorite(widget.event),
                   child: Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
@@ -134,7 +140,7 @@ class EventCard extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          event.title,
+                          widget.event.title,
                           maxLines: 1,
                           style: const TextStyle(
                               fontSize: 14, fontWeight: FontWeight.w600),
@@ -148,7 +154,7 @@ class EventCard extends StatelessWidget {
                             const SizedBox(width: 4),
                             Expanded(
                               child: Text(
-                                event.location,
+                                widget.event.location,
                                 style: const TextStyle(
                                     fontSize: 10, color: Colors.grey),
                                 overflow: TextOverflow.ellipsis,
@@ -170,7 +176,7 @@ class EventCard extends StatelessWidget {
                                           fontSize: 10, color: Colors.red),
                                     )
                                   : Text(
-                                      '${event.startTime} - ${event.endTime}',
+                                      '${widget.event.startTime} - ${widget.event.endTime}',
                                       style: const TextStyle(
                                           fontSize: 10, color: Colors.grey),
                                       overflow: TextOverflow.ellipsis,
@@ -178,39 +184,6 @@ class EventCard extends StatelessWidget {
                             ),
                           ],
                         ),
-                        if (rating != null || comment != null)
-                          Padding(
-                            padding: const EdgeInsets.only(top: 8.0),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                if (rating != null)
-                                  Row(
-                                    children: List.generate(
-                                      5,
-                                      (index) => Icon(
-                                        Icons.star,
-                                        size: 16,
-                                        color: index < rating!.round()
-                                            ? Colors.amber
-                                            : Colors.grey.shade300,
-                                      ),
-                                    ),
-                                  ),
-                                if (comment != null) ...[
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    comment!,
-                                    style: const TextStyle(
-                                      fontSize: 12,
-                                      fontStyle: FontStyle.italic,
-                                      color: Colors.grey,
-                                    ),
-                                  ),
-                                ],
-                              ],
-                            ),
-                          ),
                       ],
                     ),
                   ),
@@ -223,7 +196,8 @@ class EventCard extends StatelessWidget {
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
-                      onPressed: () => Get.toNamed('/detail', arguments: event),
+                      onPressed: () =>
+                          Get.toNamed('/detail', arguments: widget.event),
                       child: Icon(
                         Icons.arrow_forward_rounded,
                         size: 18,
