@@ -1,15 +1,13 @@
 import 'package:conference_app/controllers/favorite_controller.dart';
 import 'package:conference_app/data/models/event_model.dart';
 import 'package:conference_app/domain/use_case/events/check_event_status_use_case.dart';
-import 'package:conference_app/domain/use_case/reviews/add_review_use_case.dart';
 import 'package:conference_app/domain/use_case/reviews/get_review_for_event_use_case.dart';
-import 'package:conference_app/domain/use_case/reviews/update_average_rating_use_case.dart';
+import 'package:conference_app/ui/pages/reviews/widgets/add_review.dart';
 import 'package:conference_app/ui/widgets/event_rating_stars.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:flutter_rating_bar/flutter_rating_bar.dart';
-import 'package:conference_app/data/models/review_model.dart';
+import 'package:conference_app/domain/use_case/reviews/has_reviewed_use_case.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
 class EventCardReviews extends StatefulWidget {
@@ -31,9 +29,18 @@ class EventCardReviews extends StatefulWidget {
 }
 
 class EventCardState extends State<EventCardReviews> {
-  // Estado reactivo para controlar si ya se hizo una reseña
-  RxBool hasReviewed =
-      false.obs; // RxBool para que cambie la estrella inmediatamente
+  RxBool hasReviewed = false.obs;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkIfReviewed();
+  }
+
+  Future<void> _checkIfReviewed() async {
+    bool reviewed = await HasReviewedUseCase().execute(widget.event.id);
+    hasReviewed.value = reviewed;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -120,19 +127,17 @@ class EventCardState extends State<EventCardReviews> {
                 );
               }),
             ),
-          // Mostrar estrella si `showRating` es verdadero
           if (widget.showRating)
             Positioned(
               top: 12,
               right: 12,
               child: Obx(() {
-                // Usamos el estado reactivo `hasReviewed`
                 final reviewed = hasReviewed.value;
 
                 return GestureDetector(
                   onTap: () async {
                     if (!reviewed && context.mounted) {
-                      _showReviewDialog(context, widget.event.id);
+                      _showAddReview(context, widget.event.id);
                     } else {
                       _showReview(context, widget.event.id);
                     }
@@ -152,7 +157,6 @@ class EventCardState extends State<EventCardReviews> {
                 );
               }),
             ),
-
           Positioned(
             bottom: -30,
             left: 10,
@@ -252,146 +256,15 @@ class EventCardState extends State<EventCardReviews> {
     );
   }
 
-  // Cuadro de diálogo para dejar la reseña
-  void _showReviewDialog(BuildContext context, String eventId) {
-    double rating = 0;
-    TextEditingController commentController = TextEditingController();
-
-    showMaterialModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      builder: (context) {
-        return GestureDetector(
-          onTap: () {
-            FocusScope.of(context).requestFocus(FocusNode());
-          },
-          child: SingleChildScrollView(
-            child: Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.surface,
-                borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Container(
-                    width: 40,
-                    height: 4,
-                    margin: const EdgeInsets.only(bottom: 16),
-                    decoration: BoxDecoration(
-                      color: Colors.grey.withOpacity(0.4),
-                      borderRadius: BorderRadius.circular(2),
-                    ),
-                  ),
-                  // Título
-                  Center(
-                    child: Text(
-                      "¿Cómo calificarías este evento?",
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  // RatingBar centrada
-                  Center(
-                    child: RatingBar.builder(
-                      initialRating: rating,
-                      minRating: 1,
-                      itemSize: 40,
-                      direction: Axis.horizontal,
-                      itemCount: 5,
-                      itemPadding: EdgeInsets.symmetric(horizontal: 4.0),
-                      itemBuilder: (context, index) => Icon(
-                        Icons.star,
-                        color: Colors.green,
-                      ),
-                      onRatingUpdate: (newRating) {
-                        rating = newRating; // Actualiza la calificación
-                      },
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                  Text(
-                    "Comentarios:",
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 18),
-                  // Área de comentarios
-                  TextField(
-                    cursorColor: Theme.of(context).colorScheme.primary,
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
-                    controller: commentController,
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      filled: true,
-                      fillColor: Theme.of(context).colorScheme.outlineVariant,
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 16,
-                      ),
-                    ),
-                    maxLines: 4,
-                  ),
-                  const SizedBox(height: 16),
-                  // Botones de cancelar y guardar
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      TextButton(
-                        onPressed: () {
-                          Navigator.pop(context); // Cerrar el modal
-                        },
-                        child: Text("Cancelar"),
-                      ),
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.green, // Color verde
-                          shape: RoundedRectangleBorder(
-                            borderRadius:
-                                BorderRadius.circular(12), // Bordes redondeados
-                          ),
-                        ),
-                        onPressed: () async {
-                          final review = ReviewModel(
-                            eventId: eventId,
-                            rating: rating.toInt(),
-                            comment: commentController.text,
-                            createdAt: DateTime.now().toIso8601String(),
-                          );
-
-                          await AddReviewUseCase().execute(review);
-                          await UpdateAverageRatingUseCase().execute(eventId);
-
-                          // Actualizamos el estado reactivo después de guardar la reseña
-                          hasReviewed.value = true;
-
-                          Navigator.pop(context); // Cerrar el modal
-                        },
-                        child: Text("Guardar"),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ),
-        );
-      },
-    );
+  void _showAddReview(BuildContext context, String eventId) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => AddReviewPage(eventId: eventId),
+      ),
+    ).then((_) {
+      _checkIfReviewed();
+    });
   }
 
   void _showReview(BuildContext context, String eventId) {
@@ -514,5 +387,3 @@ class EventCardState extends State<EventCardReviews> {
     });
   }
 }
-
-// Cuadro de diálogo para dejar la reseña
