@@ -20,7 +20,7 @@ class ReviewCard extends StatelessWidget {
       padding: const EdgeInsets.all(14),
       width: 300,
       decoration: BoxDecoration(
-        color: theme.colorScheme.outline,
+        color: theme.colorScheme.tertiary,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
