@@ -52,9 +52,10 @@ class EventInfo extends StatelessWidget {
                 textColor: theme.primary,
               ),
               const SizedBox(height: 24),
-              if (!isPastEvent)
+              if (!isPastEvent) ...[
                 _spotsAvailable(context, e.spotsLeft, spotColor, theme),
-              const SizedBox(height: 24),
+                const SizedBox(height: 24),
+              ],
               const Text("Descripción del evento",
                   style:
                       TextStyle(fontSize: 14.5, fontWeight: FontWeight.bold)),
