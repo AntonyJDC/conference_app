@@ -9,6 +9,7 @@ import 'package:conference_app/routes/routes.dart';
 import 'package:conference_app/ui/theme/app_colors.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:conference_app/controllers/theme_controller.dart';
 
 void main() async {
   SystemChrome.setPreferredOrientations([
@@ -17,11 +18,13 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final prefs = await SharedPreferences.getInstance();
   final onboardingSeen = prefs.getBool('onboarding_seen') ?? false;
+  final themeController = Get.put(ThemeController());
 
   Get.put(BookedEventsController());
   Get.put(FavoriteController());
   Get.put(ReviewController());
 
+  await themeController.loadTheme();
   await initializeDateFormatting('es_CO', null);
   await InitializeEventsUseCase().execute();
   runApp(MyApp(onboardingSeen: onboardingSeen));
