@@ -1,17 +1,16 @@
 import 'dart:async';
 import 'dart:ui';
-import 'package:conference_app/controllers/notifications_controller.dart';
 import 'package:conference_app/data/models/event_model.dart';
 import 'package:conference_app/domain/use_case/events/get_all_events_use_case.dart';
 import 'package:conference_app/domain/use_case/events/get_nearby_events_use_case.dart';
 import 'package:conference_app/domain/use_case/events/get_upcoming_events_use_case.dart';
+import 'package:conference_app/routes/routes.dart';
 import 'package:conference_app/ui/pages/event/event_list_page.dart';
 import 'package:conference_app/ui/pages/home/widgets/category_list.dart';
 import 'package:conference_app/ui/pages/home/widgets/event_horizontal_list.dart';
 import 'package:conference_app/ui/pages/home/widgets/home_header.dart.dart';
 import 'package:conference_app/ui/pages/home/widgets/nearby_event_card.dart';
 import 'package:conference_app/ui/pages/home/widgets/section_title.dart';
-import 'package:conference_app/ui/pages/notifications/widgets/notifications_center.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -106,11 +105,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               IconButton(
                                 icon: Icon(Icons.notifications,
                                     color: theme.colorScheme.primary),
-                                onPressed: () {
-                                  final controller =
-                                      Get.find<NotificationsController>();
-                                  showNotificationCenter(context, controller);
-                                },
+                                onPressed: () => Get.toNamed(AppRoutes.notifications),
                               ),
                               IconButton(
                                 icon: Icon(Icons.settings,

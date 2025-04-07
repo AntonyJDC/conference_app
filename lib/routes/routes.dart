@@ -1,7 +1,7 @@
-
 import 'package:conference_app/ui/pages/event/event_detail_page.dart';
 import 'package:conference_app/ui/pages/event/event_list_page.dart';
 import 'package:conference_app/ui/pages/favorites/favorites_screen.dart';
+import 'package:conference_app/ui/pages/notifications/notifications_screen.dart';
 import 'package:conference_app/ui/pages/search/search_page.dart';
 import 'package:get/get.dart';
 import 'package:conference_app/ui/pages/home/home_screen.dart';
@@ -18,6 +18,7 @@ class AppRoutes {
   static const String detail = '/detail';
   static const String category = '/category';
   static const String favorite = '/favorite';
+  static const String notifications = '/notifications';
   static const String nearby =
       '/nearby'; // Asegúrate de que esta constante exista
 
@@ -29,6 +30,7 @@ class AppRoutes {
     GetPage(name: detail, page: () => const EventDetailPage()),
     GetPage(name: favorite, page: () => const FavoritesPage()),
     GetPage(name: category, page: () => const CategoryScreen()),
+    GetPage(name: notifications, page: () => NotificationsScreen()),
     GetPage(
       name: nearby,
       page: () {
