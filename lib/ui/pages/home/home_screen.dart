@@ -107,7 +107,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 onPressed: () => Get.toNamed('/notifications'),
                               ),
                               IconButton(
-                                icon: Icon(Icons.more_vert,
+                                icon: Icon(Icons.settings,
                                     color: theme.colorScheme.primary),
                                 onPressed: () {
                                   showModalBottomSheet(
