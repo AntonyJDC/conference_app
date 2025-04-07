@@ -10,7 +10,7 @@ class LocalNotificationService {
     tz.initializeTimeZones();
 
     const AndroidInitializationSettings androidSettings =
-        AndroidInitializationSettings('@mipmap/ic_launcher');
+        AndroidInitializationSettings('ic_stat_logo');
 
     const InitializationSettings settings = InitializationSettings(
       android: androidSettings,
@@ -18,7 +18,6 @@ class LocalNotificationService {
 
     await _notificationsPlugin.initialize(settings);
 
-    // ✅ Solicitar permiso usando permission_handler (Android 13+)
     if (await Permission.notification.isDenied) {
       await Permission.notification.request();
     }
@@ -36,6 +35,7 @@ class LocalNotificationService {
       channelDescription: 'Channel for basic notifications',
       importance: Importance.max,
       priority: Priority.high,
+      icon: 'ic_stat_logo', // <- añadido aquí
     );
 
     const NotificationDetails platformDetails = NotificationDetails(
