@@ -11,19 +11,24 @@ class NotificationsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final iconColor = isDarkMode ? Colors.white : Colors.black;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Notificaciones'),
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Get.back(), // ← vuelve al screen anterior
+          icon: Icon(Icons.arrow_back, color: iconColor),
+          onPressed: () => Get.back(),
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.more_vert),
+            icon: Icon(Icons.more_vert, color: iconColor),
             onPressed: () => _showSettingsModal(context),
           ),
         ],
+        iconTheme: IconThemeData(color: iconColor),
       ),
       body: Obx(() {
         final notifs = controller.notifications;
@@ -36,11 +41,16 @@ class NotificationsScreen extends StatelessWidget {
           itemBuilder: (_, index) {
             final item = notifs[index];
             return ListTile(
-              title: Text(item.title),
+              leading: Icon(Icons.notifications_active, color: iconColor),
+              title: Text(item.title, style: TextStyle(color: iconColor)),
               subtitle: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(item.body),
+                  Text(
+                    item.body,
+                    style: TextStyle(
+                        color: isDarkMode ? Colors.white70 : Colors.black54),
+                  ),
                   const SizedBox(height: 4),
                   Text(
                     formatter.format(item.date),
@@ -60,53 +70,58 @@ class NotificationsScreen extends StatelessWidget {
       context: context,
       builder: (_) {
         return Obx(() {
-          return Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              SwitchListTile(
-                title: const Text('Activar notificaciones'),
-                value: controller.notify1DayBefore.value ||
-                    controller.notify1HourBefore.value ||
-                    controller.notify10MinBefore.value,
-                onChanged: (value) {
-                  controller.notify1DayBefore.value = value;
-                  controller.notify1HourBefore.value = value;
-                  controller.notify10MinBefore.value = value;
-                  controller.savePreferences();
-                },
-              ),
-              if (controller.notify1DayBefore.value ||
-                  controller.notify1HourBefore.value ||
-                  controller.notify10MinBefore.value)
-                Column(
-                  children: [
-                    CheckboxListTile(
-                      title: const Text('1 día antes'),
-                      value: controller.notify1DayBefore.value,
-                      onChanged: (val) {
-                        controller.notify1DayBefore.value = val ?? false;
-                        controller.savePreferences();
-                      },
-                    ),
-                    CheckboxListTile(
-                      title: const Text('1 hora antes'),
-                      value: controller.notify1HourBefore.value,
-                      onChanged: (val) {
-                        controller.notify1HourBefore.value = val ?? false;
-                        controller.savePreferences();
-                      },
-                    ),
-                    CheckboxListTile(
-                      title: const Text('10 minutos antes'),
-                      value: controller.notify10MinBefore.value,
-                      onChanged: (val) {
-                        controller.notify10MinBefore.value = val ?? false;
-                        controller.savePreferences();
-                      },
-                    ),
-                  ],
+          return Container(
+            padding: const EdgeInsets.only(bottom: 16),
+            color: Theme.of(context).scaffoldBackgroundColor,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                SwitchListTile(
+                  title: const Text('Activar notificaciones'),
+                  value: controller.notify1DayBefore.value ||
+                      controller.notify1HourBefore.value ||
+                      controller.notify10MinBefore.value,
+                  onChanged: (value) {
+                    controller.notify1DayBefore.value = value;
+                    controller.notify1HourBefore.value = value;
+                    controller.notify10MinBefore.value = value;
+                    controller
+                        .savePreferences();
+                  },
                 ),
-            ],
+                if (controller.notify1DayBefore.value ||
+                    controller.notify1HourBefore.value ||
+                    controller.notify10MinBefore.value)
+                  Column(
+                    children: [
+                      CheckboxListTile(
+                        title: const Text('1 día antes'),
+                        value: controller.notify1DayBefore.value,
+                        onChanged: (val) {
+                          controller.notify1DayBefore.value = val ?? false;
+                          controller.savePreferences();
+                        },
+                      ),
+                      CheckboxListTile(
+                        title: const Text('1 hora antes'),
+                        value: controller.notify1HourBefore.value,
+                        onChanged: (val) {
+                          controller.notify1HourBefore.value = val ?? false;
+                          controller.savePreferences();
+                        },
+                      ),
+                      CheckboxListTile(
+                        title: const Text('10 minutos antes'),
+                        value: controller.notify10MinBefore.value,
+                        onChanged: (val) {
+                          controller.notify10MinBefore.value = val ?? false;
+                          controller.savePreferences();
+                        },
+                      ),
+                    ],
+                  ),
+              ],
+            ),
           );
         });
       },
