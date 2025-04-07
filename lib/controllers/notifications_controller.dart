@@ -71,7 +71,7 @@ class NotificationsController extends GetxController {
 
       if (notify1DayBefore.value &&
           diff.inMinutes <= 1440 &&
-          diff.inMinutes > 1439 &&
+          diff.inMinutes > 1430 &&
           !_notifiedEvents.contains('${event.id}_1d')) {
         _show(event, eventDate, '1d', 'Falta 1 día para ${event.title}',
             'Prepárate para el evento.');
@@ -87,7 +87,7 @@ class NotificationsController extends GetxController {
 
       if (notify10MinBefore.value &&
           diff.inMinutes <= 10 &&
-          diff.inMinutes > 9 &&
+          diff.inMinutes > 7 &&
           !_notifiedEvents.contains('${event.id}_10m')) {
         _show(event, eventDate, '10m', 'Faltan 10 minutos para ${event.title}',
             'Es hora de alistarte.');
