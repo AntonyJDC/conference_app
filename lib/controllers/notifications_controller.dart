@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:conference_app/data/models/event_model.dart';
 import 'package:conference_app/controllers/booked_events_controller.dart';
 import 'package:conference_app/ui/pages/notifications/service/notifications_service.dart';
@@ -10,8 +11,25 @@ class NotificationItem {
   final String body;
   final DateTime date;
 
-  NotificationItem(
-      {required this.title, required this.body, required this.date});
+  NotificationItem({
+    required this.title,
+    required this.body,
+    required this.date,
+  });
+
+  Map<String, dynamic> toJson() => {
+        'title': title,
+        'body': body,
+        'date': date.toIso8601String(),
+      };
+
+  factory NotificationItem.fromJson(Map<String, dynamic> json) {
+    return NotificationItem(
+      title: json['title'],
+      body: json['body'],
+      date: DateTime.parse(json['date']),
+    );
+  }
 }
 
 class NotificationsController extends GetxController {
@@ -31,6 +49,7 @@ class NotificationsController extends GetxController {
   void onInit() {
     super.onInit();
     _loadPreferences();
+    _loadNotificationHistory();
     _startMonitoring();
     ever(bookedEventsController.tasks, (_) => _startMonitoring());
     everAll(
@@ -87,7 +106,7 @@ class NotificationsController extends GetxController {
 
       if (notify10MinBefore.value &&
           diff.inMinutes <= 10 &&
-          diff.inMinutes > 7 &&
+          diff.inMinutes > 9 &&
           !_notifiedEvents.contains('${event.id}_10m')) {
         _show(event, eventDate, '10m', 'Faltan 10 minutos para ${event.title}',
             'Es hora de alistarte.');
@@ -107,7 +126,36 @@ class NotificationsController extends GetxController {
 
     _notifiedEvents.add('${event.id}_$key');
 
-    notifications.add(NotificationItem(title: title, body: body, date: date));
+    final item = NotificationItem(title: title, body: body, date: date);
+    notifications.add(item);
+    saveNotificationHistory();
+  }
+
+  Future<void> saveNotificationHistory() async {
+    final prefs = await SharedPreferences.getInstance();
+    final encoded = jsonEncode(notifications
+        .map((n) => {
+              'title': n.title,
+              'body': n.body,
+              'date': n.date.toIso8601String(),
+            })
+        .toList());
+    await prefs.setString('notification_history', encoded);
+  }
+
+  Future<void> _loadNotificationHistory() async {
+    final prefs = await SharedPreferences.getInstance();
+    final raw = prefs.getString('notificationHistory');
+    if (raw == null) return;
+
+    try {
+      final decoded = jsonDecode(raw) as List<dynamic>;
+      notifications.value = decoded
+          .map((item) => NotificationItem.fromJson(item))
+          .toList(growable: false);
+    } catch (e) {
+      print("Error loading notification history: $e");
+    }
   }
 
   Future<void> _loadPreferences() async {
@@ -122,5 +170,12 @@ class NotificationsController extends GetxController {
     await prefs.setBool('notify1d', notify1DayBefore.value);
     await prefs.setBool('notify1h', notify1HourBefore.value);
     await prefs.setBool('notify10m', notify10MinBefore.value);
+  }
+
+  Future<void> clearNotificationHistory() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(
+        'notification_history'); // <-- usa esta misma clave que en _saveNotificationHistory
+    notifications.clear();
   }
 }

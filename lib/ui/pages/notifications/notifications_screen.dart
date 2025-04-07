@@ -1,130 +1,176 @@
 import 'package:conference_app/controllers/notifications_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
 class NotificationsScreen extends StatelessWidget {
-  NotificationsScreen({super.key});
+  final NotificationsController controller =
+      Get.find<NotificationsController>();
 
-  final controller = Get.find<NotificationsController>();
-  final DateFormat formatter = DateFormat('dd/MM/yyyy HH:mm');
+  NotificationsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    final iconColor = isDarkMode ? Colors.white : Colors.black;
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Notificaciones'),
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        title: const Text("Notificaciones"),
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: iconColor),
+          icon: Icon(Icons.arrow_back, color: colorScheme.onBackground),
           onPressed: () => Get.back(),
         ),
         actions: [
           IconButton(
-            icon: Icon(Icons.more_vert, color: iconColor),
-            onPressed: () => _showSettingsModal(context),
+            icon: Icon(Icons.more_vert, color: colorScheme.onBackground),
+            onPressed: () => _showOptions(context),
           ),
         ],
-        iconTheme: IconThemeData(color: iconColor),
       ),
       body: Obx(() {
-        final notifs = controller.notifications;
-        if (notifs.isEmpty) {
-          return const Center(child: Text('No hay notificaciones por ahora.'));
+        final grouped = _groupByDate(controller.notifications);
+        if (grouped.isEmpty) {
+          return const Center(child: Text("Sin notificaciones por ahora."));
         }
-        return ListView.separated(
-          itemCount: notifs.length,
-          separatorBuilder: (_, __) => const Divider(height: 1),
-          itemBuilder: (_, index) {
-            final item = notifs[index];
-            return ListTile(
-              leading: Icon(Icons.notifications_active, color: iconColor),
-              title: Text(item.title, style: TextStyle(color: iconColor)),
-              subtitle: Column(
+
+        return AnimationLimiter(
+          child: ListView.builder(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            itemCount: grouped.length,
+            itemBuilder: (context, i) {
+              final group = grouped[i];
+              return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    item.body,
-                    style: TextStyle(
-                        color: isDarkMode ? Colors.white70 : Colors.black54),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    formatter.format(item.date),
-                    style: const TextStyle(fontSize: 12, color: Colors.grey),
-                  ),
+                  Text(group.label,
+                      style: theme.textTheme.titleMedium!
+                          .copyWith(fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 8),
+                  ...List.generate(group.items.length, (j) {
+                    final item = group.items[j];
+                    return AnimationConfiguration.staggeredList(
+                      position: j,
+                      duration: const Duration(milliseconds: 300),
+                      child: SlideAnimation(
+                        verticalOffset: 20.0,
+                        child: FadeInAnimation(
+                          child: Slidable(
+                            key: ValueKey(item.date.toIso8601String()),
+                            endActionPane: ActionPane(
+                              motion: const DrawerMotion(),
+                              children: [
+                                SlidableAction(
+                                  onPressed: (_) async {
+                                    controller.notifications.remove(item);
+                                    await controller
+                                        .saveNotificationHistory();
+                                  },
+                                  icon: Icons.delete,
+                                  label: 'Eliminar',
+                                  backgroundColor: Colors.red,
+                                )
+                              ],
+                            ),
+                            child: Card(
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(16)),
+                              elevation: 2,
+                              margin: const EdgeInsets.symmetric(vertical: 6),
+                              child: ListTile(
+                                title: Text(item.title),
+                                subtitle: Text(item.body),
+                                trailing: Text(
+                                  DateFormat('HH:mm').format(item.date),
+                                  style: theme.textTheme.labelSmall,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  }),
+                  const SizedBox(height: 12),
                 ],
-              ),
-            );
-          },
+              );
+            },
+          ),
         );
       }),
+      floatingActionButton: Obx(() => controller.notifications.isNotEmpty
+          ? FloatingActionButton.extended(
+              onPressed: () => controller
+                  .clearNotificationHistory(), // Limpia persistencia también
+              icon: const Icon(Icons.delete_sweep),
+              label: const Text("Limpiar todo"),
+            )
+          : const SizedBox.shrink()),
     );
   }
 
-  void _showSettingsModal(BuildContext context) {
+  void _showOptions(BuildContext context) {
     showModalBottomSheet(
       context: context,
       builder: (_) {
         return Obx(() {
-          return Container(
-            padding: const EdgeInsets.only(bottom: 16),
-            color: Theme.of(context).scaffoldBackgroundColor,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                SwitchListTile(
-                  title: const Text('Activar notificaciones'),
-                  value: controller.notify1DayBefore.value ||
-                      controller.notify1HourBefore.value ||
-                      controller.notify10MinBefore.value,
-                  onChanged: (value) {
-                    controller.notify1DayBefore.value = value;
-                    controller.notify1HourBefore.value = value;
-                    controller.notify10MinBefore.value = value;
-                    controller
-                        .savePreferences();
-                  },
-                ),
-                if (controller.notify1DayBefore.value ||
-                    controller.notify1HourBefore.value ||
-                    controller.notify10MinBefore.value)
-                  Column(
-                    children: [
-                      CheckboxListTile(
-                        title: const Text('1 día antes'),
-                        value: controller.notify1DayBefore.value,
-                        onChanged: (val) {
-                          controller.notify1DayBefore.value = val ?? false;
-                          controller.savePreferences();
-                        },
-                      ),
-                      CheckboxListTile(
-                        title: const Text('1 hora antes'),
-                        value: controller.notify1HourBefore.value,
-                        onChanged: (val) {
-                          controller.notify1HourBefore.value = val ?? false;
-                          controller.savePreferences();
-                        },
-                      ),
-                      CheckboxListTile(
-                        title: const Text('10 minutos antes'),
-                        value: controller.notify10MinBefore.value,
-                        onChanged: (val) {
-                          controller.notify10MinBefore.value = val ?? false;
-                          controller.savePreferences();
-                        },
-                      ),
-                    ],
-                  ),
-              ],
-            ),
+          return Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              SwitchListTile(
+                title: const Text('Notificar 1 día antes'),
+                value: controller.notify1DayBefore.value,
+                onChanged: (val) => controller.notify1DayBefore.value = val,
+              ),
+              SwitchListTile(
+                title: const Text('Notificar 1 hora antes'),
+                value: controller.notify1HourBefore.value,
+                onChanged: (val) => controller.notify1HourBefore.value = val,
+              ),
+              SwitchListTile(
+                title: const Text('Notificar 10 minutos antes'),
+                value: controller.notify10MinBefore.value,
+                onChanged: (val) => controller.notify10MinBefore.value = val,
+              ),
+              const SizedBox(height: 12),
+            ],
           );
         });
       },
     );
   }
+
+  List<_NotificationGroup> _groupByDate(List items) {
+    final now = DateTime.now();
+    Map<String, List<NotificationItem>> map = {};
+
+    for (var item in items) {
+      final date = item.date;
+      final difference = now.difference(date).inDays;
+
+      String label;
+      if (difference == 0) {
+        label = "Hoy";
+      } else if (difference == 1) {
+        label = "Ayer";
+      } else {
+        label = DateFormat.yMMMMd().format(date);
+      }
+
+      map.putIfAbsent(label, () => []).add(item);
+    }
+
+    return map.entries
+        .map((e) => _NotificationGroup(label: e.key, items: e.value))
+        .toList();
+  }
+}
+
+class _NotificationGroup {
+  final String label;
+  final List<NotificationItem> items;
+
+  _NotificationGroup({required this.label, required this.items});
 }
