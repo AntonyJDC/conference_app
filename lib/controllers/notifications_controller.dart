@@ -145,7 +145,7 @@ class NotificationsController extends GetxController {
 
   Future<void> _loadNotificationHistory() async {
     final prefs = await SharedPreferences.getInstance();
-    final raw = prefs.getString('notificationHistory');
+    final raw = prefs.getString('notification_history');
     if (raw == null) return;
 
     try {
