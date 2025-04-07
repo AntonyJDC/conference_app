@@ -18,7 +18,9 @@ class NotificationsScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Notificaciones"),
+        title: Center(
+            child: Text("Notificaciones",
+                style: TextStyle(color: colorScheme.onBackground))),
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: colorScheme.onBackground),
           onPressed: () => Get.back(),
@@ -65,8 +67,7 @@ class NotificationsScreen extends StatelessWidget {
                                 SlidableAction(
                                   onPressed: (_) async {
                                     controller.notifications.remove(item);
-                                    await controller
-                                        .saveNotificationHistory();
+                                    await controller.saveNotificationHistory();
                                   },
                                   icon: Icons.delete,
                                   label: 'Eliminar',
@@ -102,8 +103,7 @@ class NotificationsScreen extends StatelessWidget {
       }),
       floatingActionButton: Obx(() => controller.notifications.isNotEmpty
           ? FloatingActionButton.extended(
-              onPressed: () => controller
-                  .clearNotificationHistory(), // Limpia persistencia también
+              onPressed: () => controller.clearNotificationHistory(),
               icon: const Icon(Icons.delete_sweep),
               label: const Text("Limpiar todo"),
             )
@@ -118,21 +118,53 @@ class NotificationsScreen extends StatelessWidget {
         return Obx(() {
           return Column(
             mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               SwitchListTile(
-                title: const Text('Notificar 1 día antes'),
-                value: controller.notify1DayBefore.value,
-                onChanged: (val) => controller.notify1DayBefore.value = val,
+                title: const Text('Notificaciones activadas'),
+                value: controller.notificationsEnabled.value,
+                onChanged: (val) => controller.notificationsEnabled.value = val,
               ),
-              SwitchListTile(
-                title: const Text('Notificar 1 hora antes'),
-                value: controller.notify1HourBefore.value,
-                onChanged: (val) => controller.notify1HourBefore.value = val,
+              const Divider(),
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16.0),
+                child: Text(
+                  "Tiempos de notificación",
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                  ),
+                ),
               ),
-              SwitchListTile(
-                title: const Text('Notificar 10 minutos antes'),
-                value: controller.notify10MinBefore.value,
-                onChanged: (val) => controller.notify10MinBefore.value = val,
+              Padding(
+                padding: const EdgeInsets.only(left: 16.0),
+                child: SwitchListTile(
+                  title: const Text('Notificar 1 día antes'),
+                  value: controller.notify1DayBefore.value,
+                  onChanged: controller.notificationsEnabled.value
+                      ? (val) => controller.notify1DayBefore.value = val
+                      : null,
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(left: 16.0),
+                child: SwitchListTile(
+                  title: const Text('Notificar 1 hora antes'),
+                  value: controller.notify1HourBefore.value,
+                  onChanged: controller.notificationsEnabled.value
+                      ? (val) => controller.notify1HourBefore.value = val
+                      : null,
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(left: 16.0),
+                child: SwitchListTile(
+                  title: const Text('Notificar 10 minutos antes'),
+                  value: controller.notify10MinBefore.value,
+                  onChanged: controller.notificationsEnabled.value
+                      ? (val) => controller.notify10MinBefore.value = val
+                      : null,
+                ),
               ),
               const SizedBox(height: 12),
             ],

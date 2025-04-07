@@ -37,6 +37,7 @@ class NotificationsController extends GetxController {
       Get.find<BookedEventsController>();
 
   final notifications = <NotificationItem>[].obs;
+  var notificationsEnabled = true.obs;
 
   final notify1DayBefore = true.obs;
   final notify1HourBefore = true.obs;
@@ -51,11 +52,20 @@ class NotificationsController extends GetxController {
     _loadPreferences();
     _loadNotificationHistory();
     _startMonitoring();
+
     ever(bookedEventsController.tasks, (_) => _startMonitoring());
+
+    // Escucha cambios en las opciones de notificación individuales y guarda
     everAll(
       [notify1DayBefore, notify1HourBefore, notify10MinBefore],
       (_) => savePreferences(),
     );
+
+    // Escucha el switch general de activación de notificaciones y guarda
+    ever(notificationsEnabled, (value) async {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('notifications_enabled', value);
+    });
   }
 
   @override
@@ -160,6 +170,7 @@ class NotificationsController extends GetxController {
 
   Future<void> _loadPreferences() async {
     final prefs = await SharedPreferences.getInstance();
+    notificationsEnabled.value = prefs.getBool('notifications_enabled') ?? true;
     notify1DayBefore.value = prefs.getBool('notify1d') ?? true;
     notify1HourBefore.value = prefs.getBool('notify1h') ?? true;
     notify10MinBefore.value = prefs.getBool('notify10m') ?? true;
