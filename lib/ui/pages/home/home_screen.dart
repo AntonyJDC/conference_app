@@ -16,6 +16,7 @@ import 'package:intl/intl.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:conference_app/ui/pages/home/widgets/theme_selector_modal.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -106,9 +107,20 @@ class _HomeScreenState extends State<HomeScreen> {
                                 onPressed: () => Get.toNamed('/notifications'),
                               ),
                               IconButton(
-                                icon: Icon(Icons.more_vert,
+                                icon: Icon(Icons.settings,
                                     color: theme.colorScheme.primary),
-                                onPressed: () => Get.toNamed('/search'),
+                                onPressed: () {
+                                  showModalBottomSheet(
+                                    context: context,
+                                    shape: const RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.vertical(
+                                          top: Radius.circular(20)),
+                                    ),
+                                    backgroundColor:
+                                        Theme.of(context).colorScheme.surface,
+                                    builder: (_) => const ThemeSelectorModal(),
+                                  );
+                                },
                               ),
                             ],
                           ),
