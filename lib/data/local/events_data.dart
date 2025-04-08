@@ -19,7 +19,7 @@ List<EventModel> dummyEvents = [
     id: 'evt001',
     title: 'EVENTO QUE TERMINA',
     description: 'FinTech revolution event',
-    imageUrl: 'assets/images/evt006.webp',
+    imageUrl: 'assets/images/evt001.webp',
     date: '2025-04-04',
     startTime: '00:00',
     endTime: '23:39',
