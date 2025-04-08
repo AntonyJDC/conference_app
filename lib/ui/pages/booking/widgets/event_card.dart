@@ -15,8 +15,8 @@ class EventCard extends StatelessWidget {
       onTap: () => Get.toNamed('/detail', arguments: event),
       child: Card(
         color: theme.colorScheme.tertiary,
-        elevation: 2,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        elevation: 0,
         child: Stack(
           children: [
             Padding(
