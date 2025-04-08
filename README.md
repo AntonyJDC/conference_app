@@ -55,15 +55,13 @@ Make sure you have the following installed:
 2. Install dependencies:
 
 ```bash
-Copiar
 flutter pub get
 ```
 
 3. Run the app on an emulator or device:
 
 ```bash
-Copiar
-flutter run
+  flutter run
 ```
 
 ## App Architecture
