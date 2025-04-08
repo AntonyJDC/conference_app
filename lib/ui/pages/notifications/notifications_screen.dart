@@ -146,7 +146,7 @@ class NotificationsScreen extends StatelessWidget {
                                     title: Text(item.title),
                                     subtitle: Text(item.body),
                                     trailing: Text(
-                                      DateFormat('HH:mm').format(item.date),
+                                      DateFormat('HH:mm').format(DateTime.now()),
                                       style: theme.textTheme.labelSmall,
                                     ),
                                   ),
