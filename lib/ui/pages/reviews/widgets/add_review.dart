@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'package:conference_app/controllers/review_controller.dart';
 import 'package:conference_app/domain/use_case/reviews/add_review_use_case.dart';
 import 'package:conference_app/domain/use_case/reviews/update_average_rating_use_case.dart';
 import 'package:conference_app/data/models/review_model.dart';
@@ -174,6 +175,7 @@ class ReviewPageState extends State<AddReviewPage> {
                                   .execute(widget.eventId);
 
                               hasReviewed.value = true;
+                              Get.find<ReviewController>().addReview(review);
 
                               Navigator.pop(context); // Cerrar la página
                             },

@@ -19,7 +19,16 @@ class ReviewController extends GetxController {
 
   Future<void> addReview(ReviewModel review) async {
     await _addReviewUseCase.execute(review);
-    await loadReviews(review.eventId);
+
+    final index = _reviews.indexWhere((r) => r.eventId == review.eventId);
+
+    if (index != -1) {
+      _reviews[index] = review;
+    } else {
+      _reviews.add(review);
+    }
+
+    _reviews.refresh();
   }
 
   Future<bool> hasReviewed(String eventId) async {
