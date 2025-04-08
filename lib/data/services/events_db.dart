@@ -179,6 +179,22 @@ class EventsDB {
     return result.isNotEmpty;
   }
 
+  Future<List<ReviewModel>> getMyReviews() async {
+    final db = await database;
+    final bookedEventIds = await getBookedEventIds();
+
+    if (bookedEventIds.isEmpty) return [];
+
+    final result = await db.query(
+      'reviews',
+      where:
+          'eventId IN (${List.filled(bookedEventIds.length, '?').join(',')})',
+      whereArgs: bookedEventIds,
+    );
+
+    return result.map((e) => ReviewModel.fromMap(e)).toList();
+  }
+
   // ─── Favorites ─────────────────────────
 
   Future<void> addFavorite(String id) async {
