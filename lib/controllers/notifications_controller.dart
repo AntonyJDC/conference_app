@@ -10,17 +10,20 @@ class NotificationItem {
   final String title;
   final String body;
   final DateTime date;
+  final DateTime receivedAt;
 
   NotificationItem({
     required this.title,
     required this.body,
     required this.date,
+    required this.receivedAt,
   });
 
   Map<String, dynamic> toJson() => {
         'title': title,
         'body': body,
         'date': date.toIso8601String(),
+        'receivedAt': receivedAt.toIso8601String(),
       };
 
   factory NotificationItem.fromJson(Map<String, dynamic> json) {
@@ -28,6 +31,7 @@ class NotificationItem {
       title: json['title'],
       body: json['body'],
       date: DateTime.parse(json['date']),
+      receivedAt: DateTime.now(), // Asignar la fecha actual al recibir la notificación
     );
   }
 }
@@ -136,7 +140,8 @@ class NotificationsController extends GetxController {
 
     _notifiedEvents.add('${event.id}_$key');
 
-    final item = NotificationItem(title: title, body: body, date: date);
+    final item = NotificationItem(title: title, body: body, date: date, 
+        receivedAt: DateTime.now());
     notifications.add(item);
     saveNotificationHistory();
   }
@@ -147,7 +152,7 @@ class NotificationsController extends GetxController {
         .map((n) => {
               'title': n.title,
               'body': n.body,
-              'date': n.date.toIso8601String(),
+              'date': n.receivedAt.toIso8601String(),
             })
         .toList());
     await prefs.setString('notification_history', encoded);

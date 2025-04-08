@@ -18,7 +18,7 @@ class NotificationsScreen extends StatelessWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
-    return Scaffold(
+    return Obx(() => Scaffold(
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
@@ -173,7 +173,7 @@ class NotificationsScreen extends StatelessWidget {
               label: const Text("Limpiar todo"),
             )
           : const SizedBox.shrink()),
-    );
+    ));
   }
 
   void _showOptions(BuildContext context) {
