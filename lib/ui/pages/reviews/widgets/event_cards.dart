@@ -166,13 +166,6 @@ class EventCardState extends State<EventCardReviews> {
               decoration: BoxDecoration(
                 color: theme.colorScheme.tertiary,
                 borderRadius: BorderRadius.circular(16),
-                boxShadow: [
-                  BoxShadow(
-                    color: theme.colorScheme.shadow.withValues(alpha: 0.3),
-                    blurRadius: 6,
-                    offset: const Offset(0, 3),
-                  ),
-                ],
               ),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -292,8 +285,8 @@ class EventCardState extends State<EventCardReviews> {
               child: Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.surface,
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                  color: Theme.of(context).colorScheme.tertiary,
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
                 ),
                 child: Column(
                   mainAxisSize: MainAxisSize
@@ -355,7 +348,7 @@ class EventCardState extends State<EventCardReviews> {
                           borderRadius: BorderRadius.circular(12),
                         ),
                         filled: true,
-                        fillColor: Theme.of(context).colorScheme.outlineVariant,
+                        fillColor: Theme.of(context).colorScheme.tertiary,
                         contentPadding: const EdgeInsets.symmetric(
                           horizontal: 16,
                           vertical: 16,

@@ -112,7 +112,7 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
                     Container(
                       padding: const EdgeInsets.all(4),
                       decoration: BoxDecoration(
-                        color: theme.colorScheme.outline.withValues(alpha: 0.4),
+                        color: theme.colorScheme.tertiary,
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: SizedBox(

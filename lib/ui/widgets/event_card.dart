@@ -124,13 +124,6 @@ class EventCardState extends State<EventCard> {
               decoration: BoxDecoration(
                 color: theme.colorScheme.tertiary,
                 borderRadius: BorderRadius.circular(16),
-                boxShadow: [
-                  BoxShadow(
-                    color: theme.colorScheme.shadow.withValues(alpha: 0.3),
-                    blurRadius: 6,
-                    offset: const Offset(0, 3),
-                  ),
-                ],
               ),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,

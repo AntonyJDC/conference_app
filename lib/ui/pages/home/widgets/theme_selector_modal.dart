@@ -19,8 +19,8 @@ class ThemeSelectorModal extends StatelessWidget {
           padding:
               const EdgeInsets.only(left: 12, right: 12, bottom: 20, top: 20),
           decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surface,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+            color: Theme.of(context).colorScheme.tertiary,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
