@@ -61,7 +61,7 @@ flutter pub get
 3. Run the app on an emulator or device:
 
 ```bash
-flutter run
+  flutter run
 ```
 
 ## App Architecture
