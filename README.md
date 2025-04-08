@@ -4,7 +4,7 @@
 
 ## Overview
 
-The Event Management Application is a Flutter-based mobile app designed for managing events. The app allows users to browse event tracks, subscribe to specific events, track past and upcoming events, and provide anonymous feedback on attended events. It also supports offline functionality by caching event data using SQLite or Hive. 
+The Event Management Application is a Flutter-based mobile app designed for managing events. The app allows users to browse event tracks, subscribe to specific events, track past and upcoming events, and provide anonymous feedback on attended events. It also supports offline functionality by caching event data using SQLite. 
 
 
 ## Features
@@ -47,22 +47,20 @@ Make sure you have the following installed:
 
 1. Clone the repository:
 
-   ```bash
-   git clone https://github.com/yourusername/conference-management-app.git
-   cd conference-management-app
-   ```
+```bash
+git clone https://github.com/yourusername/conference-management-app.git
+cd conference-management-app
+```
 
 2. Install dependencies:
 
 ```bash
-Copiar
 flutter pub get
 ```
 
 3. Run the app on an emulator or device:
 
 ```bash
-Copiar
 flutter run
 ```
 
@@ -83,4 +81,4 @@ flutter run
 
 - Navigation: The app has a navigation bar for browsing: Event Lines, Subscribed Events, Search and Calendar
 
-## video
+# Demostration Video
