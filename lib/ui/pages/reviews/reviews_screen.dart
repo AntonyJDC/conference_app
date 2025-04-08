@@ -1,6 +1,10 @@
 import 'dart:ui';
 import 'package:conference_app/controllers/booked_events_controller.dart';
+import 'package:conference_app/controllers/review_controller.dart';
+import 'package:conference_app/data/models/review_model.dart';
+import 'package:conference_app/domain/use_case/reviews/get_my_reviews_use_case.dart';
 import 'package:conference_app/ui/pages/reviews/widgets/event_cards.dart';
+import 'package:conference_app/ui/pages/reviews/widgets/feedbacks_cards.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -16,6 +20,8 @@ class ReviewsScreen extends StatefulWidget {
 
 class _ReviewsScreenState extends State<ReviewsScreen> {
   final controller = Get.find<BookedEventsController>();
+  final reviewController = Get.find<ReviewController>();
+  final getMyReviewsUseCase = GetMyReviewsUseCase();
   String selectedSegment = 'feedbacks';
   late final tz.Location _colombiaTZ;
 
@@ -24,6 +30,21 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
     super.initState();
     tz.initializeTimeZones();
     _colombiaTZ = tz.getLocation('America/Bogota');
+    _loadMyReviews();
+  }
+
+  void _loadMyReviews() async {
+    final reviewsFromDb = await getMyReviewsUseCase.execute();
+
+    // Mapear por combinación única: id del evento + fecha de creación
+    final currentReviews = reviewController.reviews;
+    final combined = <String, ReviewModel>{};
+
+    for (final r in [...currentReviews, ...reviewsFromDb]) {
+      combined[r.eventId + r.createdAt] = r;
+    }
+
+    reviewController.reviews.assignAll(combined.values.toList());
   }
 
   @override
@@ -33,6 +54,7 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
     return Scaffold(
       body: Obx(() {
         final allBooked = controller.tasks;
+        final reviews = reviewController.reviews;
 
         final finishedEvents = allBooked.where((event) {
           final eventDate = DateTime.parse(event.date);
@@ -109,6 +131,7 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
                 padding: const EdgeInsets.all(16),
                 child: Column(
                   children: [
+                    // Segment Control
                     Container(
                       padding: const EdgeInsets.all(4),
                       decoration: BoxDecoration(
@@ -136,13 +159,48 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
                       ),
                     ),
                     const SizedBox(height: 20),
-                    if (selectedSegment == 'feedbacks')
-                      const Text('Aquí van los feedbacks 📋',
+
+                    // ─── Feedbacks ─────────────────────────
+                    if (selectedSegment == 'feedbacks' && reviews.isEmpty)
+                      const Text('No tienes feedbacks aún.',
                           style: TextStyle(fontSize: 16))
-                    else if (finishedEvents.isEmpty)
+                    else if (selectedSegment == 'feedbacks' &&
+                        reviews.isNotEmpty)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: reviews.map((review) {
+                            return GestureDetector(
+                              onTap: () {
+                                final event = controller.tasks.firstWhere(
+                                  (e) => e.id == review.eventId,
+                                  orElse: () =>
+                                      throw Exception("Evento no encontrado"),
+                                );
+
+                                Get.toNamed('/detail', arguments: event);
+                              },
+                              child: Padding(
+                                padding: const EdgeInsets.only(bottom: 8.0),
+                                child: ReviewCards(
+                                  review: review.comment,
+                                  date: review.createdAt,
+                                  rating: review.rating,
+                                ),
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                      )
+
+                    // ─── Finalizados ─────────────────────────
+                    else if (selectedSegment == 'finalizados' &&
+                        finishedEvents.isEmpty)
                       const Text("No tienes eventos finalizados aún.",
                           style: TextStyle(fontSize: 16))
-                    else
+                    else if (selectedSegment == 'finalizados' &&
+                        finishedEvents.isNotEmpty)
                       Column(children: [
                         Padding(
                           padding: const EdgeInsets.only(bottom: 12),
@@ -168,7 +226,7 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
                                     ),
                                   ))
                               .toList(),
-                        )
+                        ),
                       ]),
                   ],
                 ),
@@ -180,6 +238,7 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
     );
   }
 
+  // ─── Segment Widget ─────────────────────────
   Widget _buildSegment(String text, {required bool selected}) {
     return Padding(
       padding: const EdgeInsets.all(6),
