@@ -67,7 +67,7 @@ class MaterialTheme {
       onSecondaryContainer: Color(0xFFFFFFFF),
 
       // Terciario gris claro (accent)
-      tertiary: Color(0xFF262626),
+      tertiary: Color(0xFF202531),
       onTertiary: Color(0xFF383838),
       tertiaryContainer: Color(0xFF4B4B4B),
       onTertiaryContainer: Color(0xFFFFFFFF),
@@ -78,7 +78,7 @@ class MaterialTheme {
       errorContainer: Color(0xFF8C1D18),
       onErrorContainer: Color(0xFFFFFFFF),
 
-      surface: Color(0xFF000000),
+      surface: Color(0xFF0A0E15),
       onSurface: Color(0xFFFFFFFF),
       onSurfaceVariant: Color(0xFFCCCCCC),
 
