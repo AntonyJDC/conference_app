@@ -1,9 +1,9 @@
-import 'package:conference_app/controllers/review_controller.dart';
 import 'package:conference_app/data/models/event_model.dart';
+import 'package:conference_app/data/models/review_model.dart';
+import 'package:conference_app/domain/use_case/reviews/get_reviews_by_event_use_case.dart';
 import 'package:conference_app/ui/pages/reviews/widgets/reviews_card.dart';
 import 'package:conference_app/ui/widgets/event_rating_stars.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 
 class ReviewsCarousel extends StatefulWidget {
   final EventModel event;
@@ -18,172 +18,195 @@ class _ReviewsCarouselState extends State<ReviewsCarousel> {
   final PageController _controller = PageController();
   int _currentPage = 0;
 
+  List<ReviewModel> _eventReviews = [];
+  bool _isLoading = false;
+
   @override
   void initState() {
     super.initState();
-    Get.find<ReviewController>().loadReviews(widget.event.id);
+    _loadEventReviews();
+  }
+
+  @override
+  void didUpdateWidget(covariant ReviewsCarousel oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.event.id != widget.event.id) {
+      _loadEventReviews();
+    }
+  }
+
+  Future<void> _loadEventReviews() async {
+    if (_isLoading) return;
+    _isLoading = true;
+
+    final reviews = await GetReviewsByEventUseCase().execute(widget.event.id);
+
+    // Eliminar duplicados usando una combinación única
+    final uniqueReviews =
+        {for (var r in reviews) r.eventId + r.createdAt: r}.values.toList();
+
+    setState(() {
+      _eventReviews = uniqueReviews;
+    });
+
+    _isLoading = false;
   }
 
   @override
   Widget build(BuildContext context) {
-    final reviewController = Get.find<ReviewController>();
     final theme = Theme.of(context).colorScheme;
+    final reviews = _eventReviews;
+    final double avg = widget.event.averageRating ?? 0.0;
+    final int totalReviews = reviews.length;
 
-    return Obx(() {
-      final reviews = reviewController.getReviewsForEvent(widget.event.id);
-      final double avg = widget.event.averageRating ?? 0.0;
-      final int totalReviews = reviews.length;
-
-      if (reviews.isEmpty) {
-        return Padding(
-          padding: const EdgeInsets.only(top: 16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Text(
-                    avg.toStringAsFixed(1),
-                    style: const TextStyle(
-                      fontSize: 31,
-                      fontWeight: FontWeight.bold,
-                    ),
+    if (reviews.isEmpty) {
+      return Padding(
+        padding: const EdgeInsets.only(top: 16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text(
+                  avg.toStringAsFixed(1),
+                  style: const TextStyle(
+                    fontSize: 31,
+                    fontWeight: FontWeight.bold,
                   ),
-                  const SizedBox(width: 30),
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      EventRatingStars(
-                        event: widget.event,
-                        average: avg,
-                        showReviewCount: false,
-                        iconSize: 20,
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        '$totalReviews ${totalReviews == 1 ? "opinión" : "opiniones"}',
-                        style: const TextStyle(fontSize: 12),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-              const SizedBox(height: 25),
-              Center(
-                child: Column(
+                ),
+                const SizedBox(width: 30),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: theme.primary.withValues(alpha: 0.08),
-                      ),
-                      child: Container(
-                        padding: const EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: theme.primary.withValues(alpha: 0.15),
-                        ),
-                        child: Icon(
-                          Icons.star_border_rounded,
-                          size: 24,
-                          color: theme.primary,
-                        ),
-                      ),
+                    EventRatingStars(
+                      event: widget.event,
+                      average: avg,
+                      showReviewCount: false,
+                      iconSize: 20,
                     ),
-                    const SizedBox(height: 24),
-                    const Text(
-                      "Aún no hay opiniones sobre este evento",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 13.5,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 4),
                     Text(
-                      "Sé el primero en calificarlo y ayuda a otros usuarios a interesarse en este evento.",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: theme.onSurface.withValues(alpha: 0.7),
-                      ),
+                      '$totalReviews ${totalReviews == 1 ? "opinión" : "opiniones"}',
+                      style: const TextStyle(fontSize: 12),
                     ),
                   ],
                 ),
-              ),
-            ],
-          ),
-        );
-      }
-
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                avg.toStringAsFixed(1),
-                style: const TextStyle(
-                  fontSize: 36,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(width: 16),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              ],
+            ),
+            const SizedBox(height: 25),
+            Center(
+              child: Column(
                 children: [
-                  EventRatingStars(
-                    event: widget.event,
-                    average: avg,
-                    showReviewCount: false,
-                    iconSize: 18,
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: theme.primary.withOpacity(0.08),
+                    ),
+                    child: Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: theme.primary.withOpacity(0.15),
+                      ),
+                      child: Icon(
+                        Icons.star_border_rounded,
+                        size: 24,
+                        color: theme.primary,
+                      ),
+                    ),
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: 24),
+                  const Text(
+                    "Aún no hay opiniones sobre este evento",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 13.5,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
                   Text(
-                    '$totalReviews ${totalReviews == 1 ? "opinión" : "opiniones"}',
-                    style: const TextStyle(fontSize: 12),
+                    "Sé el primero en calificarlo y ayuda a otros usuarios a interesarse en este evento.",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: theme.onSurface.withOpacity(0.7),
+                    ),
                   ),
                 ],
               ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          SizedBox(
-            height: 170,
-            child: PageView.builder(
-              controller: _controller,
-              itemCount: reviews.length.clamp(0, 5),
-              onPageChanged: (index) {
-                setState(() => _currentPage = index);
-              },
-              itemBuilder: (context, index) {
-                final review = reviews[index];
-                return Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 3),
-                  child: ReviewCard(
-                    review: review.comment,
-                    date: review.createdAt.split("T").first,
-                    rating: review.rating,
-                  ),
-                );
-              },
             ),
-          ),
-          const SizedBox(height: 12),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: List.generate(
-              reviews.length.clamp(0, 5),
-              (index) => _buildDot(index),
-            ),
-          ),
-        ],
+          ],
+        ),
       );
-    });
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              avg.toStringAsFixed(1),
+              style: const TextStyle(
+                fontSize: 36,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(width: 16),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                EventRatingStars(
+                  event: widget.event,
+                  average: avg,
+                  showReviewCount: false,
+                  iconSize: 18,
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  '$totalReviews ${totalReviews == 1 ? "opinión" : "opiniones"}',
+                  style: const TextStyle(fontSize: 12),
+                ),
+              ],
+            ),
+          ],
+        ),
+        const SizedBox(height: 16),
+        SizedBox(
+          height: 170,
+          child: PageView.builder(
+            controller: _controller,
+            itemCount: reviews.length.clamp(0, 5),
+            onPageChanged: (index) {
+              setState(() => _currentPage = index);
+            },
+            itemBuilder: (context, index) {
+              final review = reviews[index];
+              return Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 3),
+                child: ReviewCard(
+                  review: review.comment,
+                  date: review.createdAt.split("T").first,
+                  rating: review.rating,
+                ),
+              );
+            },
+          ),
+        ),
+        const SizedBox(height: 12),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: List.generate(
+            reviews.length.clamp(0, 5),
+            (index) => _buildDot(index),
+          ),
+        ),
+      ],
+    );
   }
 
   AnimatedContainer _buildDot(int index) {
