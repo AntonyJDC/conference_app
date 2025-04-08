@@ -10,13 +10,12 @@ class NotificationItem {
   final String title;
   final String body;
   final DateTime date;
-  final DateTime receivedAt;
+  final DateTime receivedAt = DateTime.now(); // Asignar la fecha actual al recibir la notificación
 
   NotificationItem({
     required this.title,
     required this.body,
     required this.date,
-    required this.receivedAt,
   });
 
   Map<String, dynamic> toJson() => {
@@ -30,8 +29,7 @@ class NotificationItem {
     return NotificationItem(
       title: json['title'],
       body: json['body'],
-      date: DateTime.parse(json['date']),
-      receivedAt: DateTime.now(), // Asignar la fecha actual al recibir la notificación
+      date: DateTime.parse(json['date']), // Asignar la fecha actual al recibir la notificación
     );
   }
 }
@@ -140,8 +138,7 @@ class NotificationsController extends GetxController {
 
     _notifiedEvents.add('${event.id}_$key');
 
-    final item = NotificationItem(title: title, body: body, date: date, 
-        receivedAt: DateTime.now());
+    final item = NotificationItem(title: title, body: body, date: date);
     notifications.add(item);
     saveNotificationHistory();
   }
