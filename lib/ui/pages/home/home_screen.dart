@@ -105,7 +105,8 @@ class _HomeScreenState extends State<HomeScreen> {
                               IconButton(
                                 icon: Icon(Icons.notifications,
                                     color: theme.colorScheme.primary),
-                                onPressed: () => Get.toNamed(AppRoutes.notifications),
+                                onPressed: () =>
+                                    Get.toNamed(AppRoutes.notifications),
                               ),
                               IconButton(
                                 icon: Icon(Icons.settings,
@@ -153,12 +154,18 @@ class _HomeScreenState extends State<HomeScreen> {
                                   ),
                                   const SizedBox(width: 8),
                                 ],
-                                Text(
-                                  "BizEvents",
-                                  style: TextStyle(
-                                    fontSize: isCollapsed ? 15 : 22,
-                                    fontWeight: FontWeight.bold,
-                                    color: theme.colorScheme.primary,
+                                // provisional tap para ir al onboarding
+                                GestureDetector(
+                                  onTap: () {
+                                    Get.toNamed('/ruta-que-no-existe');
+                                  },
+                                  child: Text(
+                                    "BizEvents",
+                                    style: TextStyle(
+                                      fontSize: isCollapsed ? 15 : 22,
+                                      fontWeight: FontWeight.bold,
+                                      color: theme.colorScheme.primary,
+                                    ),
                                   ),
                                 ),
                               ],
