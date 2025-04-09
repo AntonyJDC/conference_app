@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class ReviewCard extends StatelessWidget {
   final String review;
@@ -37,7 +38,8 @@ class ReviewCard extends StatelessWidget {
               ),
               const Spacer(),
               Text(
-                date,
+                DateFormat("d 'de' MMMM 'de' y", 'es_CO')
+                    .format(DateTime.parse(date)),
                 style: const TextStyle(color: Colors.grey, fontSize: 10),
               ),
             ],
