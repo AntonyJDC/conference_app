@@ -48,7 +48,7 @@ Make sure you have the following installed:
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/yourusername/conference-management-app.git
+git clone https://github.com/antonyjdc/conference-management-app.git
 cd conference-management-app
 ```
 
@@ -82,3 +82,4 @@ flutter run
 - Navigation: The app has a navigation bar for browsing: Event Lines, Subscribed Events, Search and Calendar
 
 # Demostration Video
+![Video](assets/videos/video_demo.mp4)

@@ -132,6 +132,7 @@ class NotificationsScreen extends StatelessWidget {
                                       icon: Icons.delete,
                                       label: 'Eliminar',
                                       backgroundColor: Colors.red,
+                                      borderRadius: BorderRadius.circular(18),
                                     ),
                                   ],
                                 ),
