@@ -82,4 +82,6 @@ flutter run
 - Navigation: The app has a navigation bar for browsing: Event Lines, Subscribed Events, Search and Calendar
 
 # Demostration Video
-![Video](assets/videos/video_demo.mp4)
+<video width="640" height="360" controls>
+  <source src="assets/videos/video_demo.mp4" type="video/mp4">
+</video>
