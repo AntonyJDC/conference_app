@@ -82,6 +82,6 @@ flutter run
 - Navigation: The app has a navigation bar for browsing: Event Lines, Subscribed Events, Search and Calendar
 
 # Demostration Video 
-[![Mira el video](https://img.youtube.com/vi/AUMdnnXvuEo/0.jpg)](https://www.youtube.com/watch?v=AUMdnnXvuEo)
+[![Mira el video](https://img.youtube.com/vi/sc6U3J8MzCo/0.jpg)](https://youtu.be/sc6U3J8MzCo)
 
 Haz clic en la imagen para ver el video completo en YouTube.
