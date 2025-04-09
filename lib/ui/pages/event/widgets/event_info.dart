@@ -11,8 +11,10 @@ import 'package:intl/intl.dart';
 class EventInfo extends StatelessWidget {
   final Rx<EventModel> event;
   final VoidCallback? onTap;
+  final int? totalReviews;
 
-  const EventInfo({super.key, required this.event, this.onTap});
+  const EventInfo(
+      {super.key, required this.event, this.onTap, this.totalReviews});
 
   @override
   Widget build(BuildContext context) {
@@ -113,14 +115,15 @@ class EventInfo extends StatelessWidget {
                   const Text("Reseñas",
                       style:
                           TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
-                  GestureDetector(
-                    onTap: () => onTap?.call(), // Navigate to reviews page
-                    child: Text("Ver todas",
-                        style: TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w600,
-                            color: theme.primary)),
-                  ),
+                  if ((totalReviews ?? 0) > 5)
+                    GestureDetector(
+                      onTap: () => onTap?.call(),
+                      child: Text("Ver todas",
+                          style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w600,
+                              color: theme.primary)),
+                    ),
                 ],
               ),
               const SizedBox(height: 16),

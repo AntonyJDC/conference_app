@@ -1,11 +1,13 @@
 import 'package:conference_app/data/models/event_model.dart';
 import 'package:conference_app/domain/use_case/events/get_event_by_id_use_case.dart';
+import 'package:conference_app/domain/use_case/reviews/get_reviews_by_event_use_case.dart';
 import 'package:conference_app/ui/pages/event/widgets/animated_favorite.dart';
 import 'package:conference_app/ui/pages/event/widgets/explosion_animation.dart';
 import 'package:conference_app/ui/pages/event/widgets/event_image.dart';
 import 'package:conference_app/ui/pages/event/widgets/event_info.dart';
 import 'package:conference_app/ui/pages/event/widgets/subscribe_button.dart';
 import 'package:conference_app/controllers/favorite_controller.dart';
+import 'package:conference_app/ui/pages/reviews/widgets/see_all_reviews.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -23,6 +25,7 @@ class EventDetailPageState extends State<EventDetailPage>
   bool _showHeartAnimation = false;
   bool _showExplosionAnimation = false;
   Offset _favButtonPosition = Offset.zero;
+  int? totalReviewsCount;
 
   @override
   void initState() {
@@ -39,6 +42,12 @@ class EventDetailPageState extends State<EventDetailPage>
     final eventFromDb = await GetEventByIdUseCase().execute(id);
     if (eventFromDb != null) {
       event.value = eventFromDb;
+
+      // ✅ Obtener cantidad de reseñas
+      final reviews = await GetReviewsByEventUseCase().execute(id);
+      setState(() {
+        totalReviewsCount = reviews.length;
+      });
     }
   }
 
@@ -74,7 +83,13 @@ class EventDetailPageState extends State<EventDetailPage>
               padding: const EdgeInsets.only(bottom: 20),
               children: [
                 EventImage(event: eventData),
-                EventInfo(event: event),
+                EventInfo(
+                  event: event,
+                  onTap: () {
+                    Get.to(() => EventAllReviewsPage(event: event.value));
+                  },
+                  totalReviews: totalReviewsCount,
+                ),
               ],
             ),
             Positioned(

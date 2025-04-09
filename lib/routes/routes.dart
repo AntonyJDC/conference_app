@@ -2,6 +2,7 @@ import 'package:conference_app/ui/pages/event/event_detail_page.dart';
 import 'package:conference_app/ui/pages/event/event_list_page.dart';
 import 'package:conference_app/ui/pages/favorites/favorites_screen.dart';
 import 'package:conference_app/ui/pages/notifications/notifications_screen.dart';
+import 'package:conference_app/ui/pages/reviews/widgets/see_all_reviews.dart';
 import 'package:conference_app/ui/pages/search/search_page.dart';
 import 'package:get/get.dart';
 import 'package:conference_app/ui/pages/home/home_screen.dart';
@@ -43,5 +44,9 @@ class AppRoutes {
       },
     ),
     GetPage(name: '/reviews', page: () => const ReviewsScreen()),
+    GetPage(
+      name: '/event/reviews',
+      page: () => EventAllReviewsPage(event: Get.arguments),
+    ),
   ];
 }
