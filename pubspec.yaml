@@ -55,6 +55,9 @@ dependencies:
   permission_handler: ^11.4.0
   flutter_slidable: ^4.0.0
   flutter_staggered_animations: ^1.1.1
+  http: ^1.4.0
+  connectivity_plus: ^6.1.4
+  animate_do: ^4.2.0
 
 dev_dependencies:
   flutter_test:
