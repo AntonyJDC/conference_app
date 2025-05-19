@@ -1,17 +1,12 @@
 import 'package:conference_app/data/models/event_model.dart';
-import 'package:conference_app/data/services/events_db.dart';
+import 'package:conference_app/repository/event_repository.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class GetEventsByCategoryUseCase {
-  final EventsDB _db = EventsDB();
-
   Future<List<EventModel>> execute(String category) async {
-    final allEvents = await _db.getAllEvents();
-
-    // Filtramos eventos que contienen la categoría (case-insensitive)
-    return allEvents.where((event) {
-      return event.categories.any(
-        (cat) => cat.toLowerCase() == category.toLowerCase(),
-      );
-    }).toList();
+    final prefs = await SharedPreferences.getInstance();
+    final repository = EventRepository(prefs);
+    final events = await repository.getAllEvents();
+    return events.where((e) => e.categories.contains(category)).toList();
   }
 }
