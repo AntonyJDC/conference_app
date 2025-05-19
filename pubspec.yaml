@@ -58,6 +58,7 @@ dependencies:
   http: ^1.4.0
   connectivity_plus: ^6.1.4
   animate_do: ^4.2.0
+  flutter_dotenv: ^5.2.1
 
 dev_dependencies:
   flutter_test:
