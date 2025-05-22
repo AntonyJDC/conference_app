@@ -2,7 +2,9 @@ import 'package:conference_app/controllers/booked_events_controller.dart';
 import 'package:conference_app/controllers/favorite_controller.dart';
 import 'package:conference_app/controllers/notifications_controller.dart';
 import 'package:conference_app/controllers/review_controller.dart';
-import 'package:conference_app/domain/use_case/events/initialize_events_use_case.dart';
+import 'package:conference_app/controllers/connection_controller.dart';
+import 'package:conference_app/repository/event_repository.dart';
+import 'package:conference_app/services/SyncService.dart';
 import 'package:conference_app/ui/pages/notifications/service/notifications_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -12,10 +14,11 @@ import 'package:conference_app/ui/theme/app_colors.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:conference_app/controllers/theme_controller.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 void main() async {
-  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
   WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
 
   final prefs = await SharedPreferences.getInstance();
   final onboardingSeen = prefs.getBool('onboarding_seen') ?? false;
@@ -24,6 +27,9 @@ void main() async {
   final savedThemeMode = prefs.getString('theme_mode');
   final themeController = Get.put(ThemeController());
 
+  final repo = EventRepository(prefs);
+  await repo.syncEventsIfNeeded();
+  
   Get.put(BookedEventsController());
   Get.put(FavoriteController());
   Get.put(ReviewController());
@@ -32,8 +38,11 @@ void main() async {
 
   await themeController.loadTheme();
   await initializeDateFormatting('es_CO', null);
-  await InitializeEventsUseCase().execute();
   await LocalNotificationService.initialize();
+
+  Get.put(ConnectionController());
+  SyncService().start();
+  await dotenv.load(); //
 
   runApp(MyApp(
     onboardingSeen: onboardingSeen,
