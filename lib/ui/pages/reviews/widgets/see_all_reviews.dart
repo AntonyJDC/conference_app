@@ -17,6 +17,7 @@ class EventAllReviewsPage extends StatefulWidget {
 class _EventAllReviewsPageState extends State<EventAllReviewsPage> {
   List<ReviewModel> reviews = [];
   bool isLoading = true;
+  double averageRating = 0.0;
 
   @override
   void initState() {
@@ -26,8 +27,13 @@ class _EventAllReviewsPageState extends State<EventAllReviewsPage> {
 
   Future<void> _loadReviews() async {
     final data = await GetReviewsByEventUseCase().execute(widget.event.id);
+
+    final total = data.fold<double>(0, (sum, r) => sum + r.rating);
+    final average = data.isEmpty ? 0.0 : total / data.length;
+
     setState(() {
       reviews = data;
+      averageRating = double.parse(average.toStringAsFixed(1));
       isLoading = false;
     });
   }
@@ -57,8 +63,7 @@ class _EventAllReviewsPageState extends State<EventAllReviewsPage> {
                       Row(
                         children: [
                           Text(
-                            widget.event.averageRating?.toStringAsFixed(1) ??
-                                "0.0",
+                            averageRating.toStringAsFixed(1),
                             style: const TextStyle(
                               fontSize: 36,
                               fontWeight: FontWeight.bold,
@@ -70,7 +75,7 @@ class _EventAllReviewsPageState extends State<EventAllReviewsPage> {
                             children: [
                               EventRatingStars(
                                 event: widget.event,
-                                average: widget.event.averageRating ?? 0.0,
+                                average: averageRating,
                                 showReviewCount: false,
                                 iconSize: 20,
                               ),

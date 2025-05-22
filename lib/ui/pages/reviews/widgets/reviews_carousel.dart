@@ -7,8 +7,13 @@ import 'package:flutter/material.dart';
 
 class ReviewsCarousel extends StatefulWidget {
   final EventModel event;
+  final void Function(double average, int count)? onDataLoaded;
 
-  const ReviewsCarousel({super.key, required this.event});
+  const ReviewsCarousel({
+    super.key,
+    required this.event,
+    this.onDataLoaded,
+  });
 
   @override
   State<ReviewsCarousel> createState() => _ReviewsCarouselState();
@@ -20,6 +25,7 @@ class _ReviewsCarouselState extends State<ReviewsCarousel> {
 
   List<ReviewModel> _eventReviews = [];
   bool _isLoading = false;
+  double averageRating = 0.0;
 
   @override
   void initState() {
@@ -45,9 +51,17 @@ class _ReviewsCarouselState extends State<ReviewsCarousel> {
     final uniqueReviews =
         {for (var r in reviews) r.eventId + r.createdAt: r}.values.toList();
 
+    // Calcular promedio
+    final total = uniqueReviews.fold<double>(0, (sum, r) => sum + r.rating);
+    final average = uniqueReviews.isEmpty ? 0.0 : total / uniqueReviews.length;
+
     setState(() {
       _eventReviews = uniqueReviews;
+      averageRating = double.parse(average.toStringAsFixed(1));
     });
+
+    // ✅ Enviar los datos al widget padre
+    widget.onDataLoaded?.call(averageRating, uniqueReviews.length);
 
     _isLoading = false;
   }
@@ -56,7 +70,7 @@ class _ReviewsCarouselState extends State<ReviewsCarousel> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context).colorScheme;
     final reviews = _eventReviews;
-    final double avg = widget.event.averageRating ?? 0.0;
+    final double avg = averageRating;
     final int totalReviews = reviews.length;
 
     if (reviews.isEmpty) {

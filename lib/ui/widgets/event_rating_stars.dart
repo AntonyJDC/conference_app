@@ -19,7 +19,7 @@ class _PartialClipper extends CustomClipper<Rect> {
 
 class EventRatingStars extends StatelessWidget {
   final EventModel event;
-  final double? average; // puedes pasar un promedio si ya lo tienes (opcional)
+  final double? average; // si no se pasa, se calculará
   final bool showReviewCount;
   final Color? starColor;
   final Color? textColor;
@@ -46,7 +46,16 @@ class EventRatingStars extends StatelessWidget {
 
     return Obx(() {
       final reviews = reviewController.getReviewsForEvent(event.id);
-      final double avg = average ?? event.averageRating ?? 0.0;
+
+      // ✅ Calcular promedio si no viene como parámetro
+      final double avg = average ??
+          (reviews.isEmpty
+              ? 0.0
+              : double.parse(
+                  (reviews.fold<double>(0, (sum, r) => sum + r.rating) /
+                          reviews.length)
+                      .toStringAsFixed(1)));
+
       final int totalReviews = reviews.length;
 
       return Row(
@@ -59,8 +68,7 @@ class EventRatingStars extends StatelessWidget {
             final fraction = avg - index;
 
             return Padding(
-              padding: const EdgeInsets.only(
-                  right: 4), // Cambia 4 por el espacio que quieras
+              padding: const EdgeInsets.only(right: 4),
               child: SizedBox(
                 width: iconSize,
                 height: iconSize,

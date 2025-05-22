@@ -1,7 +1,6 @@
 import 'dart:ui';
 import 'package:conference_app/controllers/booked_events_controller.dart';
 import 'package:conference_app/controllers/review_controller.dart';
-import 'package:conference_app/data/models/review_model.dart';
 import 'package:conference_app/domain/use_case/reviews/get_my_reviews_use_case.dart';
 import 'package:conference_app/ui/pages/reviews/widgets/event_cards.dart';
 import 'package:conference_app/ui/pages/reviews/widgets/feedbacks_cards.dart';
@@ -36,15 +35,9 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
   void _loadMyReviews() async {
     final reviewsFromDb = await getMyReviewsUseCase.execute();
 
-    // Mapear por combinación única: id del evento + fecha de creación
-    final currentReviews = reviewController.reviews;
-    final combined = <String, ReviewModel>{};
-
-    for (final r in [...currentReviews, ...reviewsFromDb]) {
-      combined[r.eventId + r.createdAt] = r;
+    for (final review in reviewsFromDb) {
+      await reviewController.addReview(review);
     }
-
-    reviewController.reviews.assignAll(combined.values.toList());
   }
 
   @override
@@ -71,8 +64,7 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
 
           return tz.TZDateTime.now(_colombiaTZ).isAfter(eventEnd);
         }).toList()
-          ..sort((a, b) =>
-              DateTime.parse(b.date).compareTo(DateTime.parse(a.date)));
+          ..sort((a, b) => DateTime.parse(b.date).compareTo(DateTime.parse(a.date)));
 
         return CustomScrollView(
           slivers: [
@@ -84,10 +76,8 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
               centerTitle: true,
               flexibleSpace: LayoutBuilder(
                 builder: (context, constraints) {
-                  final collapsedHeight =
-                      64.0 + MediaQuery.of(context).padding.top;
-                  final bool isCollapsed =
-                      constraints.maxHeight <= collapsedHeight;
+                  final collapsedHeight = 64.0 + MediaQuery.of(context).padding.top;
+                  final bool isCollapsed = constraints.maxHeight <= collapsedHeight;
 
                   return Stack(
                     fit: StackFit.expand,
@@ -95,8 +85,7 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
                       if (isCollapsed)
                         ClipRect(
                           child: BackdropFilter(
-                            filter:
-                                ImageFilter.blur(sigmaX: 35.0, sigmaY: 35.0),
+                            filter: ImageFilter.blur(sigmaX: 35.0, sigmaY: 35.0),
                             child: Container(
                               color: theme.colorScheme.surface.withOpacity(0.1),
                             ),
@@ -108,9 +97,8 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
                           bottom: 10,
                         ),
                         child: Align(
-                          alignment: isCollapsed
-                              ? Alignment.bottomCenter
-                              : Alignment.bottomLeft,
+                          alignment:
+                              isCollapsed ? Alignment.bottomCenter : Alignment.bottomLeft,
                           child: Text(
                             "Historial",
                             style: TextStyle(
@@ -131,7 +119,6 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
                 padding: const EdgeInsets.all(16),
                 child: Column(
                   children: [
-                    // Segment Control
                     Container(
                       padding: const EdgeInsets.all(4),
                       decoration: BoxDecoration(
@@ -150,22 +137,17 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
                             }
                           },
                           children: {
-                            'feedbacks': _buildSegment('Feedbacks',
-                                selected: selectedSegment == 'feedbacks'),
-                            'finalizados': _buildSegment('Eventos',
-                                selected: selectedSegment == 'finalizados'),
+                            'feedbacks': _buildSegment('Feedbacks', selected: selectedSegment == 'feedbacks'),
+                            'finalizados': _buildSegment('Eventos', selected: selectedSegment == 'finalizados'),
                           },
                         ),
                       ),
                     ),
                     const SizedBox(height: 20),
 
-                    // ─── Feedbacks ─────────────────────────
                     if (selectedSegment == 'feedbacks' && reviews.isEmpty)
-                      const Text('No tienes feedbacks aún.',
-                          style: TextStyle(fontSize: 16))
-                    else if (selectedSegment == 'feedbacks' &&
-                        reviews.isNotEmpty)
+                      const Text('No tienes feedbacks aún.', style: TextStyle(fontSize: 16))
+                    else if (selectedSegment == 'feedbacks' && reviews.isNotEmpty)
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: 8.0),
                         child: Column(
@@ -175,8 +157,7 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
                               onTap: () {
                                 final event = controller.tasks.firstWhere(
                                   (e) => e.id == review.eventId,
-                                  orElse: () =>
-                                      throw Exception("Evento no encontrado"),
+                                  orElse: () => throw Exception("Evento no encontrado"),
                                 );
 
                                 Get.toNamed('/detail', arguments: event);
@@ -193,39 +174,28 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
                           }).toList(),
                         ),
                       )
-
-                    // ─── Finalizados ─────────────────────────
-                    else if (selectedSegment == 'finalizados' &&
-                        finishedEvents.isEmpty)
-                      const Text("No tienes eventos finalizados aún.",
-                          style: TextStyle(fontSize: 16))
-                    else if (selectedSegment == 'finalizados' &&
-                        finishedEvents.isNotEmpty)
+                    else if (selectedSegment == 'finalizados' && finishedEvents.isEmpty)
+                      const Text("No tienes eventos finalizados aún.", style: TextStyle(fontSize: 16))
+                    else if (selectedSegment == 'finalizados' && finishedEvents.isNotEmpty)
                       Column(children: [
                         Padding(
                           padding: const EdgeInsets.only(bottom: 12),
                           child: Text(
                             "Los eventos a los que has hecho feedback tendrán un ícono de estrella de color verde.",
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w500,
-                            ),
+                            style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
                             textAlign: TextAlign.center,
                           ),
                         ),
                         Column(
-                          children: finishedEvents
-                              .map((event) => Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        vertical: 8.0),
-                                    child: EventCardReviews(
-                                      event: event,
-                                      showDate: true,
-                                      showFavorite: false,
-                                      showRating: true,
-                                    ),
-                                  ))
-                              .toList(),
+                          children: finishedEvents.map((event) => Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 8.0),
+                            child: EventCardReviews(
+                              event: event,
+                              showDate: true,
+                              showFavorite: false,
+                              showRating: true,
+                            ),
+                          )).toList(),
                         ),
                       ]),
                   ],
@@ -238,7 +208,6 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
     );
   }
 
-  // ─── Segment Widget ─────────────────────────
   Widget _buildSegment(String text, {required bool selected}) {
     return Padding(
       padding: const EdgeInsets.all(6),
