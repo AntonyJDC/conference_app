@@ -27,7 +27,7 @@ class EventCard extends StatelessWidget {
                   // Imagen
                   ClipRRect(
                     borderRadius: BorderRadius.circular(8),
-                    child: Image.asset(
+                    child: Image.network(
                       event.imageUrl,
                       width: 80,
                       height: 100,
