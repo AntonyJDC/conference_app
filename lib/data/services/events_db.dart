@@ -49,7 +49,9 @@ class EventsDB {
           eventId TEXT,
           rating INTEGER,
           comment TEXT,
-          createdAt TEXT
+          createdAt TEXT,
+          isSynced INTEGER DEFAULT 0,
+          isMine INTEGER DEFAULT 0
         )
       ''');
 
@@ -82,6 +84,11 @@ class EventsDB {
         whereArgs: [event.id],
       );
     });
+  }
+
+  Future<void> clearEvents() async {
+    final db = await database;
+    await db.delete('events');
   }
 
   Future<List<EventModel>> getAllEvents() async {
@@ -149,12 +156,33 @@ class EventsDB {
 
   // ─── Reviews ─────────────────────────
 
-  Future<void> insertReview(ReviewModel review) async {
+  Future<void> insertReview(ReviewModel review,
+      {bool synced = false, bool isMine = false}) async {
     final db = await database;
     await db.insert(
       'reviews',
-      review.toMap(),
+      {
+        ...review.toMap(),
+        'isSynced': synced ? 1 : 0,
+        'isMine': isMine ? 1 : 0,
+      },
       conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
+  Future<List<ReviewModel>> getPendingReviews() async {
+    final db = await database;
+    final result = await db.query('reviews', where: 'isSynced = 0');
+    return result.map((e) => ReviewModel.fromMap(e)).toList();
+  }
+
+  Future<void> markReviewAsSynced(String id) async {
+    final db = await database;
+    await db.update(
+      'reviews',
+      {'isSynced': 1},
+      where: 'id = ?',
+      whereArgs: [id],
     );
   }
 
@@ -172,7 +200,7 @@ class EventsDB {
     final db = await database;
     final result = await db.query(
       'reviews',
-      where: 'eventId = ?',
+      where: 'eventId = ? AND isMine = 1',
       whereArgs: [eventId],
       limit: 1,
     );
@@ -185,14 +213,22 @@ class EventsDB {
 
     if (bookedEventIds.isEmpty) return [];
 
-    final result = await db.query(
-      'reviews',
-      where:
-          'eventId IN (${List.filled(bookedEventIds.length, '?').join(',')})',
-      whereArgs: bookedEventIds,
-    );
+    final reviews = <ReviewModel>[];
 
-    return result.map((e) => ReviewModel.fromMap(e)).toList();
+    for (final id in bookedEventIds) {
+      final result = await db.query(
+        'reviews',
+        where: 'eventId = ? AND isMine = 1',
+        whereArgs: [id],
+        limit: 1,
+      );
+
+      if (result.isNotEmpty) {
+        reviews.add(ReviewModel.fromMap(result.first));
+      }
+    }
+
+    return reviews;
   }
 
   // ─── Favorites ─────────────────────────

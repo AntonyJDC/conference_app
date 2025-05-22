@@ -45,20 +45,23 @@ class EventModel {
 
   factory EventModel.fromMap(Map<String, dynamic> map) {
     return EventModel(
-        id: map['id'],
-        title: map['title'],
-        description: map['description'],
-        imageUrl: map['imageUrl'],
-        date: map['date'],
-        startTime: map['startTime'],
-        endTime: map['endTime'],
-        location: map['location'],
-        capacity: map['capacity'],
-        spotsLeft: map['spotsLeft'],
-        categories: (map['categories'] as String?)?.split(',') ?? [],
-        averageRating: map['averageRating'] != null
-            ? double.parse(map['averageRating'].toString())
-            : null);
+      id: map['id'],
+      title: map['title'],
+      description: map['description'],
+      imageUrl: map['imageUrl'],
+      date: map['date'],
+      startTime: map['startTime'],
+      endTime: map['endTime'],
+      location: map['location'],
+      capacity: map['capacity'],
+      spotsLeft: map['spotsLeft'],
+      categories: map['categories'] is String
+          ? (map['categories'] as String).split(',')
+          : List<String>.from(map['categories'] ?? []),
+      averageRating: map['averageRating'] != null
+          ? double.tryParse(map['averageRating'].toString())
+          : null,
+    );
   }
 
   EventModel copyWith(
