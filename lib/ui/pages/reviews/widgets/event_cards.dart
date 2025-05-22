@@ -63,7 +63,7 @@ class EventCardState extends State<EventCardReviews> {
         children: [
           ClipRRect(
             borderRadius: BorderRadius.circular(16),
-            child: Image.asset(
+            child: Image.network(
               widget.event.imageUrl,
               width: double.infinity,
               height: MediaQuery.of(context).size.width * 0.5,
