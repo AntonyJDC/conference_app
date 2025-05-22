@@ -12,7 +12,7 @@ class EventImage extends StatelessWidget {
 
     return Stack(
       children: [
-        Image.asset(
+        Image.network(
           event.imageUrl,
           height: imageHeight,
           width: double.infinity,

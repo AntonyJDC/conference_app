@@ -1,12 +1,44 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:conference_app/controllers/booked_events_controller.dart';
+import 'package:conference_app/controllers/review_controller.dart';
 import 'package:conference_app/data/models/event_model.dart';
 import 'package:conference_app/domain/use_case/events/update_event_use_case.dart';
+import 'package:conference_app/domain/use_case/reviews/get_my_reviews_use_case.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest.dart' as tz;
 import 'animated_dialog.dart';
+import 'package:http/http.dart' as http;
+
+Future<bool> hasRealConnection() async {
+  try {
+    final result = await InternetAddress.lookup('google.com');
+    return result.isNotEmpty && result.first.rawAddress.isNotEmpty;
+  } catch (_) {
+    return false;
+  }
+}
+
+final String baseUrl = dotenv.env['API_BASE_URL']!;
+
+Future<void> subscribeToEvent(String id) async {
+  final url = Uri.parse('$baseUrl/events/$id/subscribe');
+  final res = await http.post(url);
+  if (res.statusCode != 200) {
+    throw Exception('Error al suscribirse al evento');
+  }
+}
+
+Future<void> unsubscribeFromEvent(String id) async {
+  final url = Uri.parse('$baseUrl/events/$id/unsubscribe');
+  final res = await http.post(url);
+  if (res.statusCode != 200) {
+    throw Exception('Error al cancelar la suscripción al evento');
+  }
+}
 
 class SubscribeButton extends StatefulWidget {
   final Rx<EventModel> event;
@@ -83,46 +115,97 @@ class _SubscribeButtonState extends State<SubscribeButton> {
         buttonColor = colorScheme.errorContainer;
         textColor = colorScheme.onErrorContainer;
         onPressed = () async {
-          bookedEvtController.removeTask(eventValue.id);
-
-          widget.event.value = widget.event.value.copyWith(
-            spotsLeft: (widget.event.value.spotsLeft + 1)
-                .clamp(0, widget.event.value.capacity),
-          );
-
-          await UpdateEventUseCase().execute(widget.event.value);
-
-          WidgetsBinding.instance.addPostFrameCallback((_) {
+          final connected = await hasRealConnection();
+          if (!connected) {
             showAnimatedDialog(
               context,
-              'Suscripción cancelada',
+              'No tienes conexión a Internet',
               isCheck: false,
             );
-          });
+            return;
+          }
+
+          try {
+            await unsubscribeFromEvent(eventValue.id);
+
+            bookedEvtController.removeTask(eventValue.id);
+
+            widget.event.value = widget.event.value.copyWith(
+              spotsLeft: (widget.event.value.spotsLeft + 1)
+                  .clamp(0, widget.event.value.capacity),
+            );
+
+            await UpdateEventUseCase().execute(widget.event.value);
+
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              showAnimatedDialog(
+                context,
+                'Suscripción cancelada',
+                isCheck: false,
+              );
+            });
+          } catch (e) {
+            showAnimatedDialog(
+              context,
+              'Hubo un error al cancelar tu suscripción',
+              isCheck: false,
+            );
+          }
         };
       } else if (eventValue.spotsLeft > 0) {
         buttonText = "Suscribirse";
         buttonColor = colorScheme.primary;
         textColor = colorScheme.onPrimary;
         onPressed = () async {
-          // ✅ Guardar en el historial (para feedbacks)
-          bookedEvtController.addTask(eventValue);
-
-          // 🟡 Reducir cupo
-          widget.event.value = widget.event.value.copyWith(
-            spotsLeft: (widget.event.value.spotsLeft - 1)
-                .clamp(0, widget.event.value.capacity),
-          );
-
-          await UpdateEventUseCase().execute(widget.event.value);
-
-          WidgetsBinding.instance.addPostFrameCallback((_) {
+          final connected = await hasRealConnection();
+          if (!connected) {
             showAnimatedDialog(
               context,
-              'Te has suscrito al evento',
-              isCheck: true,
+              'No tienes conexión a Internet',
+              isCheck: false,
             );
-          });
+            return;
+          }
+
+          try {
+            // 🔁 POST al backend
+            await subscribeToEvent(eventValue.id);
+
+            // 🗂 Guardar en historial local
+            bookedEvtController.addTask(eventValue);
+
+            // ✅ Cargar solo la review del usuario (si existe)
+            final myReviews = await GetMyReviewsUseCase().execute();
+            final myReview =
+                myReviews.firstWhereOrNull((r) => r.eventId == eventValue.id);
+
+            if (myReview != null) {
+              final reviewController = Get.find<ReviewController>();
+              await reviewController.addReview(myReview);
+            }
+
+            // 🟢 Reducir cupo
+            widget.event.value = widget.event.value.copyWith(
+              spotsLeft: (widget.event.value.spotsLeft - 1)
+                  .clamp(0, widget.event.value.capacity),
+            );
+
+            await UpdateEventUseCase().execute(widget.event.value);
+
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              showAnimatedDialog(
+                context,
+                'Te has suscrito al evento',
+                isCheck: true,
+              );
+            });
+          } catch (e) {
+            showAnimatedDialog(
+              context,
+              'Hubo un error al suscribirte',
+              isCheck: false,
+            );
+          }
         };
       } else {
         buttonText = "Agotado";

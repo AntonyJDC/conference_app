@@ -8,21 +8,41 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
-class EventInfo extends StatelessWidget {
+class EventInfo extends StatefulWidget {
   final Rx<EventModel> event;
   final VoidCallback? onTap;
   final int? totalReviews;
 
-  const EventInfo(
-      {super.key, required this.event, this.onTap, this.totalReviews});
+  const EventInfo({
+    super.key,
+    required this.event,
+    this.onTap,
+    this.totalReviews,
+  });
+
+  @override
+  State<EventInfo> createState() => _EventInfoState();
+}
+
+class _EventInfoState extends State<EventInfo> {
+  final RxDouble averageRating = 0.0.obs;
+  final RxInt reviewCount = 0.obs;
+
+  @override
+  void initState() {
+    super.initState();
+    averageRating.value = widget.event.value.averageRating ?? 0.0;
+    reviewCount.value = widget.totalReviews ?? 0;
+  }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context).colorScheme;
     final size = MediaQuery.of(context).size;
     final overlap = size.height * 0.35 * 0.15;
+
     return Obx(() {
-      final e = event.value;
+      final e = widget.event.value;
       final percentage = e.spotsLeft / e.capacity;
 
       final spotColor = percentage < 0.25
@@ -45,35 +65,40 @@ class EventInfo extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(e.title,
-                  style: const TextStyle(
-                      fontSize: 16, fontWeight: FontWeight.bold)),
-              const SizedBox(height: 8), // nuevo
-              EventRatingStars(
-                event: event.value,
-                textColor: theme.primary,
+              Text(
+                e.title,
+                style: const TextStyle(
+                    fontSize: 16, fontWeight: FontWeight.bold),
               ),
+              const SizedBox(height: 8),
+
+              /// ✅ Esta es la línea que ahora sí se actualizará correctamente
+              Obx(() => EventRatingStars(
+                    event: e,
+                    average: averageRating.value,
+                    showReviewCount: false,
+                    textColor: theme.primary,
+                    
+                  )),
+
               const SizedBox(height: 24),
               if (!isPastEvent) ...[
                 _spotsAvailable(context, e.spotsLeft, spotColor, theme),
                 const SizedBox(height: 24),
               ],
+
               const Text("Descripción del evento",
-                  style:
-                      TextStyle(fontSize: 14.5, fontWeight: FontWeight.bold)),
+                  style: TextStyle(
+                      fontSize: 14.5, fontWeight: FontWeight.bold)),
               const SizedBox(height: 12),
-              Text(e.description, style: TextStyle(fontSize: 12)),
+              Text(e.description, style: const TextStyle(fontSize: 12)),
               const SizedBox(height: 24),
-              Divider(
-                thickness: 1,
-                height: 1,
-                color: Theme.of(context).colorScheme.outline.withValues(
-                    alpha: 0.3), // o usa Theme.of(context).dividerColor
-              ),
+              Divider(thickness: 1, height: 1, color: theme.outline.withAlpha(75)),
               const SizedBox(height: 24),
+
               const Text("Acerca del evento",
-                  style:
-                      TextStyle(fontSize: 14.5, fontWeight: FontWeight.bold)),
+                  style: TextStyle(
+                      fontSize: 14.5, fontWeight: FontWeight.bold)),
               const SizedBox(height: 12),
               DetailIcon(
                 icon: Icons.calendar_today,
@@ -103,31 +128,40 @@ class EventInfo extends StatelessWidget {
               const SizedBox(height: 24),
               EventCategoryTags(event: e),
               const SizedBox(height: 12),
-              Divider(
-                thickness: 1,
-                height: 1,
-                color: theme.outline.withValues(alpha: 0.3),
-              ),
+              Divider(thickness: 1, height: 1, color: theme.outline.withAlpha(75)),
               const SizedBox(height: 24),
+
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const Text("Reseñas",
                       style:
                           TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
-                  if ((totalReviews ?? 0) > 5)
-                    GestureDetector(
-                      onTap: () => onTap?.call(),
-                      child: Text("Ver todas",
-                          style: TextStyle(
-                              fontSize: 11,
-                              fontWeight: FontWeight.w600,
-                              color: theme.primary)),
-                    ),
+                  Obx(() {
+                    if (reviewCount.value > 5) {
+                      return GestureDetector(
+                        onTap: () => widget.onTap?.call(),
+                        child: Text("Ver todas",
+                            style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w600,
+                                color: theme.primary)),
+                      );
+                    }
+                    return const SizedBox();
+                  }),
                 ],
               ),
               const SizedBox(height: 16),
-              ReviewsCarousel(event: event.value),
+
+              /// ✅ Callback para sincronizar promedio con este widget
+              ReviewsCarousel(
+                event: widget.event.value,
+                onDataLoaded: (avg, count) {
+                  averageRating.value = avg;
+                  reviewCount.value = count;
+                },
+              ),
             ],
           ),
         ),
