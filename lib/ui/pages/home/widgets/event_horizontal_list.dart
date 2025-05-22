@@ -36,7 +36,7 @@ class EventHorizontalList extends StatelessWidget {
                     ClipRRect(
                       borderRadius:
                           const BorderRadius.vertical(top: Radius.circular(16)),
-                      child: Image.asset(event.imageUrl,
+                      child: Image.network(event.imageUrl,
                           width: double.infinity,
                           height: 120,
                           fit: BoxFit.cover),

@@ -26,7 +26,7 @@ class NearbyEventCard extends StatelessWidget {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(20),
             image: DecorationImage(
-              image: AssetImage(event.imageUrl),
+              image: NetworkImage(event.imageUrl),
               fit: BoxFit.cover,
             ),
           ),

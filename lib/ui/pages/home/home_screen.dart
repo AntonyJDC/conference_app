@@ -1,5 +1,7 @@
 import 'dart:async';
 import 'dart:ui';
+import 'package:animate_do/animate_do.dart';
+import 'package:conference_app/controllers/connection_controller.dart';
 import 'package:conference_app/data/models/event_model.dart';
 import 'package:conference_app/domain/use_case/events/get_all_events_use_case.dart';
 import 'package:conference_app/domain/use_case/events/get_nearby_events_use_case.dart';
@@ -32,6 +34,8 @@ class _HomeScreenState extends State<HomeScreen> {
   late tz.Location _colombiaTZ;
   late Future<List<EventModel>> _futureEvents;
 
+  final connectionController = Get.find<ConnectionController>();
+
   @override
   void initState() {
     super.initState();
@@ -39,8 +43,11 @@ class _HomeScreenState extends State<HomeScreen> {
     _colombiaTZ = tz.getLocation('America/Bogota');
     dateFormat = DateFormat.yMMMMd('es_CO');
     _futureEvents = _loadSortedEvents();
-    _timer = Timer.periodic(const Duration(seconds: 10), (_) {
-      if (mounted) setState(() {});
+
+    _timer = Timer.periodic(const Duration(seconds: 10), (_) async {
+      if (mounted) {
+        setState(() {});
+      }
     });
   }
 
@@ -176,6 +183,60 @@ class _HomeScreenState extends State<HomeScreen> {
                     );
                   },
                 ),
+              ),
+              SliverToBoxAdapter(
+                child: Obx(() {
+                  if (!connectionController.hasConnection.value) {
+                    return FadeInDown(
+                      duration: const Duration(milliseconds: 500),
+                      child: Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 4),
+                        margin: const EdgeInsets.symmetric(
+                            vertical: 8, horizontal: 16),
+                        decoration: BoxDecoration(
+                          color: Colors.red.withOpacity(0.1),
+                          border: Border.all(color: Colors.red),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: const [
+                            Icon(Icons.signal_wifi_off, color: Colors.red),
+                            SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Sin conexión a Internet',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.red,
+                                    ),
+                                  ),
+                                  SizedBox(height: 2),
+                                  Text(
+                                    'Algunos datos pueden no estar actualizados.',
+                                    style: TextStyle(
+                                      fontSize: 11,
+                                      fontStyle: FontStyle.italic,
+                                      color: Colors.red,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  }
+
+                  return const SizedBox.shrink(); // conexión disponible
+                }),
               ),
 
               // Si está cargando
