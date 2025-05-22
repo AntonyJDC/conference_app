@@ -1,12 +1,13 @@
 import 'package:conference_app/data/services/events_db.dart';
 import 'package:conference_app/data/models/event_model.dart';
-import 'package:conference_app/data/models/review_model.dart';
+import 'package:conference_app/repository/review_repository.dart';
 
 class UpdateAverageRatingUseCase {
   final EventsDB _db = EventsDB();
+  final ReviewRepository _repository = ReviewRepository();
 
   Future<void> execute(String eventId) async {
-    final List<ReviewModel> reviews = await _db.getReviewsByEventId(eventId);
+    final reviews = await _repository.getReviewsByEvent(eventId);
 
     if (reviews.isEmpty) return;
 

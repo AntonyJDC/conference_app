@@ -1,7 +1,7 @@
 class ReviewModel {
-  final int? id;
+  final String? id;
   final String eventId;
-  final int rating; // de 1 a 5
+  final int rating;
   final String comment;
   final String createdAt;
 
@@ -21,8 +21,16 @@ class ReviewModel {
         'createdAt': createdAt,
       };
 
+  Map<String, dynamic> toJson() => {
+        if (id != null) 'id': id,
+        'eventId': eventId,
+        'rating': rating,
+        'comment': comment,
+        'createdAt': createdAt,
+      };
+
   factory ReviewModel.fromMap(Map<String, dynamic> map) => ReviewModel(
-        id: map['id'],
+        id: map['id'] ?? map['_id'],
         eventId: map['eventId'],
         rating: map['rating'],
         comment: map['comment'],
