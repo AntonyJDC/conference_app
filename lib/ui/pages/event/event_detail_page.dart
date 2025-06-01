@@ -1,4 +1,5 @@
 import 'package:conference_app/data/models/event_model.dart';
+import 'package:conference_app/data/models/review_model.dart';
 import 'package:conference_app/domain/use_case/events/get_event_by_id_use_case.dart';
 import 'package:conference_app/domain/use_case/reviews/get_reviews_by_event_use_case.dart';
 import 'package:conference_app/ui/pages/event/widgets/animated_favorite.dart';
@@ -26,6 +27,7 @@ class EventDetailPageState extends State<EventDetailPage>
   bool _showExplosionAnimation = false;
   Offset _favButtonPosition = Offset.zero;
   int? totalReviewsCount;
+  List<ReviewModel> reviews = [];
 
   @override
   void initState() {
@@ -43,10 +45,10 @@ class EventDetailPageState extends State<EventDetailPage>
     if (eventFromDb != null) {
       event.value = eventFromDb;
 
-      // ✅ Obtener cantidad de reseñas
-      final reviews = await GetReviewsByEventUseCase().execute(id);
+      final loadedReviews = await GetReviewsByEventUseCase().execute(id);
       setState(() {
-        totalReviewsCount = reviews.length;
+        reviews = loadedReviews;
+        totalReviewsCount = loadedReviews.length;
       });
     }
   }
