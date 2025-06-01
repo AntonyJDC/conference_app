@@ -1,6 +1,7 @@
 import 'package:conference_app/controllers/favorite_controller.dart';
 import 'package:conference_app/data/models/event_model.dart';
 import 'package:conference_app/domain/use_case/events/check_event_status_use_case.dart';
+import 'package:conference_app/ui/widgets/build_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -51,8 +52,8 @@ class EventCardState extends State<EventCard> {
         children: [
           ClipRRect(
             borderRadius: BorderRadius.circular(16),
-            child: Image.network(
-              widget.event.imageUrl,
+            child: buildImage(
+              widget.event,
               width: double.infinity,
               height: MediaQuery.of(context).size.width * 0.5,
               fit: BoxFit.cover,

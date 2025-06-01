@@ -3,6 +3,7 @@ import 'package:conference_app/data/models/event_model.dart';
 import 'package:conference_app/domain/use_case/events/check_event_status_use_case.dart';
 import 'package:conference_app/domain/use_case/reviews/get_review_for_event_use_case.dart';
 import 'package:conference_app/ui/pages/reviews/widgets/add_review.dart';
+import 'package:conference_app/ui/widgets/build_image.dart';
 import 'package:conference_app/ui/widgets/event_rating_stars.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -63,8 +64,8 @@ class EventCardState extends State<EventCardReviews> {
         children: [
           ClipRRect(
             borderRadius: BorderRadius.circular(16),
-            child: Image.network(
-              widget.event.imageUrl,
+            child: buildImage(
+              widget.event,
               width: double.infinity,
               height: MediaQuery.of(context).size.width * 0.5,
               fit: BoxFit.cover,

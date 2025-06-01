@@ -1,4 +1,5 @@
 import 'package:conference_app/data/models/event_model.dart';
+import 'package:conference_app/ui/widgets/build_image.dart';
 import 'package:flutter/material.dart';
 
 class EventImage extends StatelessWidget {
@@ -12,8 +13,8 @@ class EventImage extends StatelessWidget {
 
     return Stack(
       children: [
-        Image.network(
-          event.imageUrl,
+        buildImage(
+          event,
           height: imageHeight,
           width: double.infinity,
           fit: BoxFit.cover,

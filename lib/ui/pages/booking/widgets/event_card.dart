@@ -1,4 +1,5 @@
 import 'package:conference_app/data/models/event_model.dart';
+import 'package:conference_app/ui/widgets/build_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -27,8 +28,8 @@ class EventCard extends StatelessWidget {
                   // Imagen
                   ClipRRect(
                     borderRadius: BorderRadius.circular(8),
-                    child: Image.network(
-                      event.imageUrl,
+                    child: buildImage(
+                      event,
                       width: 80,
                       height: 100,
                       fit: BoxFit.cover,

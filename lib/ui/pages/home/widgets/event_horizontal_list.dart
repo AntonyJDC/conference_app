@@ -1,4 +1,5 @@
 import 'package:conference_app/data/models/event_model.dart';
+import 'package:conference_app/ui/widgets/build_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -36,7 +37,7 @@ class EventHorizontalList extends StatelessWidget {
                     ClipRRect(
                       borderRadius:
                           const BorderRadius.vertical(top: Radius.circular(16)),
-                      child: Image.network(event.imageUrl,
+                      child: buildImage(event,
                           width: double.infinity,
                           height: 120,
                           fit: BoxFit.cover),
