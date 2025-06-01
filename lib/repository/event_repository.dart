@@ -2,8 +2,10 @@ import 'package:conference_app/data/models/event_model.dart';
 import 'package:conference_app/data/services/events_db.dart';
 import 'package:conference_app/repository/event_api_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'dart:io';
+import 'package:http/http.dart' as http;
+import 'package:path_provider/path_provider.dart';
 
 class EventRepository {
   final EventApiProvider _api = EventApiProvider();
@@ -11,6 +13,13 @@ class EventRepository {
   final SharedPreferences prefs;
 
   EventRepository(this.prefs);
+
+  void _downloadImageInBackground(EventModel event) async {
+    final localPath =
+        await downloadAndSaveImage(event.imageUrl, '${event.id}.jpg');
+    final updated = event.copyWith(localImagePath: localPath);
+    await _db.updateEvent(updated);
+  }
 
   static const versionKey = 'events';
 
@@ -25,7 +34,10 @@ class EventRepository {
         final remoteEvents = await _api.fetchRemoteEvents();
         await _db.clearEvents();
         for (final event in remoteEvents) {
-          await _db.insertEvent(event);
+          final localPath =
+              await downloadAndSaveImage(event.imageUrl, '${event.id}.jpg');
+          final localEvent = event.copyWith(localImagePath: localPath);
+          await _db.insertEvent(localEvent);
         }
         return remoteEvents;
       } catch (e) {
@@ -41,18 +53,35 @@ class EventRepository {
     try {
       final remoteVersion = await _api.fetchRemoteVersion();
       final localVersion = prefs.getInt(versionKey) ?? 0;
-
       final localEvents = await _db.getAllEvents();
+
       if (remoteVersion > localVersion || localEvents.isEmpty) {
         final events = await _api.fetchRemoteEvents();
         await _db.clearEvents();
+
         for (final event in events) {
-          await _db.insertEvent(event);
+          final eventWithPath = event.copyWith(localImagePath: null);
+          await _db.insertEvent(eventWithPath); // primero guarda sin imagen
+          _downloadImageInBackground(event); // luego descarga en fondo
         }
+
         prefs.setInt(versionKey, remoteVersion);
       }
-    } catch (_) {
-      // Fallo de red: ignorar
+    } catch (_) {}
+  }
+
+  Future<String> downloadAndSaveImage(String imageUrl, String filename) async {
+    final directory = await getApplicationDocumentsDirectory();
+    final filePath = '${directory.path}/$filename';
+    final file = File(filePath);
+
+    if (await file.exists()) {
+      return filePath; // Ya está descargado
     }
+
+    final response = await http.get(Uri.parse(imageUrl));
+    await file.writeAsBytes(response.bodyBytes);
+
+    return filePath;
   }
 }
