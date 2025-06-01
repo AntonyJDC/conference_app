@@ -11,6 +11,7 @@ class EventModel {
   final int spotsLeft;
   final List<String> categories;
   final double? averageRating;
+  final String? localImagePath;
 
   EventModel(
       {required this.id,
@@ -24,7 +25,8 @@ class EventModel {
       required this.capacity,
       required this.spotsLeft,
       required this.categories,
-      this.averageRating});
+      this.averageRating,
+      this.localImagePath });
 
   Map<String, dynamic> toMap() {
     return {
@@ -40,6 +42,7 @@ class EventModel {
       'spotsLeft': spotsLeft,
       'categories': categories.join(','),
       'averageRating': averageRating,
+      'localImagePath': localImagePath,
     };
   }
 
@@ -61,6 +64,7 @@ class EventModel {
       averageRating: map['averageRating'] != null
           ? double.tryParse(map['averageRating'].toString())
           : null,
+      localImagePath: map['localImagePath'] as String?,
     );
   }
 
@@ -76,7 +80,8 @@ class EventModel {
       int? capacity,
       int? spotsLeft,
       List<String>? categories,
-      double? averageRating}) {
+      double? averageRating,
+      String? localImagePath}) {
     return EventModel(
         id: id ?? this.id,
         title: title ?? this.title,
@@ -89,6 +94,7 @@ class EventModel {
         capacity: capacity ?? this.capacity,
         spotsLeft: spotsLeft ?? this.spotsLeft,
         categories: categories ?? this.categories,
-        averageRating: averageRating ?? this.averageRating);
+        averageRating: averageRating ?? this.averageRating,
+        localImagePath: localImagePath ?? this.localImagePath);
   }
 }

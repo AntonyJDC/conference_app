@@ -33,7 +33,8 @@ class EventsDB {
           capacity INTEGER,
           spotsLeft INTEGER,
           categories TEXT,
-          averageRating REAL
+          averageRating REAL,
+          localImagePath TEXT
         )
       ''');
 
@@ -159,15 +160,31 @@ class EventsDB {
   Future<void> insertReview(ReviewModel review,
       {bool synced = false, bool isMine = false}) async {
     final db = await database;
-    await db.insert(
-      'reviews',
-      {
-        ...review.toMap(),
-        'isSynced': synced ? 1 : 0,
-        'isMine': isMine ? 1 : 0,
-      },
-      conflictAlgorithm: ConflictAlgorithm.replace,
-    );
+
+    final existing =
+        await db.query('reviews', where: 'id = ?', whereArgs: [review.id]);
+
+    if (existing.isEmpty) {
+      await db.insert(
+        'reviews',
+        {
+          ...review.toMap(),
+          'isSynced': synced ? 1 : 0,
+          'isMine': isMine ? 1 : 0,
+        },
+      );
+    } else {
+      // Solo actualiza si hace falta
+      await db.update(
+        'reviews',
+        {
+          if (synced) 'isSynced': 1,
+          'isMine': isMine ? 1 : 0,
+        },
+        where: 'id = ?',
+        whereArgs: [review.id],
+      );
+    }
   }
 
   Future<List<ReviewModel>> getPendingReviews() async {
