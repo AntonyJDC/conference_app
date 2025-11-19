@@ -6,6 +6,7 @@
 
 The Event Management Application is a Flutter-based mobile app designed for managing events. The app allows users to browse event tracks, subscribe to specific events, track past and upcoming events, and provide anonymous feedback on attended events. It also supports offline functionality by caching event data using SQLite. 
 
+Look the conference app admin repository [rigth here!](https://github.com/AntonyJDC/conference_admin)
 
 ## Features
 
